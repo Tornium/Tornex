@@ -1,11 +1,11 @@
-defmodule Tornix.Test.API do
+defmodule Tornex.Test.API do
   @test_api_key "asdf1234asdf1234"
-  @comment_string "&comment=Tornix"
+  @comment_string "&comment=Tornex"
 
   use ExUnit.Case
 
   test "current_user_resource_url" do
-    assert Tornix.API.query_to_url(%Tornix.Query{
+    assert Tornex.API.query_to_url(%Tornex.Query{
              resource: "user",
              key: @test_api_key,
              selections: []
@@ -13,7 +13,7 @@ defmodule Tornix.Test.API do
   end
 
   test "other_user_resource_url" do
-    assert Tornix.API.query_to_url(%Tornix.Query{
+    assert Tornex.API.query_to_url(%Tornex.Query{
              resource: "user",
              resource_id: 1,
              key: @test_api_key,
@@ -22,13 +22,13 @@ defmodule Tornix.Test.API do
   end
 
   test "current_user_selection_url" do
-    assert Tornix.API.query_to_url(%Tornix.Query{
+    assert Tornex.API.query_to_url(%Tornex.Query{
              resource: "user",
              key: @test_api_key,
              selections: ["basic"]
            }) == "/user/?selections=basic&key=" <> @test_api_key <> @comment_string
 
-    assert Tornix.API.query_to_url(%Tornix.Query{
+    assert Tornex.API.query_to_url(%Tornex.Query{
              resource: "user",
              key: @test_api_key,
              selections: ["basic", "attacks"]
@@ -36,14 +36,14 @@ defmodule Tornix.Test.API do
   end
 
   test "other_user_selection_url" do
-    assert Tornix.API.query_to_url(%Tornix.Query{
+    assert Tornex.API.query_to_url(%Tornex.Query{
              resource: "user",
              resource_id: 1,
              key: @test_api_key,
              selections: ["basic"]
            }) == "/user/1?selections=basic&key=" <> @test_api_key <> @comment_string
 
-    assert Tornix.API.query_to_url(%Tornix.Query{
+    assert Tornex.API.query_to_url(%Tornex.Query{
              resource: "user",
              resource_id: 1,
              key: @test_api_key,
@@ -53,7 +53,7 @@ defmodule Tornix.Test.API do
 
   test "ee_basic_user_requeset" do
     assert {:error, {:api, 2}} ==
-             Tornix.API.torn_get(%Tornix.Query{
+             Tornex.API.torn_get(%Tornex.Query{
                resource: "user",
                resource_id: 1,
                key: @test_api_key,

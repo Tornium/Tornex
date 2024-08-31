@@ -1,11 +1,11 @@
-defmodule Tornix.MixProject do
+defmodule Tornex.MixProject do
   use Mix.Project
 
   @version "0.1.0"
 
   def project do
     [
-      app: :tornix,
+      app: :tornex,
       version: @version,
       elixir: "~> 1.16",
       package: package(),
@@ -35,7 +35,7 @@ defmodule Tornix.MixProject do
       files: ["lib", "mix.exs", "README.md", "LICENSE.md"],
       maintainers: ["tiksan"],
       licenses: ["Apache 2.0"],
-      links: %{"GitHub" => "https://github.com/Tornium/tornix"}
+      links: %{"GitHub" => "https://github.com/Tornium/tornex"}
     ]
   end
 end

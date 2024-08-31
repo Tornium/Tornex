@@ -12,30 +12,46 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-defmodule Tornix.Query do
+defmodule Tornex.Query do
+  alias Tornex.Query
   # TODO: Define required keys
   @type t :: %__MODULE__{
           resource: String.t(),
           resource_id: Integer | String.t(),
           key: String.t(),
-          key_owner: Integer,
           selections: List,
           from: Integer,
           to: Integer,
           timestamp: Integer,
           limit: Integer,
-          sort: :asc | :desc
+          sort: :asc | :desc,
+
+          # Values required for the scheduler
+          key_owner: Integer,
+          nice: Integer
         }
   defstruct [
     :resource,
     :resource_id,
     :key,
-    :key_owner,
     :selections,
     :from,
     :to,
     :timestamp,
     :limit,
-    :sort
+    :sort,
+
+    # Values required for the scheduler
+    :key_owner,
+    :nice
   ]
+
+  @spec query_priority(Query.t()) :: :user_request | :high_priority | :generic_request
+  def query_priority(query) do
+    cond do
+      query.nice <= -10 -> :user_request
+      query.nice <= 0 -> :high_priority
+      true -> :generic_request
+    end
+  end
 end

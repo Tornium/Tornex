@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-defmodule Tornix.API do
-  alias Tornix.Query
+defmodule Tornex.API do
+  alias Tornex.Query
 
   use Tesla
 
-  @user_agent [{"User-agent", "tornix " <> Mix.Project.config()[:version]}]
+  @user_agent [{"User-agent", "tornex" <> Mix.Project.config()[:version]}]
 
   plug(Tesla.Middleware.BaseUrl, "https://api.torn.com")
   plug(Tesla.Middleware.Headers, @user_agent)
@@ -48,7 +48,7 @@ defmodule Tornix.API do
       to: query.to || [],
       timestamp: query.timestamp || [],
       key: query.key,
-      comment: "Tornix"
+      comment: "Tornex"
     )
   end
 

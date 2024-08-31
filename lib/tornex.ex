@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-defmodule Tornix do
+defmodule Tornex do
   @moduledoc """
   Interface to Torn's API: https://api.torn.com
   """
