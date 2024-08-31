@@ -24,7 +24,6 @@ defmodule Tornex.MixProject do
   def deps do
     [
       {:tesla, "~> 1.9"},
-      {:hackney, "~> 1.20"},
       {:jason, "~> 1.4"}
     ]
   end

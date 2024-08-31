@@ -45,7 +45,7 @@ defmodule Tornex.Query do
     # Values required for the scheduler
     :key_owner,
     :nice,
-    :origin,
+    :origin
   ]
 
   @spec query_priority(Query.t()) :: :user_request | :high_priority | :generic_request

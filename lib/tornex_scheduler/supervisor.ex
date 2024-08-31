@@ -21,7 +21,7 @@ defmodule Tornex.Scheduler.Supervisor do
 
     {:ok, _} =
       DynamicSupervisor.start_child(pid, {Task.Supervisor, name: Tornex.Scheduler.TaskSupervisor})
-    
+
     {:ok, _} = DynamicSupervisor.start_child(pid, Tornex.Scheduler.Timer)
 
     {:ok, pid}
