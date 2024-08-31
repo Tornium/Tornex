@@ -28,7 +28,8 @@ defmodule Tornex.Query do
 
           # Values required for the scheduler
           key_owner: Integer,
-          nice: Integer
+          nice: Integer,
+          origin: GenServer.from() | nil
         }
   defstruct [
     :resource,
@@ -43,7 +44,8 @@ defmodule Tornex.Query do
 
     # Values required for the scheduler
     :key_owner,
-    :nice
+    :nice,
+    :origin,
   ]
 
   @spec query_priority(Query.t()) :: :user_request | :high_priority | :generic_request

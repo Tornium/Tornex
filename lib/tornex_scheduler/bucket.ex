@@ -15,6 +15,8 @@
 defmodule Tornex.Scheduler.Bucket do
   use GenServer
 
+  @max_size 10
+
   # Public API
   def start_link(opts) do
     GenServer.start_link(__MODULE__, :ok, opts)
@@ -37,21 +39,24 @@ defmodule Tornex.Scheduler.Bucket do
         from,
         %{query_priority_queue: query_priority_queue, pending_count: pending_count} = state
       ) do
+    # Add from to query in case the request is dumped for the reply to be sent
+    query = %{query | origin: from}
+
     cond do
-      Tornex.Query.query_priority(query) == :user_request and pending_count < 10 ->
+      Tornex.Query.query_priority(query) == :user_request and pending_count < @max_size ->
         # Request has a niceness indicating it's a user request and there's available space in the 
         # bucket to perform the request
 
         make_request(query, from)
-        Map.replace(state, :pending_count, pending_count + 1)
+        state = Map.replace(state, :pending_count, pending_count + 1)
         {:noreply, state}
 
-      Tornex.Query.query_priority(query) in [:user_request, :high_priority] and pending_count < 7 ->
+      Tornex.Query.query_priority(query) in [:user_request, :high_priority] and pending_count < 0.7 * @max_size ->
         # Request has a niceness indicating it's a user request or high priority and there's available 
         # space in the bucket to perform the request
 
         make_request(query, from)
-        Map.replace(state, :pending_count, pending_count + 1)
+        state = Map.replace(state, :pending_count, pending_count + 1)
         {:noreply, state}
 
       true ->
@@ -63,9 +68,21 @@ defmodule Tornex.Scheduler.Bucket do
 
         # Sorts inserted query with higher priority queries at the start
         updated_queue = Enum.sort_by([query | query_priority_queue], & &1.nice, :asc)
-        Map.replace(state, :query_priority_queue, updated_queue)
+        state = Map.replace(state, :query_priority_queue, updated_queue)
+
         {:noreply, state}
     end
+  end
+
+  @impl true
+  def handle_info(:dump, state) do
+    {dumped_queries, remaining_queries} = Enum.split(state.query_priority_queue, @max_size - state.pending_count)
+
+    Map.replace(state, :pending_count, 0)
+    Map.replace(state, :query_priority_queue, remaining_queries)
+    Enum.map(dumped_queries, fn query -> make_request(query, query.origin) end)
+
+    {:noreply, state}
   end
 
   @impl true
@@ -79,7 +96,6 @@ defmodule Tornex.Scheduler.Bucket do
   end
 
   def make_request(query, from) do
-    # TODO: Use partition supervisor
     Task.Supervisor.async_nolink(Tornex.Scheduler.TaskSupervisor, fn ->
       make_request_task(query, from)
     end)

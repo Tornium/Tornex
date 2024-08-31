@@ -12,23 +12,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-defmodule Tornex.Scheduler.Supervisor do
-  use DynamicSupervisor
-  # TODO: Refactor into a Supervisor with static supervisors and children underneath it
+defmodule Tornex.Scheduler.Timer do
+  use GenServer
 
-  def start_link(args) do
-    {:ok, pid} = DynamicSupervisor.start_link(__MODULE__, args, name: __MODULE__)
+  # 15 seconds
+  @timer_interval 15_000
 
-    {:ok, _} =
-      DynamicSupervisor.start_child(pid, {Task.Supervisor, name: Tornex.Scheduler.TaskSupervisor})
-    
-    {:ok, _} = DynamicSupervisor.start_child(pid, Tornex.Scheduler.Timer)
-
-    {:ok, pid}
+  # Public API
+  def start_link(_) do
+    GenServer.start_link(__MODULE__, :ok, [])
   end
 
-  @impl true
-  def init(_init_args) do
-    DynamicSupervisor.init(strategy: :one_for_one)
+  # GenServer Callbacks
+  def init(_opts) do
+    :timer.send_interval(@timer_interval, :dump_signal)
+
+    {:ok, %{}}
+  end
+
+  def handle_info(:dump_signal, state) do
+    children = DynamicSupervisor.which_children(Tornex.Scheduler.Supervisor)
+
+    Enum.each(children, fn
+      {_, pid, :worker, _} ->
+        send(pid, :dump)
+
+      _ ->
+        :ok
+    end)
+
+    {:noreply, state}
   end
 end
