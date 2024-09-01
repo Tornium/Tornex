@@ -18,13 +18,42 @@ defmodule Tornex.Scheduler.Bucket do
   @max_size 10
 
   # Public API
-  def start_link(opts) do
-    GenServer.start_link(__MODULE__, :ok, opts)
+  def start_link(user_id) do
+    GenServer.start_link(__MODULE__, :ok, name: {:via, Registry, {Tornex.Scheduler.BucketRegistry, user_id}})
+  end
+
+  @spec enqueue(query :: Tornex.Query.t()) :: any()
+  def enqueue(query) do
+    case get_by_id(query.key_owner) do
+      {:ok, pid} ->
+        GenServer.call(pid, {:enqueue, query}, 60_000)
+
+      :error ->
+        {:ok, pid} =
+          DynamicSupervisor.start_child(
+            Tornex.Scheduler.Supervisor,
+            {Tornex.Scheduler.Bucket, user_id: query.key_owner}
+          )
+
+        IO.puts("Creating new bucket for user ")
+        IO.inspect(query.key_owner)
+
+        # Adds GenServer to Registry in `start_link`
+        GenServer.call(pid, {:enqueue, query}, 60_000)
+    end
   end
 
   @spec enqueue(pid :: pid(), query :: Tornex.Query.t()) :: any()
   def enqueue(pid, query) do
     GenServer.call(pid, {:enqueue, query}, 60_000)
+  end
+
+  @spec get_by_id(user_id :: integer()) :: {:ok, pid()} | :error
+  def get_by_id(user_id) do
+    case Registry.lookup(Tornex.Scheduler.BucketRegistry, user_id) do
+      [{pid, _}] -> {:ok, pid}
+      [] -> :error
+    end
   end
 
   # GenServer Callbacks

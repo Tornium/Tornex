@@ -73,4 +73,21 @@ defmodule Tornex.Test.Scheduler do
     GenServer.stop(pid)
     Supervisor.stop(s_pid)
   end
+
+  test "test_genserver_new_bucket" do
+    {:ok, s_pid} = ExUnit.Callbacks.start_supervised(Tornex.Scheduler.Supervisor)
+    {:ok, pid} = DynamicSupervisor.start_child(s_pid, Tornex.Scheduler.Bucket)
+
+    {:error, {:api, 2}} =
+      Tornex.Scheduler.Bucket.enqueue(%Tornex.Query{
+        resource: "user",
+        resource_id: 1,
+        key: @test_api_key,
+        key_owner: 2_383_326,
+        nice: 0
+      })
+
+    GenServer.stop(pid)
+    Supervisor.stop(s_pid)
+  end
 end
