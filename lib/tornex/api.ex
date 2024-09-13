@@ -52,25 +52,11 @@ defmodule Tornex.API do
     )
   end
 
-  @spec validate_api_error(Map) :: {:ok, Map} | {:error, {:api, Integer}}
-  defp validate_api_error(response) when is_map(response) do
-    case response["error"] do
-      nil -> {:ok, response}
-      %{"code" => error_code} -> {:error, {:api, error_code}}
-    end
-  end
-
-  @spec validate_api_error({:error, any()}) :: {:error, any()}
-  defp validate_api_error({:error, error}) do
-    {:error, error}
-  end
-
   @spec torn_get(Query.t()) :: {:ok, Map} | {:error, {:api, Integer}} | {:error, any()}
   def torn_get(query) do
     case get(query_to_url(query)) do
       {:ok, response} ->
         response.body
-        |> validate_api_error()
 
       {:error, _} ->
         {:error, :unknown}
