@@ -16,7 +16,7 @@ defmodule Tornex.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: [:logger, :hackney]
     ]
   end
 
@@ -24,7 +24,8 @@ defmodule Tornex.MixProject do
   def deps do
     [
       {:tesla, "~> 1.9"},
-      {:jason, "~> 1.4"}
+      {:jason, "~> 1.4"},
+      {:hackney, "~> 1.20"}
     ]
   end
 
