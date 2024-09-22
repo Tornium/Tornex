@@ -43,4 +43,8 @@ defmodule Tornex.Scheduler.Timer do
 
     {:noreply, state}
   end
+
+  def handle_info(:dump, state) do
+    {:noreply, state}
+  end
 end
