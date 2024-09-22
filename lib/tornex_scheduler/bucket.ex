@@ -13,6 +13,7 @@
 # limitations under the License.
 
 defmodule Tornex.Scheduler.Bucket do
+  require Logger
   use GenServer
 
   @max_size 10
@@ -22,21 +23,32 @@ defmodule Tornex.Scheduler.Bucket do
     GenServer.start_link(__MODULE__, :ok, name: {:via, Registry, {Tornex.Scheduler.BucketRegistry, user_id}})
   end
 
+  @spec new(user_id :: integer()) :: pid() | nil
+  def new(user_id) when is_integer(user_id) do
+    bucket = DynamicSupervisor.start_child(
+      Tornex.Scheduler.Supervisor,
+      {Tornex.Scheduler.Bucket, user_id: user_id}
+    )
+
+    case bucket do
+      {:ok, pid} -> pid
+      {:ok, pid, _info} -> pid
+      {:error, {:already_started, pid}} -> pid
+      {:error, error} ->
+        Logger.error("Unable to create bucket for #{user_id} due to #{error}")
+        nil
+      _ -> nil
+    end
+  end
+
   @spec enqueue(query :: Tornex.Query.t()) :: any()
-  def enqueue(query) do
+  def enqueue(%Tornex.Query{} = query) do
     case get_by_id(query.key_owner) do
       {:ok, pid} ->
         GenServer.call(pid, {:enqueue, query}, 60_000)
 
       :error ->
-        {:ok, pid} =
-          DynamicSupervisor.start_child(
-            Tornex.Scheduler.Supervisor,
-            {Tornex.Scheduler.Bucket, user_id: query.key_owner}
-          )
-
-        IO.puts("Creating new bucket for user ")
-        IO.inspect(query.key_owner)
+        pid = new(query.key_owner)
 
         # Adds GenServer to Registry in `start_link`
         GenServer.call(pid, {:enqueue, query}, 60_000)
@@ -44,12 +56,12 @@ defmodule Tornex.Scheduler.Bucket do
   end
 
   @spec enqueue(pid :: pid(), query :: Tornex.Query.t()) :: any()
-  def enqueue(pid, query) do
+  def enqueue(pid, %Tornex.Query{} = query) when is_pid(pid) do
     GenServer.call(pid, {:enqueue, query}, 60_000)
   end
 
   @spec get_by_id(user_id :: integer()) :: {:ok, pid()} | :error
-  def get_by_id(user_id) do
+  def get_by_id(user_id) when is_integer(user_id) do
     case Registry.lookup(Tornex.Scheduler.BucketRegistry, user_id) do
       [{pid, _}] -> {:ok, pid}
       [] -> :error

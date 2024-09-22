@@ -13,8 +13,6 @@
 # limitations under the License.
 
 defmodule Tornex.API do
-  alias Tornex.Query
-
   use Tesla
 
   @user_agent [{"User-agent", "tornex" <> Mix.Project.config()[:version]}]
@@ -23,23 +21,21 @@ defmodule Tornex.API do
   plug(Tesla.Middleware.Headers, @user_agent)
   plug(Tesla.Middleware.JSON)
 
-  @spec append_resource_id(String.t(), Query.t()) :: String.t()
-  defp append_resource_id(uri_string, %Query{resource_id: nil} = _) do
+  @spec append_resource_id(String.t(), Tornex.Query.t()) :: String.t()
+  defp append_resource_id(uri_string, %Tornex.Query{resource_id: nil} = _) do
     uri_string
   end
 
-  @spec append_resource_id(String.t(), Query.t()) :: String.t()
   defp append_resource_id(uri_string, query) when is_binary(query.resource_id) do
     uri_string <> query.resource_id
   end
 
-  @spec append_resource_id(String.t(), Query.t()) :: String.t()
   defp append_resource_id(uri_string, query) when is_integer(query.resource_id) do
     uri_string <> Integer.to_string(query.resource_id)
   end
 
-  @spec query_to_url(Query.t()) :: String.t()
-  def query_to_url(query) do
+  @spec query_to_url(Tornex.Query.t()) :: String.t()
+  def query_to_url(%Tornex.Query{} = query) do
     ("/" <> query.resource <> "/")
     |> append_resource_id(query)
     |> Tesla.build_url(
@@ -52,8 +48,8 @@ defmodule Tornex.API do
     )
   end
 
-  @spec torn_get(Query.t()) :: {:ok, Map} | {:error, {:api, Integer}} | {:error, any()}
-  def torn_get(query) do
+  @spec torn_get(Tornex.Query.t()) :: {:ok, Map} | {:error, {:api, Integer}} | {:error, any()}
+  def torn_get(%Tornex.Query{} = query) do
     case get(query_to_url(query)) do
       {:ok, response} ->
         response.body

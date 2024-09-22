@@ -13,7 +13,6 @@
 # limitations under the License.
 
 defmodule Tornex.Query do
-  alias Tornex.Query
   # TODO: Define required keys
   @type t :: %__MODULE__{
           resource: String.t(),
@@ -48,8 +47,8 @@ defmodule Tornex.Query do
     :origin
   ]
 
-  @spec query_priority(Query.t()) :: :user_request | :high_priority | :generic_request
-  def query_priority(query) do
+  @spec query_priority(Tornex.Query.t()) :: :user_request | :high_priority | :generic_request
+  def query_priority(%Tornex.Query{} = query) do
     cond do
       query.nice <= -10 -> :user_request
       query.nice <= 0 -> :high_priority
