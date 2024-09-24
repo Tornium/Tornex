@@ -61,11 +61,11 @@ defmodule Tornex.Telemetry do
   end
 
   def handle_event([:tornex, :bucket, :create], _measurements, metadata, _opts) do
-    Logger.info("[#{metadata.pid}] Bucket created for #{metadata.user}")
+    Logger.info("Bucket created for #{metadata.user}")
   end
 
   def handle_event([:tornex, :bucket, :create_error], _measurements, metadata, _opts) do
-    Logger.warning("[#{metadata.pid}] Bucket creation failed for #{metadata.user} due to #{metadata.error}")
+    Logger.warning("Bucket creation failed for #{metadata.user} due to #{metadata.error}")
   end
 
   def handle_event([:tornex, :bucket, :dump], _measurements, _metadata, _opts) do
