@@ -25,7 +25,8 @@ defmodule Tornex.MixProject do
     [
       {:tesla, "~> 1.9"},
       {:jason, "~> 1.4"},
-      {:hackney, "~> 1.20"}
+      {:hackney, "~> 1.20"},
+      {:telemetry, "~> 1.3"}
     ]
   end
 

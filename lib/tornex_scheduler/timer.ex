@@ -31,6 +31,8 @@ defmodule Tornex.Scheduler.Timer do
   end
 
   def handle_info(:dump_signal, state) do
+    :telemetry.execute([:tornex, :bucket, :dump], %{}, %{})
+
     children = DynamicSupervisor.which_children(Tornex.Scheduler.Supervisor)
 
     Enum.each(children, fn

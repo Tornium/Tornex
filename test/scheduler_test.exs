@@ -8,11 +8,6 @@ defmodule Tornex.Test.Scheduler do
     DynamicSupervisor.stop(s_pid)
   end
 
-  # test "test_genserver_basic" do
-  #   {:ok, pid} = Tornex.Scheduler.Bucket.start_link([])
-  #   GenServer.stop(pid)
-  # end
-
   test "test_genserver_single" do
     {:ok, s_pid} = ExUnit.Callbacks.start_supervised(Tornex.Scheduler.Supervisor)
     {:ok, pid} = DynamicSupervisor.start_child(s_pid, Tornex.Scheduler.Bucket)

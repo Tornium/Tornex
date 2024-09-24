@@ -48,13 +48,40 @@ defmodule Tornex.API do
     )
   end
 
-  @spec torn_get(Tornex.Query.t()) :: {:ok, Map} | {:error, {:api, Integer}} | {:error, any()}
+  @spec torn_get(Tornex.Query.t()) :: {:ok, Map} | {:error, any()}
   def torn_get(%Tornex.Query{} = query) do
-    case get(query_to_url(query)) do
-      {:ok, response} ->
+    :telemetry.execute([:tornex, :api, :start], %{}, %{
+      resource: query.resource,
+      resource_id: query.resource_id,
+      selections: query.selections,
+      user: query.key_owner
+    })
+
+    # {latency, response} = :timer.tc(Tesla, :get, [query_to_url(query)])
+    {latency, response} = :timer.tc(&get/1, [query_to_url(query)])
+
+    case response do
+      {:ok, %Tesla.Env{} = response} ->
+        :telemetry.execute([:tornex, :api, :finish], %{latency: latency}, %{
+          resource: query.resource,
+          resource_id: query.resource_id,
+          selections: query.selections,
+          user: query.key_owner,
+          status: response.status
+        })
+
         response.body
 
-      {:error, _} ->
+      {:error, e} ->
+        :telemetry.execute([:tornex, :api, :finish], %{latency: latency}, %{
+          resource: query.resource,
+          resource_id: query.resource_id,
+          selections: query.selections,
+          user: query.key_owner
+        })
+
+        IO.inspect(e)
+
         {:error, :unknown}
     end
   end

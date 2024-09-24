@@ -25,24 +25,43 @@ defmodule Tornex.Scheduler.Bucket do
 
   @spec new(user_id :: integer()) :: pid() | nil
   def new(user_id) when is_integer(user_id) do
-    bucket = DynamicSupervisor.start_child(
-      Tornex.Scheduler.Supervisor,
-      {Tornex.Scheduler.Bucket, user_id: user_id}
-    )
+    bucket =
+      DynamicSupervisor.start_child(
+        Tornex.Scheduler.Supervisor,
+        {Tornex.Scheduler.Bucket, user_id: user_id}
+      )
 
     case bucket do
-      {:ok, pid} -> pid
-      {:ok, pid, _info} -> pid
-      {:error, {:already_started, pid}} -> pid
+      {:ok, pid} ->
+        :telemetry.execute([:tornex, :bucket, :create], %{}, %{user: user_id, pid: pid})
+        pid
+
+      {:ok, pid, _info} ->
+        :telemetry.execute([:tornex, :bucket, :create], %{}, %{user: user_id, pid: pid})
+        pid
+
+      {:error, {:already_started, pid}} ->
+        :telemetry.execute([:tornex, :bucket, :create_error], %{}, %{user: user_id, error: "Bucket already started"})
+        pid
+
       {:error, error} ->
-        Logger.error("Unable to create bucket for #{user_id} due to #{error}")
+        :telemetry.execute([:tornex, :bucket, :create_error], %{}, %{user: user_id, error: error})
         nil
-      _ -> nil
+
+      _ ->
+        nil
     end
   end
 
   @spec enqueue(query :: Tornex.Query.t()) :: any()
   def enqueue(%Tornex.Query{} = query) do
+    :telemetry.execute([:tornex, :bucket, :enqueue], %{}, %{
+      selections: query.selections,
+      resource: query.resource,
+      resource_id: query.resource_id,
+      user: query.key_owner
+    })
+
     case get_by_id(query.key_owner) do
       {:ok, pid} ->
         GenServer.call(pid, {:enqueue, query}, 60_000)
