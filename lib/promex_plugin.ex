@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-defmodule Tornium.Tornex.PromExPlugin do
+defmodule Tornex.PromExPlugin do
   use PromEx.Plugin
 
   @impl true
