@@ -78,7 +78,7 @@ defmodule Tornex.Telemetry do
     )
   end
 
-  def handle_event([:tornex, _, _], _, _, _) do
+  def handle_event([:tornex, _event_type, _event], _measurements, _metadata, _opts) do
     :ok
   end
 end
