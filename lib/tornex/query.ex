@@ -24,6 +24,7 @@ defmodule Tornex.Query do
           timestamp: Integer,
           limit: Integer,
           sort: :asc | :desc,
+          params: Keyword,
 
           # Values required for the scheduler
           key_owner: Integer,
@@ -40,6 +41,7 @@ defmodule Tornex.Query do
     :timestamp,
     :limit,
     :sort,
+    :params,
 
     # Values required for the scheduler
     :key_owner,

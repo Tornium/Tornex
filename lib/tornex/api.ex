@@ -38,14 +38,14 @@ defmodule Tornex.API do
   def query_to_url(%Tornex.Query{} = query) do
     ("/" <> query.resource <> "/")
     |> append_resource_id(query)
-    |> Tesla.build_url(
+    |> Tesla.build_url([
       selections: Enum.join(query.selections || [], ","),
       from: query.from || [],
       to: query.to || [],
       timestamp: query.timestamp || [],
       key: query.key,
       comment: "Tornex"
-    )
+    ] ++ (query.params || []))
   end
 
   @spec torn_get(Tornex.Query.t()) :: {:ok, Map} | {:error, any()}

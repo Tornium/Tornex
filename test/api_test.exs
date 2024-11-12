@@ -51,6 +51,16 @@ defmodule Tornex.Test.API do
            }) == "/user/1?selections=basic%2Cattacks&key=" <> @test_api_key <> @comment_string
   end
 
+  test "user_resource_params" do
+    assert Tornex.API.query_to_url(%Tornex.Query{
+      resource: "user",
+      resource_id: 1,
+      key: @test_api_key,
+      selections: ["basic"],
+      params: [limit: 10, log: 1]
+    }) == "/user/1?selections=basic&key=" <> @test_api_key <> @comment_string <> "&limit=10&log=1"
+  end
+
   test "ee_basic_user_requeset" do
     assert {:error, {:api, 2}} ==
              Tornex.API.torn_get(%Tornex.Query{
