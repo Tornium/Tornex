@@ -16,7 +16,7 @@ defmodule Tornex.PromExPlugin do
   use PromEx.Plugin
 
   @impl true
-  def event_metrics(opts) do
+  def event_metrics(_opts) do
     [
       Event.build(
         :tornex_api_events,
@@ -31,7 +31,7 @@ defmodule Tornex.PromExPlugin do
             measurement: :latency,
             description: "The time it takes for the Torn API to respond to API calls.",
             reporter_options: [
-              buckets: [0, 100, 250, 500, 1_000, 2_500, 5_000, 10_000],
+              buckets: [0, 100, 250, 500, 1_000, 2_500, 5_000, 10_000]
             ],
             unit: {:native, :microsecond}
           ),
