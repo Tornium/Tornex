@@ -139,11 +139,12 @@ defmodule Tornex.Scheduler.Bucket do
     # TODO: Make this functionality synchronous to prevent race conditions
     {dumped_queries, remaining_queries} = Enum.split(state.query_priority_queue, @max_size - state.pending_count)
 
-    Map.replace(state, :pending_count, 0)
-    Map.replace(state, :query_priority_queue, remaining_queries)
-    Enum.map(dumped_queries, fn query -> make_request(query, query.origin) end)
+    state =
+      state
+      |> Map.replace(:pending_count, 0)
+      |> Map.replace(:query_priority_queue, remaining_queries)
 
-    state = Map.replace!(state, :query_priority_queue, remaining_queries)
+    Enum.map(dumped_queries, fn query -> make_request(query, query.origin) end)
     {:noreply, state}
   end
 
