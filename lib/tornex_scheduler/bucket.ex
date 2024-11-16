@@ -19,8 +19,10 @@ defmodule Tornex.Scheduler.Bucket do
   @max_size 10
 
   # Public API
-  def start_link(user_id) do
-    GenServer.start_link(__MODULE__, :ok, name: {:via, Registry, {Tornex.Scheduler.BucketRegistry, user_id}})
+  def start_link(opts) do
+    # TODO: Add guard for opts.user_id
+
+    GenServer.start_link(__MODULE__, :ok, name: {:via, Registry, {Tornex.Scheduler.BucketRegistry, opts[:user_id]}})
   end
 
   @spec new(user_id :: integer()) :: pid() | nil
