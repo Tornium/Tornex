@@ -65,7 +65,8 @@ defmodule Tornex.Telemetry do
   end
 
   def handle_event([:tornex, :bucket, :create_error], _measurements, metadata, _opts) do
-    Logger.warning("Bucket creation failed for #{metadata.user} due to #{metadata.error}")
+    Logger.warning("Bucket creation failed for #{metadata.user} due to an error")
+    IO.inspect(metadata.error)
   end
 
   def handle_event([:tornex, :bucket, :dump], _measurements, _metadata, _opts) do
