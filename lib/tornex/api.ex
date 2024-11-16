@@ -50,7 +50,7 @@ defmodule Tornex.API do
     )
   end
 
-  @spec torn_get(Tornex.Query.t()) :: {:ok, Map} | {:error, any()}
+  @spec torn_get(Tornex.Query.t()) :: map() | {:error, any()}
   def torn_get(%Tornex.Query{} = query) do
     :telemetry.execute([:tornex, :api, :start], %{}, %{
       resource: query.resource,
