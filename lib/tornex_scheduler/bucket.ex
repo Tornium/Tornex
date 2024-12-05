@@ -108,17 +108,17 @@ defmodule Tornex.Scheduler.Bucket do
       Tornex.Query.query_priority(query) == :user_request and pending_count < @max_size ->
         # Request has a niceness indicating it's a user request and there's available space in the 
         # bucket to perform the request
-
         make_request(query, from)
         state = Map.replace(state, :pending_count, pending_count + 1)
+
         {:noreply, state}
 
       Tornex.Query.query_priority(query) in [:user_request, :high_priority] and pending_count < 0.7 * @max_size ->
         # Request has a niceness indicating it's a user request or high priority and there's available 
         # space in the bucket to perform the request
-
         make_request(query, from)
         state = Map.replace(state, :pending_count, pending_count + 1)
+
         {:noreply, state}
 
       true ->
@@ -140,6 +140,7 @@ defmodule Tornex.Scheduler.Bucket do
   def handle_info(:dump, state) do
     # TODO: Make this functionality synchronous to prevent race conditions
     {dumped_queries, remaining_queries} = Enum.split(state.query_priority_queue, @max_size - state.pending_count)
+    Logger.info("Dumped #{Kernel.length(dumped_queries)} queries")
 
     state =
       state
@@ -166,6 +167,3 @@ defmodule Tornex.Scheduler.Bucket do
     end)
   end
 end
-
-# TODO: Add custom await_many that won't error on timeouts
-# TODO: Add custom await_many that won't error on timeouts and has a callback
