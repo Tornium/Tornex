@@ -13,15 +13,12 @@
 # limitations under the License.
 
 defmodule Tornex.Scheduler.Bucket do
-  require Logger
   use GenServer
 
   @max_size 10
 
   # Public API
-  def start_link(opts) do
-    # TODO: Add guard for opts.user_id
-
+  def start_link(opts \\ []) do
     GenServer.start_link(__MODULE__, :ok, name: {:via, Registry, {Tornex.Scheduler.BucketRegistry, opts[:user_id]}})
   end
 
@@ -140,7 +137,6 @@ defmodule Tornex.Scheduler.Bucket do
   def handle_info(:dump, state) do
     # TODO: Make this functionality synchronous to prevent race conditions
     {dumped_queries, remaining_queries} = Enum.split(state.query_priority_queue, @max_size - state.pending_count)
-    Logger.info("Dumped #{Kernel.length(dumped_queries)} queries")
 
     state =
       state

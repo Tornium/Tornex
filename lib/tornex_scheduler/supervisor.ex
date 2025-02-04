@@ -16,12 +16,10 @@ defmodule Tornex.Scheduler.Supervisor do
   use DynamicSupervisor
   # TODO: Refactor into a Supervisor with static supervisors and children underneath it
 
-  def start_link(args) do
+  def start_link(args \\ []) do
     {:ok, pid} = DynamicSupervisor.start_link(__MODULE__, args, name: __MODULE__)
 
-    {:ok, _} =
-      DynamicSupervisor.start_child(pid, {Task.Supervisor, name: Tornex.Scheduler.TaskSupervisor})
-
+    {:ok, _} = DynamicSupervisor.start_child(pid, {Task.Supervisor, name: Tornex.Scheduler.TaskSupervisor})
     {:ok, _} = DynamicSupervisor.start_child(pid, Tornex.Scheduler.Timer)
     {:ok, _} = DynamicSupervisor.start_child(pid, {Registry, name: Tornex.Scheduler.BucketRegistry, keys: :unique})
 
