@@ -59,7 +59,6 @@ defmodule Tornex.API do
       user: query.key_owner
     })
 
-    # {latency, response} = :timer.tc(Tesla, :get, [query_to_url(query)])
     {latency, response} = :timer.tc(&get/1, [query_to_url(query)])
 
     case response do

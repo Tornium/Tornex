@@ -61,16 +61,16 @@ defmodule Tornex.Scheduler.Bucket do
       user: query.key_owner
     })
 
-    case get_by_id(query.key_owner) do
-      {:ok, pid} ->
-        GenServer.call(pid, {:enqueue, query}, 60_000)
+    pid =
+      case get_by_id(query.key_owner) do
+        {:ok, pid} ->
+          pid
 
-      :error ->
-        pid = new(query.key_owner)
+        :error ->
+          new(query.key_owner)
+      end
 
-        # Adds GenServer to Registry in `start_link`
-        GenServer.call(pid, {:enqueue, query}, 60_000)
-    end
+    enqueue(pid, query)
   end
 
   @spec enqueue(pid :: pid(), query :: Tornex.Query.t()) :: any()
