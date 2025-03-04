@@ -23,11 +23,12 @@ defmodule Tornex.MixProject do
   # Run "mix help deps" to learn about dependencies.
   def deps do
     [
-      {:tesla, "~> 1.9"},
+      {:tesla, "~> 1.14"},
       {:jason, "~> 1.4"},
-      {:hackney, "~> 1.20"},
+      {:hackney, "~> 1.23"},
       {:telemetry, "~> 1.3"},
-      {:prom_ex, "~> 1.10", optional: true}
+      {:prom_ex, "~> 1.11", optional: true},
+      {:plug_cowboy, "~> 2.7", optional: true}
     ]
   end
 
