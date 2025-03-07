@@ -54,9 +54,15 @@ defmodule Tornex.Telemetry do
     )
   end
 
+  def handle_event([:tornex, :api, :timeout], _measurements, metadata, _opts) do
+    Logger.debug(
+      "[#{metadata.resource}/#{metadata.resource_id || ""}?selections=#{Enum.join(metadata.selections || [], ",")}] Request failed due to timeout"
+    )
+  end
+
   def handle_event([:tornex, :api, :error], measurements, metadata, _opts) do
     Logger.info(
-      "[#{metadata.resource}/#{metadata.resource_id || ""}?selections=#{Enum.join(metadata.selections || [], ",")}] Requested failed due to #{metadata.error} in #{measurements.latency} ms"
+      "[#{metadata.resource}/#{metadata.resource_id || ""}?selections=#{Enum.join(metadata.selections || [], ",")}] Request failed due to #{metadata.error} in #{measurements.latency} ms"
     )
   end
 

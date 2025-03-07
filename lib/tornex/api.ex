@@ -50,7 +50,7 @@ defmodule Tornex.API do
     )
   end
 
-  @spec torn_get(Tornex.Query.t()) :: map() | {:error, any()}
+  @spec torn_get(Tornex.Query.t()) :: map() | {:error, :timeout | :unknown | any()}
   def torn_get(%Tornex.Query{} = query) do
     :telemetry.execute([:tornex, :api, :start], %{}, %{
       resource: query.resource,
@@ -73,6 +73,23 @@ defmodule Tornex.API do
 
         response.body
 
+      {:error, :timeout} ->
+        :telemetry.execute([:tornex, :api, :timeout], %{}, %{
+          resource: query.resource,
+          resource_id: query.resource_id,
+          selections: query.selections,
+          user: query.key_owner
+        })
+
+        :telemetry.execute([:tornex, :api, :finish], %{latency: latency}, %{
+          resource: query.resource,
+          resource_id: query.resource_id,
+          selections: query.selections,
+          user: query.key_owner
+        })
+
+        {:error, :timeout}
+
       {:error, e} ->
         :telemetry.execute([:tornex, :api, :finish], %{latency: latency}, %{
           resource: query.resource,
@@ -81,7 +98,7 @@ defmodule Tornex.API do
           user: query.key_owner
         })
 
-        IO.inspect(e)
+        IO.inspect(e, label: "Unknown Tornex error")
 
         {:error, :unknown}
     end

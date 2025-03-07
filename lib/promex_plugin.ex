@@ -39,7 +39,13 @@ defmodule Tornex.PromExPlugin do
             "tornex.api.errors",
             event_name: [:tornex, :api, :error],
             tags: [:error],
-            description: "Errors returned by the Torn API"
+            description: "Count of errors returned by the Torn API"
+          ),
+          counter(
+            "tornex.api.timeout",
+            event_name: [:tornex, :api, :timeout],
+            tags: [:error],
+            description: "Count of Torn API timeouts"
           )
         ]
       ),
