@@ -15,6 +15,8 @@
 defmodule Tornex.API do
   use Tesla
 
+  @type error :: {:error, :timeout | :unknown | any()}
+
   @user_agent [{"User-agent", "tornex" <> Mix.Project.config()[:version]}]
 
   plug(Tesla.Middleware.BaseUrl, "https://api.torn.com")
@@ -50,7 +52,7 @@ defmodule Tornex.API do
     )
   end
 
-  @spec torn_get(Tornex.Query.t()) :: map() | {:error, :timeout | :unknown | any()}
+  @spec torn_get(Tornex.Query.t()) :: map() | error()
   def torn_get(%Tornex.Query{} = query) do
     :telemetry.execute([:tornex, :api, :start], %{}, %{
       resource: query.resource,
