@@ -23,6 +23,7 @@ defmodule Tornex.Telemetry do
       [:tornex, :api, :start],
       [:tornex, :api, :finish],
       [:tornex, :api, :error],
+      [:tornex, :api, :timeout],
       [:tornex, :bucket, :create],
       [:tornex, :bucket, :create_error],
       [:tornex, :bucket, :dump],
