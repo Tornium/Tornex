@@ -40,7 +40,7 @@ defmodule Tornex.MixProject do
       description: "Simple Elixir Wrapper for the Torn API",
       files: ["lib", "mix.exs", "README.md", "LICENSE.md"],
       maintainers: ["tiksan"],
-      licenses: ["Apache 2.0"],
+      licenses: ["Apache-2.0"],
       links: %{"GitHub" => "https://github.com/Tornium/tornex"}
     ]
   end
