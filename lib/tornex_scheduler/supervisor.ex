@@ -1,4 +1,4 @@
-# Copyright 2024 tiksan
+# Copyright 2024-2025 tiksan
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,7 +13,13 @@
 # limitations under the License.
 
 defmodule Tornex.Scheduler.Supervisor do
+  @moduledoc """
+  Default supervisor to supervise `Tornex.Scheduler.Bucket`, the dump timer, and the bucket registry.
+  The `Supervisor` can be replaced if necessary to modify bucket storage, the dump timer, etc.
+  """
+
   use DynamicSupervisor
+
   # TODO: Refactor into a Supervisor with static supervisors and children underneath it
 
   def start_link(args \\ []) do

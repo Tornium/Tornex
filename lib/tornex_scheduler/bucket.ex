@@ -1,4 +1,4 @@
-# Copyright 2024 tiksan
+# Copyright 2024-2025 tiksan
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,9 +13,39 @@
 # limitations under the License.
 
 defmodule Tornex.Scheduler.Bucket do
+  @moduledoc """
+  `Tornex.Scheduler.Bucket` represents a user's bucket for API requests used for rate-limiting and prioritizing.
+
+  A bucket can hold as many API requests as the computer can support. However, each bucket will only process 10 
+  API requests every 6 seconds.
+
+  The bucket provides the `enqueue/1` and `enqueue/2` operation that provides the core of the functionality of this module by creating
+  the bucket if necessary, handling telemetry, and request handling.
+
+  ## Bucket Creation
+  Creating buckets is not required, but you can create and store buckets in a different manner if you need to do so.
+
+  A buckets can be created with the following two methods:
+    - `new/1` to create a bucket and store the PID of the GenServer manually
+    - `enqueue/1` to create a bucket and let Tornex store the PID of the GenServer in a pre-initialized registry `Tornex.Scheduler.BucketRegistry`
+
+  ## Making API Requests
+  API requests are made with the `enqueue/1` and the `enqueue/2` operations with a `Tornex.Query` struct. The operations will then wait until the API call has been scheduled and the Torn API has responded instead of ending the invocation early and using a later `await`-like function.
+
+  However, for example, this can still be done with the built-in `Task` module (including to handle many API requests at once): 
+
+      1..10
+      |> Enum.map(fn n ->
+        Task.async(fn ->
+          Tornex.Scheduler.Bucket.enqueue(pid, query)
+        end)
+      end)
+      |> Task.await_many(timeout)
+  """
+
   use GenServer
 
-  @max_size 10
+  @bucket_capacity 10
 
   # Public API
   def start_link(opts \\ []) do
@@ -53,21 +83,21 @@ defmodule Tornex.Scheduler.Bucket do
   end
 
   @spec enqueue(query :: Tornex.Query.t()) :: any()
-  def enqueue(%Tornex.Query{} = query) do
+  def enqueue(%Tornex.Query{key_owner: key_owner} = query) when is_integer(key_owner) do
     :telemetry.execute([:tornex, :bucket, :enqueue], %{}, %{
       selections: query.selections,
       resource: query.resource,
       resource_id: query.resource_id,
-      user: query.key_owner
+      user: key_owner
     })
 
     pid =
-      case get_by_id(query.key_owner) do
+      case get_by_id(key_owner) do
         {:ok, pid} ->
           pid
 
         :error ->
-          new(query.key_owner)
+          new(key_owner)
       end
 
     enqueue(pid, query)
@@ -102,7 +132,7 @@ defmodule Tornex.Scheduler.Bucket do
     query = %{query | origin: from}
 
     cond do
-      Tornex.Query.query_priority(query) == :user_request and pending_count < @max_size ->
+      Tornex.Query.query_priority(query) == :user_request and pending_count < @bucket_capacity ->
         # Request has a niceness indicating it's a user request and there's available space in the 
         # bucket to perform the request
         make_request(query, from)
@@ -110,7 +140,7 @@ defmodule Tornex.Scheduler.Bucket do
 
         {:noreply, state}
 
-      Tornex.Query.query_priority(query) in [:user_request, :high_priority] and pending_count < 0.7 * @max_size ->
+      Tornex.Query.query_priority(query) in [:user_request, :high_priority] and pending_count < 0.7 * @bucket_capacity ->
         # Request has a niceness indicating it's a user request or high priority and there's available 
         # space in the bucket to perform the request
         make_request(query, from)
@@ -136,7 +166,7 @@ defmodule Tornex.Scheduler.Bucket do
   @impl true
   def handle_info(:dump, state) do
     # TODO: Make this functionality synchronous to prevent race conditions
-    {dumped_queries, remaining_queries} = Enum.split(state.query_priority_queue, @max_size - state.pending_count)
+    {dumped_queries, remaining_queries} = Enum.split(state.query_priority_queue, @bucket_capacity - state.pending_count)
 
     state =
       state

@@ -1,4 +1,4 @@
-# Copyright 2024 tiksan
+# Copyright 2024-2025 tiksan
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,10 +13,20 @@
 # limitations under the License.
 
 defmodule Tornex.Telemetry do
+  @moduledoc """
+  Telemetry for Tornex
+
+  `Tornex.Telemetry` defaults to using `Logger` to handle telemetry events but this can be 
+  customized by not attaching the default logger.
+  """
+
   require Logger
 
   @handler_id "tornex-default-telemetry-handler"
 
+  @doc """
+  Attach the default built-in log handler to Tornex Telemetry
+  """
   @spec attach_default_logger() :: :ok | {:error, :already_exists}
   def attach_default_logger(opts \\ []) when is_list(opts) do
     events = [
@@ -38,54 +48,66 @@ defmodule Tornex.Telemetry do
     :telemetry.attach_many(@handler_id, events, &__MODULE__.handle_event/4, opts)
   end
 
+  @doc false
   @spec detach_default_logger() :: :ok | {:error, :not_found}
   def detach_default_logger() do
     :telemetry.detach(@handler_id)
   end
 
+  # TODO: Document the individual events
+
+  @doc false
   def handle_event([:tornex, :api, :start], _measurements, metadata, _opts) do
     Logger.debug(
       "[#{metadata.resource}/#{metadata.resource_id || ""}?selections=#{Enum.join(metadata.selections || [], ",")}] Request started for #{metadata.user}"
     )
   end
 
+  @doc false
   def handle_event([:tornex, :api, :finish], measurements, metadata, _opts) do
     Logger.debug(
       "[#{metadata.resource}/#{metadata.resource_id || ""}?selections=#{Enum.join(metadata.selections || [], ",")}] [HTTP #{metadata.status}] Request finished in #{measurements.latency} ms"
     )
   end
 
+  @doc false
   def handle_event([:tornex, :api, :timeout], _measurements, metadata, _opts) do
     Logger.debug(
       "[#{metadata.resource}/#{metadata.resource_id || ""}?selections=#{Enum.join(metadata.selections || [], ",")}] Request failed due to timeout"
     )
   end
 
+  @doc false
   def handle_event([:tornex, :api, :error], measurements, metadata, _opts) do
     Logger.info(
       "[#{metadata.resource}/#{metadata.resource_id || ""}?selections=#{Enum.join(metadata.selections || [], ",")}] Request failed due to #{metadata.error} in #{measurements.latency} ms"
     )
   end
 
+  @doc false
   def handle_event([:tornex, :bucket, :create], _measurements, metadata, _opts) do
     Logger.info("Bucket created for #{metadata.user}")
   end
 
+  @doc false
   def handle_event([:tornex, :bucket, :create_error], _measurements, metadata, _opts) do
     Logger.warning("Bucket creation failed for #{metadata.user} due to an error")
     IO.inspect(metadata.error)
   end
 
+  @doc false
   def handle_event([:tornex, :bucket, :dump], _measurements, _metadata, _opts) do
     Logger.debug("Dump of buckets started")
   end
 
+  @doc false
   def handle_event([:tornex, :bucket, :enqueue], _measurements, metadata, _opts) do
     Logger.debug(
       "[#{metadata.resource}/#{metadata.resource_id || ""}?selections=#{Enum.join(metadata.selections || [], ",")}] Request enqueue for #{metadata.user}"
     )
   end
 
+  @doc false
   def handle_event([:tornex, _event_type, _event], _measurements, _metadata, _opts) do
     :ok
   end

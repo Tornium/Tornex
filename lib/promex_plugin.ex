@@ -1,4 +1,4 @@
-# Copyright 2024 tiksan
+# Copyright 2024-2025 tiksan
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,8 +13,13 @@
 # limitations under the License.
 
 defmodule Tornex.PromExPlugin do
+  @moduledoc """
+  PromEx plugin for Tornex to export events and metrics to Prometheus
+  """
+
   use PromEx.Plugin
 
+  @doc false
   @impl true
   def event_metrics(_opts) do
     [

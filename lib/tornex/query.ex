@@ -1,4 +1,4 @@
-# Copyright 2024 tiksan
+# Copyright 2024-2025 tiksan
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -49,6 +49,9 @@ defmodule Tornex.Query do
     :origin
   ]
 
+  @doc """
+  Determine the priority of a query as a priority "bucket" atom.
+  """
   @spec query_priority(Tornex.Query.t()) :: :user_request | :high_priority | :generic_request
   def query_priority(%Tornex.Query{} = query) do
     cond do

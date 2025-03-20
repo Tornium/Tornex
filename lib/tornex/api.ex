@@ -1,4 +1,4 @@
-# Copyright 2024 tiksan
+# Copyright 2024-2025 tiksan
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
 
 defmodule Tornex.API do
   use Tesla
+
+  # TODO: Remove all unused methods and types originating in `Tesla` from `Tornex.API`
 
   @type error :: {:error, :timeout | :unknown | any()}
 
