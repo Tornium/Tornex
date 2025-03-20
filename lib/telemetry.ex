@@ -66,7 +66,7 @@ defmodule Tornex.Telemetry do
   @doc false
   def handle_event([:tornex, :api, :finish], measurements, metadata, _opts) do
     Logger.debug(
-      "[#{metadata.resource}/#{metadata.resource_id || ""}?selections=#{Enum.join(metadata.selections || [], ",")}] [HTTP #{metadata.status}] Request finished in #{measurements.latency} ms"
+      "[#{metadata.resource}/#{metadata.resource_id || ""}?selections=#{Enum.join(metadata.selections || [], ",")}] Request finished in #{measurements.latency} ms"
     )
   end
 

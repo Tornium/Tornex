@@ -9,7 +9,9 @@ defmodule Tornex.MixProject do
       version: @version,
       elixir: "~> 1.16",
       package: package(),
-      deps: deps()
+      deps: deps(),
+      source_url: "https://github.com/Tornium/tornex",
+      docs: docs()
     ]
   end
 
@@ -40,6 +42,13 @@ defmodule Tornex.MixProject do
       maintainers: ["tiksan"],
       licenses: ["Apache 2.0"],
       links: %{"GitHub" => "https://github.com/Tornium/tornex"}
+    ]
+  end
+
+  def docs do
+    [
+      main: "TornEx",
+      extras: ["README.md"]
     ]
   end
 end

@@ -13,6 +13,8 @@
 # limitations under the License.
 
 defmodule Tornex.Query do
+  # TODO: Add documentation
+
   # TODO: Define required keys
   @type t :: %__MODULE__{
           resource: String.t(),

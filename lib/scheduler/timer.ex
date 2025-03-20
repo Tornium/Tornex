@@ -22,7 +22,6 @@ defmodule Tornex.Scheduler.Timer do
 
   use GenServer
 
-  # 15 seconds
   @timer_interval 15_000
 
   # Public API
