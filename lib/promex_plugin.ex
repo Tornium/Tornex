@@ -14,7 +14,20 @@
 
 defmodule Tornex.PromExPlugin do
   @moduledoc """
-  PromEx plugin for Tornex to export events and metrics to Prometheus
+  PromEx plugin for Tornex to export events and metrics to Prometheus.
+
+  To add `Tornex.PromExPlugin` to your application's PromEx implementation, add `Tornex.PromExPlugin` to your list of plugins:
+
+      @impl true
+      def plugins do
+        [
+          Plugins.Application,
+          Plugins.Beam,
+          Tornex.PromExPlugin
+        ]
+      end
+
+  For more information on setting up PromEx, see the [PromEx docs](https://hexdocs.pm/prom_ex/PromEx.html).
   """
 
   use PromEx.Plugin

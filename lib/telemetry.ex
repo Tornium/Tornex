@@ -14,7 +14,7 @@
 
 defmodule Tornex.Telemetry do
   @moduledoc """
-  Telemetry for Tornex
+  Telemetry for Tornex using `:telemetry`.
 
   `Tornex.Telemetry` defaults to using `Logger` to handle telemetry events but this can be 
   customized by not attaching the default logger.

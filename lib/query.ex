@@ -13,26 +13,12 @@
 # limitations under the License.
 
 defmodule Tornex.Query do
-  # TODO: Add documentation
+  @moduledoc """
+  The query struct containing API request data.
 
-  # TODO: Define required keys
-  @type t :: %__MODULE__{
-          resource: String.t(),
-          resource_id: Integer | String.t(),
-          key: String.t(),
-          selections: List,
-          from: Integer,
-          to: Integer,
-          timestamp: Integer,
-          limit: Integer,
-          sort: :asc | :desc,
-          params: Keyword,
+  The `Tornex.Query` struct is utilized by `Tornex.API.torn_get/1` and `Tornex.Scheduler.Bucket.enqueue/1` to make API calls. The struct stores the required information to perform the API call.
+  """
 
-          # Values required for the scheduler
-          key_owner: Integer,
-          nice: Integer,
-          origin: GenServer.from() | nil
-        }
   defstruct [
     :resource,
     :resource_id,
@@ -51,8 +37,33 @@ defmodule Tornex.Query do
     :origin
   ]
 
+  @type t :: %__MODULE__{
+          resource: String.t(),
+          resource_id: Integer | String.t(),
+          key: String.t(),
+          selections: List,
+          from: Integer,
+          to: Integer,
+          timestamp: Integer,
+          limit: Integer,
+          sort: :asc | :desc,
+          params: Keyword,
+
+          # Values required for the scheduler
+          key_owner: Integer,
+          nice: Integer,
+          origin: GenServer.from() | nil
+        }
+
   @doc """
-  Determine the priority of a query as a priority "bucket" atom.
+  Determine the priority of a `Tornex.Query` by the `nice` value as a priority "bucket" atom.
+
+  The nice value of a query is based on the Linux niceness value between -20 and 19. A niceness of -20 is the highest priority request and 19 is the lowest priority. For more information on the scheduling of requests against `Tornex.Query`, see `Tornex.Scheduler.Bucket`.
+
+  There are three priority buckets:
+  - generic requests (nice > 0) => Requests that are intended to be made with as much latency as needed
+  - high priority requests (-10 < nice <= 0) => Requests where latency matters
+  - user requests (nice <= -10) => Requests that should be performed immediately, typically initiated by a user action
   """
   @spec query_priority(Tornex.Query.t()) :: :user_request | :high_priority | :generic_request
   def query_priority(%Tornex.Query{} = query) do
