@@ -5,9 +5,11 @@ defmodule Tornex.MixProject do
 
   def project do
     [
+      name: "Tornex",
+      description: "Robust API call planning and execution for Torn City",
       app: :tornex,
       version: @version,
-      elixir: "~> 1.16",
+      elixir: ">= 1.16",
       package: package(),
       deps: deps(),
       source_url: "https://github.com/Tornium/tornex",
@@ -38,8 +40,9 @@ defmodule Tornex.MixProject do
 
   def package do
     [
+      name: "tornex",
       description: "Simple Elixir Wrapper for the Torn API",
-      files: ["lib", "mix.exs", "README.md", "LICENSE.md"],
+      files: ["lib", "mix.exs", "README.md", "LICENSE.md", "CHANGELOG.md", ".formatter.exs"],
       maintainers: ["tiksan"],
       licenses: ["Apache-2.0"],
       links: %{"GitHub" => "https://github.com/Tornium/tornex"}
@@ -48,7 +51,7 @@ defmodule Tornex.MixProject do
 
   def docs do
     [
-      main: "TornEx",
+      main: "Tornex",
       extras: ["README.md", "LICENSE.md"]
     ]
   end
