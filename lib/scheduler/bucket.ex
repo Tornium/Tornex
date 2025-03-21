@@ -213,7 +213,7 @@ defmodule Tornex.Scheduler.Bucket do
       |> Map.replace(:pending_count, 0)
       |> Map.replace(:query_priority_queue, remaining_queries)
 
-    Enum.map(dumped_queries, fn query -> make_request(query, query.origin) end)
+    :ok = Enum.each(dumped_queries, fn query -> make_request(query, query.origin) end)
     {:noreply, state}
   end
 
