@@ -41,8 +41,8 @@ defmodule Tornex.MixProject do
   def package do
     [
       name: "tornex",
-      description: "Simple Elixir Wrapper for the Torn API",
-      files: ["lib", "mix.exs", "README.md", "LICENSE.md", "CHANGELOG.md", ".formatter.exs"],
+      description: "Robust API call planning and execution for Torn City",
+      files: ["lib", "mix.exs", "README.md", "LICENSE.md", "CHANGELOG.md"],
       maintainers: ["tiksan"],
       licenses: ["Apache-2.0"],
       links: %{"GitHub" => "https://github.com/Tornium/tornex"}
