@@ -44,7 +44,7 @@ defmodule Tornex.API do
   plug(Tesla.Middleware.JSON)
 
   @doc """
-  Convert a `Tornex.Query` to the URL required to make the HTTP request.
+  Converts a `Tornex.Query` to the URL required to make the HTTP request.
 
       iex> query = %Tornex.Query{
       ...>   resource: "user",
@@ -74,7 +74,7 @@ defmodule Tornex.API do
   end
 
   @doc """
-  Perform a blocking HTTP GET request against the Torn API for the `Tornex.Query`.
+  Performs a blocking HTTP GET request against the Torn API for the `Tornex.Query`.
 
   ## Examples
 

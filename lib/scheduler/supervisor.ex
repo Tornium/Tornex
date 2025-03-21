@@ -20,9 +20,12 @@ defmodule Tornex.Scheduler.Supervisor do
 
   use DynamicSupervisor
 
-  # TODO: Refactor into a Supervisor with static supervisors and children underneath it
-
+  @doc """
+  Starts the `DynamicSupervisor` required for enqueuing a `Tornex.Query`.
+  """
   def start_link(args \\ []) do
+    # TODO: Refactor into a Supervisor with static supervisors and children underneath it
+
     {:ok, pid} = DynamicSupervisor.start_link(__MODULE__, args, name: __MODULE__)
 
     {:ok, _} = DynamicSupervisor.start_child(pid, {Task.Supervisor, name: Tornex.Scheduler.TaskSupervisor})
@@ -32,6 +35,7 @@ defmodule Tornex.Scheduler.Supervisor do
     {:ok, pid}
   end
 
+  @doc false
   @impl true
   def init(_init_args) do
     DynamicSupervisor.init(strategy: :one_for_one)

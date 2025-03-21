@@ -56,7 +56,7 @@ defmodule Tornex.Query do
         }
 
   @doc """
-  Determine the priority of a `Tornex.Query` by the `nice` value as a priority "bucket" atom.
+  Determines the priority of a `Tornex.Query` by the `nice` value as a priority "bucket" atom.
 
   The nice value of a query is based on the Linux niceness value between -20 and 19. A niceness of -20 is the highest priority request and 19 is the lowest priority. For more information on the scheduling of requests against `Tornex.Query`, see `Tornex.Scheduler.Bucket`.
 

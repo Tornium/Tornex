@@ -15,27 +15,30 @@
 defmodule Tornex.Scheduler.Timer do
   @moduledoc """
   Timer used to determine when to dump all of the buckets, see `Tornex.Scheduler.Bucket`.
-  By default, the bucket will be dumped every 6 seconds to allow for a maximum call rate of 
+  By default, the bucket will be dumped every 15 seconds to allow for a maximum call rate of 
   60 API requests per minute. Upon the dump timer ending, the GenServer will send a `:dump` signal to 
-  all GenServers under `Tornex.Scheduler.Supervisor`.
+  all `Tornex.Scheduler.Bucket` under `Tornex.Scheduler.Supervisor`.
   """
 
   use GenServer
 
   @timer_interval 15_000
 
-  # Public API
+  @doc """
+  Starts the `GenServer` for the `Tornex.Scheduler.Bucket` dump timer.
+  """
   def start_link(_) do
     GenServer.start_link(__MODULE__, :ok, [])
   end
 
-  # GenServer Callbacks
+  @doc false
   def init(_opts) do
     :timer.send_interval(@timer_interval, :dump_signal)
 
     {:ok, %{}}
   end
 
+  @doc false
   def handle_info(:dump_signal, state) do
     :telemetry.execute([:tornex, :bucket, :dump], %{}, %{})
 
@@ -52,6 +55,7 @@ defmodule Tornex.Scheduler.Timer do
     {:noreply, state}
   end
 
+  @doc false
   def handle_info(:dump, state) do
     # Fake handler to prevent errors when `handle_info(:dump_signal, _)` also sends the signal to this GenServer
     {:noreply, state}

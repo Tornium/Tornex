@@ -14,13 +14,14 @@
 
 defmodule Tornex.Scheduler.Bucket do
   @moduledoc """
-  `Tornex.Scheduler.Bucket` represents a user's bucket for API requests used for rate-limiting and prioritizing.
+  Representation of a user's bucket for API requests used for rate-limiting and prioritization.
 
-  A bucket can hold as many API requests as the computer can support. However, each bucket will only process 10 
-  API requests every 6 seconds.
+  A bucket can contain as many API requests as the BEAM VM and the memory can handle. However, each bucket will only process 10 API requests every 6 seconds.
 
-  The bucket provides the `enqueue/1` and `enqueue/2` operation that provides the core of the functionality of this module by creating
-  the bucket if necessary, handling telemetry, and request handling.
+  The bucket provides the `enqueue/1` and `enqueue/2` operations providing the core functionality of this module:
+  - creating the bucket if necessary,
+  - handling telemetry,
+  - and request handling.
 
   ## Bucket Creation
   Creating buckets is not required, but you can create and store buckets in a different manner if you need to do so.
@@ -48,10 +49,36 @@ defmodule Tornex.Scheduler.Bucket do
   @bucket_capacity 10
 
   # Public API
+  @doc """
+  Starts the bucket for a user.
+
+  ## Options
+
+    * `:user_id` - (any) A required unique identifier for the user the bucket belongs to
+
+  ## Examples
+
+      iex> Tornex.Scheduler.Bucket.start_link(user_id: 2383326)
+      {:ok, process}
+      iex> is_pid(process)
+      true
+  """
   def start_link(opts \\ []) do
     GenServer.start_link(__MODULE__, :ok, name: {:via, Registry, {Tornex.Scheduler.BucketRegistry, opts[:user_id]}})
   end
 
+  @doc """
+  Attempts to start a `Tornex.Scheduler.Bucket` and return the `pid` of a bucket.
+
+  The `Tornex.Scheduler.Supervisor` will attempt to start the bucket as a child. If the bucket does not exist, the bucket will be created and the `pid` of the bucket will be returned. If the bucket is already a child of `Tornex.Scheduler.Supervisor`, the `pid` of the existing bucket will be returned.
+
+  If there is an error in retrieving the `pid` of the bucket or an error in creating the bucket (e.g. maximum number of children in the supervisor reached), `nil` will be returned.
+
+  ## Examples
+
+      iex> Tornex.Scheduler.Bucket.new(2383326)
+      #PID<0.105.0>
+  """
   @spec new(user_id :: integer()) :: pid() | nil
   def new(user_id) when is_integer(user_id) do
     bucket =
@@ -82,15 +109,13 @@ defmodule Tornex.Scheduler.Bucket do
     end
   end
 
-  @spec enqueue(query :: Tornex.Query.t()) :: any()
-  def enqueue(%Tornex.Query{key_owner: key_owner} = query) when is_integer(key_owner) do
-    :telemetry.execute([:tornex, :bucket, :enqueue], %{}, %{
-      selections: query.selections,
-      resource: query.resource,
-      resource_id: query.resource_id,
-      user: key_owner
-    })
+  @doc """
+  Enqueues a `Tornex.Query` to the queue of the `Tornex.Scheduler.Bucket` of the API key's user.
 
+  The `pid` of the bucket belonging to the API key's user will be retrieved with `Tornex.Scheduler.Bucket.get_by_id/1`, and will be used to enqueue the query for that specific bucket.
+  """
+  @spec enqueue(query :: Tornex.Query.t()) :: term()
+  def enqueue(%Tornex.Query{key_owner: key_owner} = query) when is_integer(key_owner) do
     pid =
       case get_by_id(key_owner) do
         {:ok, pid} ->
@@ -103,11 +128,23 @@ defmodule Tornex.Scheduler.Bucket do
     enqueue(pid, query)
   end
 
-  @spec enqueue(pid :: pid(), query :: Tornex.Query.t()) :: any()
-  def enqueue(pid, %Tornex.Query{} = query) when is_pid(pid) do
+  @spec enqueue(pid :: pid(), query :: Tornex.Query.t()) :: term()
+  def enqueue(pid, %Tornex.Query{key_owner: key_owner} = query) when is_pid(pid) and is_integer(key_owner) do
+    :telemetry.execute([:tornex, :bucket, :enqueue], %{}, %{
+      selections: query.selections,
+      resource: query.resource,
+      resource_id: query.resource_id,
+      user: key_owner
+    })
+
     GenServer.call(pid, {:enqueue, query}, 60_000)
   end
 
+  @doc """
+  Retrieves the `pid` of the bucket by the bucket's user ID.
+
+  Using the `Tornex.Scheduler.BucketRegistry` that creates the relationship between the bucket and the user ID upon bucket creation, the `pid` of the bucket will be returned. If a bucket is not registered for that user, `:error` will be returned.
+  """
   @spec get_by_id(user_id :: integer()) :: {:ok, pid()} | :error
   def get_by_id(user_id) when is_integer(user_id) do
     case Registry.lookup(Tornex.Scheduler.BucketRegistry, user_id) do
@@ -117,11 +154,13 @@ defmodule Tornex.Scheduler.Bucket do
   end
 
   # GenServer Callbacks
+  @doc false
   @impl true
   def init(_opts) do
     {:ok, %{query_priority_queue: [], pending_count: 0}}
   end
 
+  @doc false
   @impl true
   def handle_call(
         {:enqueue, query},
@@ -163,6 +202,7 @@ defmodule Tornex.Scheduler.Bucket do
     end
   end
 
+  @doc false
   @impl true
   def handle_info(:dump, state) do
     # TODO: Make this functionality synchronous to prevent race conditions
@@ -177,17 +217,20 @@ defmodule Tornex.Scheduler.Bucket do
     {:noreply, state}
   end
 
+  @doc false
   @impl true
   def handle_info(_msg, state) do
     {:noreply, state}
   end
 
   # Utility functions
+  @doc false
   defp make_request_task(query, from) do
     GenServer.reply(from, Tornex.API.torn_get(query))
   end
 
-  def make_request(query, from) do
+  @doc false
+  defp make_request(query, from) do
     Task.Supervisor.async_nolink(Tornex.Scheduler.TaskSupervisor, fn ->
       make_request_task(query, from)
     end)

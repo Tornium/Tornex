@@ -5,7 +5,7 @@ An Elixir library providing robust API call planning and execution for the [Torn
 > Currently, tornex is intended to work on single-node deployments. Multi-node deployments will experience issues with ratelimiting.
 
 ## Features
-- Efficient API ratelimiting and planning using buckets and priorities
+- Efficient API ratelimiting and planning using buckets and prioritized requests
 - `:telemetry`-based logging (with included support for [PromEx](https://hex.pm/packages/prom_ex))
 - Support for APIv1 and APIv2
 
@@ -14,6 +14,7 @@ An Elixir library providing robust API call planning and execution for the [Torn
 - [ ] Combine similar queries to reduce throughput
 - [ ] Multi-node support
 - [ ] APIv2 struct coalescing using [torngen](https://github.com/Tornium/torngen)
+- [ ] APIv2 mocking server using [torngen](https://github.com/Tornium/torngen)
 
 ## Installation
 Once [available in Hex](https://hex.pm/docs/publish), the library can be installed

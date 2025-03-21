@@ -25,7 +25,7 @@ defmodule Tornex.Telemetry do
   @handler_id "tornex-default-telemetry-handler"
 
   @doc """
-  Attach the default built-in log handler to Tornex Telemetry
+  Attaches the default Tornex `:telemetry` handler built on-top of `Logger`.
   """
   @spec attach_default_logger() :: :ok | {:error, :already_exists}
   def attach_default_logger(opts \\ []) when is_list(opts) do
@@ -48,7 +48,9 @@ defmodule Tornex.Telemetry do
     :telemetry.attach_many(@handler_id, events, &__MODULE__.handle_event/4, opts)
   end
 
-  @doc false
+  @doc """
+  Detaches the default Tornex telemetry handler.
+  """
   @spec detach_default_logger() :: :ok | {:error, :not_found}
   def detach_default_logger() do
     :telemetry.detach(@handler_id)
