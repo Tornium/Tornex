@@ -9,7 +9,7 @@ defmodule Tornex.MixProject do
       description: "Robust API call planning and execution for Torn City",
       app: :tornex,
       version: @version,
-      elixir: ">= 1.16",
+      elixir: "~= 1.16",
       package: package(),
       deps: deps(),
       source_url: "https://github.com/Tornium/tornex",
