@@ -63,7 +63,7 @@ defmodule Tornex.Test.Scheduler do
         )
       end)
     end)
-    |> Task.await_many(60000)
+    |> Task.await_many(60_000)
 
     GenServer.stop(pid)
     Supervisor.stop(s_pid)
@@ -89,7 +89,7 @@ defmodule Tornex.Test.Scheduler do
         )
       end)
     end)
-    |> Task.await_many(60000)
+    |> Task.await_many(60_000)
 
     GenServer.stop(pid)
     Supervisor.stop(s_pid)
