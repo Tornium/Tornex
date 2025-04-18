@@ -27,13 +27,17 @@ defmodule Tornex.Test.Scheduler do
     {:ok, pid} = DynamicSupervisor.start_child(s_pid, Tornex.Scheduler.Bucket)
 
     %{"error" => %{"code" => 2}} =
-      Tornex.Scheduler.Bucket.enqueue(pid, %Tornex.Query{
-        resource: "user",
-        resource_id: 1,
-        key: @test_api_key,
-        key_owner: 2_383_326,
-        nice: 0
-      })
+      Tornex.Scheduler.Bucket.enqueue(
+        pid,
+        %Tornex.Query{
+          resource: "user",
+          resource_id: 1,
+          key: @test_api_key,
+          key_owner: 2_383_326,
+          nice: 0
+        },
+        []
+      )
 
     GenServer.stop(pid)
     Supervisor.stop(s_pid)
@@ -46,13 +50,17 @@ defmodule Tornex.Test.Scheduler do
     1..10
     |> Enum.map(fn n ->
       Task.async(fn ->
-        Tornex.Scheduler.Bucket.enqueue(pid, %Tornex.Query{
-          resource: "user",
-          resource_id: n,
-          key: @test_api_key,
-          key_owner: 2_383_326,
-          nice: -5
-        })
+        Tornex.Scheduler.Bucket.enqueue(
+          pid,
+          %Tornex.Query{
+            resource: "user",
+            resource_id: n,
+            key: @test_api_key,
+            key_owner: 2_383_326,
+            nice: -5
+          },
+          []
+        )
       end)
     end)
     |> Task.await_many(60000)
@@ -68,13 +76,17 @@ defmodule Tornex.Test.Scheduler do
     1..10
     |> Enum.map(fn n ->
       Task.async(fn ->
-        Tornex.Scheduler.Bucket.enqueue(pid, %Tornex.Query{
-          resource: "user",
-          resource_id: n,
-          key: @test_api_key,
-          key_owner: 2_383_326,
-          nice: 0 + n
-        })
+        Tornex.Scheduler.Bucket.enqueue(
+          pid,
+          %Tornex.Query{
+            resource: "user",
+            resource_id: n,
+            key: @test_api_key,
+            key_owner: 2_383_326,
+            nice: 0 + n
+          },
+          []
+        )
       end)
     end)
     |> Task.await_many(60000)
@@ -88,13 +100,16 @@ defmodule Tornex.Test.Scheduler do
     {:ok, pid} = DynamicSupervisor.start_child(s_pid, Tornex.Scheduler.Bucket)
 
     %{"error" => %{"code" => 2}} =
-      Tornex.Scheduler.Bucket.enqueue(%Tornex.Query{
-        resource: "user",
-        resource_id: 1,
-        key: @test_api_key,
-        key_owner: 2_383_326,
-        nice: 0
-      })
+      Tornex.Scheduler.Bucket.enqueue(
+        %Tornex.Query{
+          resource: "user",
+          resource_id: 1,
+          key: @test_api_key,
+          key_owner: 2_383_326,
+          nice: 0
+        },
+        []
+      )
 
     GenServer.stop(pid)
     Supervisor.stop(s_pid)
