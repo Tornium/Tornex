@@ -118,7 +118,7 @@ defmodule Tornex.Scheduler.Bucket do
 
     * `:timeout` - Timeout of the GenServer call in milliseconds (default: `60_000`)
   """
-  @spec enqueue(query :: Tornex.Query.t(), opts :: Keyword) :: term()
+  @spec enqueue(query :: Tornex.Query.t(), opts :: Keyword.t()) :: term()
   def enqueue(%Tornex.Query{key_owner: key_owner} = query, opts \\ []) when is_integer(key_owner) do
     pid =
       case get_by_id(key_owner) do
@@ -132,8 +132,8 @@ defmodule Tornex.Scheduler.Bucket do
     enqueue(pid, query, opts)
   end
 
-  @spec enqueue(pid :: pid(), query :: Tornex.Query.t(), opts :: Keyword) :: term()
   @doc false
+  @spec enqueue(pid :: pid(), query :: Tornex.Query.t(), opts :: Keyword.t()) :: term()
   def enqueue(pid, %Tornex.Query{key_owner: key_owner} = query, opts)
       when is_pid(pid) and is_integer(key_owner) do
     :telemetry.execute([:tornex, :bucket, :enqueue], %{}, %{
