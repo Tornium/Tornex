@@ -26,3 +26,6 @@ tornix-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
+
+# IEx configuration
+.iex.exs

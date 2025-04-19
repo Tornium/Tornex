@@ -34,7 +34,8 @@ defmodule Tornex.MixProject do
       {:prom_ex, "~> 1.11", optional: true},
       {:plug_cowboy, "~> 2.7", optional: true},
       {:ex_doc, "~> 0.34", only: :dev, runtime: false},
-      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:torngen, path: "../torngen/", only: :dev, runtime: false}
     ]
   end
 

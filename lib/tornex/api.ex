@@ -73,6 +73,10 @@ defmodule Tornex.API do
     )
   end
 
+  @spec query_to_url(Tornex.SpecQuery.t()) :: String.t()
+  def query_to_url(%Tornex.SpecQuery{} = query) do
+  end
+
   @doc """
   Performs a blocking HTTP GET request against the Torn API for the `Tornex.Query`.
 
@@ -104,6 +108,23 @@ defmodule Tornex.API do
     })
 
     handle_response(query, response)
+  end
+
+  @spec torn_get(Tornex.SpecQuery.t()) :: term() | error()
+  def torn_get(%Tornex.SpecQuery{} = query) do
+    :telemetry.execute([:tornex, :api, :start], %{}, %{
+      resource: query.resource,
+      resource_id: query.resource_id,
+      selections: query.selections,
+      user: query.key_owner
+    })
+
+    # TODO: Validate query
+    # TODO: Replace Tesla.get with some other library (e.g. Req)
+    # TODO: Switch `torn_get` to `get` and deprecate `torn_get`
+    {latency, response} = :timer.tc(&get/1, [query_to_url(query)])
+
+    {path, selections} = Tornex.SpecQuery.path_selections!(query)
   end
 
   @spec handle_response(query :: Tornex.Query.t(), response :: tuple()) :: {:ok, return()} | error()
