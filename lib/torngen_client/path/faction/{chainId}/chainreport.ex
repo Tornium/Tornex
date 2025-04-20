@@ -7,9 +7,6 @@ defmodule Torngen.Client.Path.Faction.ChainId.Chainreport do
   ## Parmeters
   - chainId: Chain id
 
-  ## Response
-  NYI
-
   ## Tags
   - Faction
   """
@@ -27,13 +24,13 @@ defmodule Torngen.Client.Path.Faction.ChainId.Chainreport do
 
   @impl true
   def path_selection(), do: Torngen.Client.Path.path_selection(@path)
-  
+
   @impl true
   defparameter :chainId, value do
     # Chain id
     {:path, :chainId, value}
   end
-  
+
   @impl true
   def parameter(parameter_name, _value) when is_atom(parameter_name) do
     :error

@@ -16,9 +16,6 @@ defmodule Torngen.Client.Path.Faction do
   - sort: Sorted by the greatest timestamps
   - offset: N/A
 
-  ## Response
-  NYI
-
   ## Tags
   - Faction
   """
@@ -36,67 +33,67 @@ defmodule Torngen.Client.Path.Faction do
 
   @impl true
   def path_selection(), do: Torngen.Client.Path.path_selection(@path)
-  
+
   @impl true
   defparameter :selections, value do
     # Selection names
     {:query, :selections, value}
   end
-  
+
   @impl true
   defparameter :id, value do
     # selection id
     {:query, :id, value}
   end
-  
+
   @impl true
   defparameter :limit, value do
     # N/A
     {:query, :limit, value}
   end
-  
+
   @impl true
   defparameter :from, value do
     # Timestamp that sets the lower limit for the data returned. Data returned will be after this time
     {:query, :from, value}
   end
-  
+
   @impl true
   defparameter :to, value do
     # Timestamp that sets the upper limit for the data returned. Data returned will be up to and including this time
     {:query, :to, value}
   end
-  
+
   @impl true
   defparameter :cat, value do
     # Selection category
     {:query, :cat, value}
   end
-  
+
   @impl true
   defparameter :stat, value do
     # Stat category
     {:query, :stat, value}
   end
-  
+
   @impl true
   defparameter :striptags, value do
     # Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user').
     {:query, :striptags, value}
   end
-  
+
   @impl true
   defparameter :sort, value do
     # Sorted by the greatest timestamps
     {:query, :sort, value}
   end
-  
+
   @impl true
   defparameter :offset, value do
     # N/A
     {:query, :offset, value}
   end
-  
+
   @impl true
   def parameter(parameter_name, _value) when is_atom(parameter_name) do
     :error

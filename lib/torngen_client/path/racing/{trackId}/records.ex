@@ -8,9 +8,6 @@ defmodule Torngen.Client.Path.Racing.TrackId.Records do
   - trackId: Track id
   - cat: Car class
 
-  ## Response
-  NYI
-
   ## Tags
   - Racing
   """
@@ -28,19 +25,19 @@ defmodule Torngen.Client.Path.Racing.TrackId.Records do
 
   @impl true
   def path_selection(), do: Torngen.Client.Path.path_selection(@path)
-  
+
   @impl true
   defparameter :trackId, value do
     # Track id
     {:path, :trackId, value}
   end
-  
+
   @impl true
   defparameter :cat, value do
     # Car class
     {:query, :cat, value}
   end
-  
+
   @impl true
   def parameter(parameter_name, _value) when is_atom(parameter_name) do
     :error

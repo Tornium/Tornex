@@ -37,7 +37,7 @@ defmodule Tornex.Test.SpecQuery do
     |> Tornex.SpecQuery.put_path(Torngen.Client.Path.Faction.Basic)
     |> Tornex.SpecQuery.uri()
     |> URI.to_string()
-    |> (& assert &1 == "https://api.torn.com/v2/faction/?selections=basic").()
+    |> (&assert(&1 == "https://api.torn.com/v2/faction/?selections=basic")).()
 
     Tornex.SpecQuery.new()
     |> Tornex.SpecQuery.put_path(Torngen.Client.Path.Faction.Id.Basic)
@@ -45,7 +45,7 @@ defmodule Tornex.Test.SpecQuery do
     |> Tornex.SpecQuery.put_parameter(:id, 1)
     |> Tornex.SpecQuery.uri()
     |> URI.to_string()
-    |> (& assert &1 == "https://api.torn.com/v2/faction/1/?selections=members,basic").()
+    |> (&assert(&1 == "https://api.torn.com/v2/faction/1/?selections=members,basic")).()
 
     Tornex.SpecQuery.new()
     |> Tornex.SpecQuery.put_path(Torngen.Client.Path.Faction.Id.Chains)
@@ -54,6 +54,6 @@ defmodule Tornex.Test.SpecQuery do
     |> Tornex.SpecQuery.put_parameter(:limit, 100)
     |> Tornex.SpecQuery.uri()
     |> URI.to_string()
-    |> (& assert &1 == "https://api.torn.com/v2/faction/89/?selections=basic,chains&limit=100").()
+    |> (&assert(&1 == "https://api.torn.com/v2/faction/89/?selections=basic,chains&limit=100")).()
   end
 end

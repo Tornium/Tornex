@@ -8,9 +8,6 @@ defmodule Torngen.Client.Path.Faction.Contributors do
   - stat: Get contributors for this field.
   - cat: By default, this selection will return only current faction's member contributions, and the option 'all' will return all contributors.
 
-  ## Response
-  NYI
-
   ## Tags
   - Faction
   """
@@ -28,19 +25,19 @@ defmodule Torngen.Client.Path.Faction.Contributors do
 
   @impl true
   def path_selection(), do: Torngen.Client.Path.path_selection(@path)
-  
+
   @impl true
   defparameter :stat, value do
     # Get contributors for this field.
     {:query, :stat, value}
   end
-  
+
   @impl true
   defparameter :cat, value do
     # By default, this selection will return only current faction's member contributions, and the option 'all' will return all contributors.
     {:query, :cat, value}
   end
-  
+
   @impl true
   def parameter(parameter_name, _value) when is_atom(parameter_name) do
     :error

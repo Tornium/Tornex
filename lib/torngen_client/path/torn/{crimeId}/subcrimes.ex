@@ -7,9 +7,6 @@ defmodule Torngen.Client.Path.Torn.CrimeId.Subcrimes do
   ## Parmeters
   - crimeId: Crime id
 
-  ## Response
-  NYI
-
   ## Tags
   - Torn
   """
@@ -27,13 +24,13 @@ defmodule Torngen.Client.Path.Torn.CrimeId.Subcrimes do
 
   @impl true
   def path_selection(), do: Torngen.Client.Path.path_selection(@path)
-  
+
   @impl true
   defparameter :crimeId, value do
     # Crime id
     {:path, :crimeId, value}
   end
-  
+
   @impl true
   def parameter(parameter_name, _value) when is_atom(parameter_name) do
     :error

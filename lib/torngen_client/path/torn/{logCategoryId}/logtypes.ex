@@ -7,9 +7,6 @@ defmodule Torngen.Client.Path.Torn.LogCategoryId.Logtypes do
   ## Parmeters
   - logCategoryId: Log category id
 
-  ## Response
-  NYI
-
   ## Tags
   - Torn
   """
@@ -27,13 +24,13 @@ defmodule Torngen.Client.Path.Torn.LogCategoryId.Logtypes do
 
   @impl true
   def path_selection(), do: Torngen.Client.Path.path_selection(@path)
-  
+
   @impl true
   defparameter :logCategoryId, value do
     # Log category id
     {:path, :logCategoryId, value}
   end
-  
+
   @impl true
   def parameter(parameter_name, _value) when is_atom(parameter_name) do
     :error

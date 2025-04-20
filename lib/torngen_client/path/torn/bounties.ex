@@ -8,9 +8,6 @@ defmodule Torngen.Client.Path.Torn.Bounties do
   - limit: N/A
   - offset: N/A
 
-  ## Response
-  NYI
-
   ## Tags
   - Torn
   """
@@ -28,19 +25,19 @@ defmodule Torngen.Client.Path.Torn.Bounties do
 
   @impl true
   def path_selection(), do: Torngen.Client.Path.path_selection(@path)
-  
+
   @impl true
   defparameter :limit, value do
     # N/A
     {:query, :limit, value}
   end
-  
+
   @impl true
   defparameter :offset, value do
     # N/A
     {:query, :offset, value}
   end
-  
+
   @impl true
   def parameter(parameter_name, _value) when is_atom(parameter_name) do
     :error

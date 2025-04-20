@@ -6,9 +6,6 @@ defmodule Torngen.Client.Path.Market.Timestamp do
 
   ## Parmeters
 
-  ## Response
-  NYI
-
   ## Tags
   - Market
   """
@@ -26,7 +23,7 @@ defmodule Torngen.Client.Path.Market.Timestamp do
 
   @impl true
   def path_selection(), do: Torngen.Client.Path.path_selection(@path)
-  
+
   @impl true
   def parameter(parameter_name, _value) when is_atom(parameter_name) do
     :error

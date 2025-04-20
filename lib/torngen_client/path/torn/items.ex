@@ -8,9 +8,6 @@ defmodule Torngen.Client.Path.Torn.Items do
   - cat: Item category type
   - sort: Sort rows from newest to oldest<br>Default ordering is ascending
 
-  ## Response
-  NYI
-
   ## Tags
   - Torn
   """
@@ -28,19 +25,19 @@ defmodule Torngen.Client.Path.Torn.Items do
 
   @impl true
   def path_selection(), do: Torngen.Client.Path.path_selection(@path)
-  
+
   @impl true
   defparameter :cat, value do
     # Item category type
     {:query, :cat, value}
   end
-  
+
   @impl true
   defparameter :sort, value do
     # Sort rows from newest to oldest<br>Default ordering is ascending
     {:query, :sort, value}
   end
-  
+
   @impl true
   def parameter(parameter_name, _value) when is_atom(parameter_name) do
     :error

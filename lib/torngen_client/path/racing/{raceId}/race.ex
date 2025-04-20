@@ -7,9 +7,6 @@ defmodule Torngen.Client.Path.Racing.RaceId.Race do
   ## Parmeters
   - raceId: Race id
 
-  ## Response
-  NYI
-
   ## Tags
   - Racing
   """
@@ -27,13 +24,13 @@ defmodule Torngen.Client.Path.Racing.RaceId.Race do
 
   @impl true
   def path_selection(), do: Torngen.Client.Path.path_selection(@path)
-  
+
   @impl true
   defparameter :raceId, value do
     # Race id
     {:path, :raceId, value}
   end
-  
+
   @impl true
   def parameter(parameter_name, _value) when is_atom(parameter_name) do
     :error

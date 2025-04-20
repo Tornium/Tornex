@@ -165,7 +165,13 @@ defmodule Tornex.API do
     end
   end
 
-  defp handle_response(_query, {:ok, %Tesla.Env{} = response}) do
+  # TODO: Parse error responses into new error struct
+  defp handle_response(%Tornex.Query{} = query, {:ok, %Tesla.Env{} = response}) do
+    response.body
+  end
+
+  defp handle_response(%Tornex.SpecQuery{} = query, {:ok, %Tesla.Env{} = response}) do
+    # TODO: Parse query into response struct(s)
     response.body
   end
 

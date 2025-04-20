@@ -9,21 +9,28 @@ defmodule Torngen.Client.Path do
   end
 
   @doc """
-  Gets the path for a request against a path in the specification.
+  Get the path for a request against a path in the specification.
   """
   @callback path() :: String.t()
 
+  @doc """
+  Get the base path and selection(s) a query would utilize.
+  """
   @callback path_selection() :: {String.t(), String.t() | nil}
 
+  @doc """
+  Get the list of parameters the query would accept.
+  """
   @callback parameters() :: [atom()]
 
   @doc """
   Get the type of parameter.
   """
   @callback parameter(atom(), any()) :: {Torngen.Spec.Parameter.parameter_locations(), atom(), term()}
-  
+
   @optional_callbacks parameter: 2
 
+  @doc false
   def path_selection(path) do
     path
     |> String.split("/")

@@ -9,9 +9,6 @@ defmodule Torngen.Client.Path.Forum.ThreadId.Posts do
   - striptags: Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user').
   - threadId: Thread id
 
-  ## Response
-  NYI
-
   ## Tags
   - Forum
   """
@@ -29,25 +26,25 @@ defmodule Torngen.Client.Path.Forum.ThreadId.Posts do
 
   @impl true
   def path_selection(), do: Torngen.Client.Path.path_selection(@path)
-  
+
   @impl true
   defparameter :offset, value do
     # N/A
     {:query, :offset, value}
   end
-  
+
   @impl true
   defparameter :striptags, value do
     # Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user').
     {:query, :striptags, value}
   end
-  
+
   @impl true
   defparameter :threadId, value do
     # Thread id
     {:path, :threadId, value}
   end
-  
+
   @impl true
   def parameter(parameter_name, _value) when is_atom(parameter_name) do
     :error

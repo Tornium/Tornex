@@ -9,9 +9,6 @@ defmodule Torngen.Client.Path.Market.Id.Itemmarket do
   - bonus: Used to filter weapons with a specific bonus.
   - offset: N/A
 
-  ## Response
-  NYI
-
   ## Tags
   - Market
   """
@@ -29,25 +26,25 @@ defmodule Torngen.Client.Path.Market.Id.Itemmarket do
 
   @impl true
   def path_selection(), do: Torngen.Client.Path.path_selection(@path)
-  
+
   @impl true
   defparameter :id, value do
     # Item id
     {:path, :id, value}
   end
-  
+
   @impl true
   defparameter :bonus, value do
     # Used to filter weapons with a specific bonus.
     {:query, :bonus, value}
   end
-  
+
   @impl true
   defparameter :offset, value do
     # N/A
     {:query, :offset, value}
   end
-  
+
   @impl true
   def parameter(parameter_name, _value) when is_atom(parameter_name) do
     :error

@@ -8,9 +8,6 @@ defmodule Torngen.Client.Path.Faction.Id.Members do
   - id: Faction id
   - striptags: Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user').
 
-  ## Response
-  NYI
-
   ## Tags
   - Faction
   """
@@ -28,19 +25,19 @@ defmodule Torngen.Client.Path.Faction.Id.Members do
 
   @impl true
   def path_selection(), do: Torngen.Client.Path.path_selection(@path)
-  
+
   @impl true
   defparameter :id, value do
     # Faction id
     {:path, :id, value}
   end
-  
+
   @impl true
   defparameter :striptags, value do
     # Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user').
     {:query, :striptags, value}
   end
-  
+
   @impl true
   def parameter(parameter_name, _value) when is_atom(parameter_name) do
     :error

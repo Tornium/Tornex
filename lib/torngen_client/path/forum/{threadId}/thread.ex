@@ -7,9 +7,6 @@ defmodule Torngen.Client.Path.Forum.ThreadId.Thread do
   ## Parmeters
   - threadId: Thread id
 
-  ## Response
-  NYI
-
   ## Tags
   - Forum
   """
@@ -27,13 +24,13 @@ defmodule Torngen.Client.Path.Forum.ThreadId.Thread do
 
   @impl true
   def path_selection(), do: Torngen.Client.Path.path_selection(@path)
-  
+
   @impl true
   defparameter :threadId, value do
     # Thread id
     {:path, :threadId, value}
   end
-  
+
   @impl true
   def parameter(parameter_name, _value) when is_atom(parameter_name) do
     :error

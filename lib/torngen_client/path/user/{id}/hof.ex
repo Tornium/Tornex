@@ -7,9 +7,6 @@ defmodule Torngen.Client.Path.User.Id.Hof do
   ## Parmeters
   - id: User id
 
-  ## Response
-  NYI
-
   ## Tags
   - User
   """
@@ -27,13 +24,13 @@ defmodule Torngen.Client.Path.User.Id.Hof do
 
   @impl true
   def path_selection(), do: Torngen.Client.Path.path_selection(@path)
-  
+
   @impl true
   defparameter :id, value do
     # User id
     {:path, :id, value}
   end
-  
+
   @impl true
   def parameter(parameter_name, _value) when is_atom(parameter_name) do
     :error

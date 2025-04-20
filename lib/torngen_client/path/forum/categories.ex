@@ -6,9 +6,6 @@ defmodule Torngen.Client.Path.Forum.Categories do
 
   ## Parmeters
 
-  ## Response
-  NYI
-
   ## Tags
   - Forum
   """
@@ -26,7 +23,7 @@ defmodule Torngen.Client.Path.Forum.Categories do
 
   @impl true
   def path_selection(), do: Torngen.Client.Path.path_selection(@path)
-  
+
   @impl true
   def parameter(parameter_name, _value) when is_atom(parameter_name) do
     :error

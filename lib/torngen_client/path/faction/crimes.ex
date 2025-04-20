@@ -11,9 +11,6 @@ defmodule Torngen.Client.Path.Faction.Crimes do
   - to: Timestamp that sets the upper limit for the data returned
   - sort: Sorted by the greatest timestamps
 
-  ## Response
-  NYI
-
   ## Tags
   - Faction
   """
@@ -31,37 +28,37 @@ defmodule Torngen.Client.Path.Faction.Crimes do
 
   @impl true
   def path_selection(), do: Torngen.Client.Path.path_selection(@path)
-  
+
   @impl true
   defparameter :cat, value do
     # Category of organized crimes returned. Category 'available' includes both 'recruiting' & 'planning', and category 'completed' includes both 'successful' & 'failure'<br>Default category is 'all'
     {:query, :cat, value}
   end
-  
+
   @impl true
   defparameter :offset, value do
     # N/A
     {:query, :offset, value}
   end
-  
+
   @impl true
   defparameter :from, value do
     # Timestamp that sets the lower limit for the data returned. Data returned will be after this time
     {:query, :from, value}
   end
-  
+
   @impl true
   defparameter :to, value do
     # Timestamp that sets the upper limit for the data returned. Data returned will be up to and including this time
     {:query, :to, value}
   end
-  
+
   @impl true
   defparameter :sort, value do
     # Sorted by the greatest timestamps
     {:query, :sort, value}
   end
-  
+
   @impl true
   def parameter(parameter_name, _value) when is_atom(parameter_name) do
     :error
