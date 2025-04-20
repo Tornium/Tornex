@@ -31,7 +31,7 @@ defmodule Tornex.Scheduler.Bucket do
     - `enqueue/1` to create a bucket and let Tornex store the PID of the GenServer in a pre-initialized registry `Tornex.Scheduler.BucketRegistry`
 
   ## Making API Requests
-  API requests are made with the `enqueue/1` and the `enqueue/2` operations with a `Tornex.Query` struct. The operations will then wait until the API call has been scheduled and the Torn API has responded instead of ending the invocation early and using a later `await`-like function.
+  API requests are made with the `enqueue/1` and the `enqueue/2` operations with a `Tornex.Query` or `Tornex.SpecQuery` struct. The operations will then wait until the API call has been scheduled and the Torn API has responded instead of ending the invocation early and using a later `await`-like function.
 
   However, for example, this can still be done with the built-in `Task` module (including to handle many API requests at once): 
 
@@ -43,6 +43,7 @@ defmodule Tornex.Scheduler.Bucket do
       end)
       |> Task.await_many(timeout)
   """
+  alias Torngen.Client.Path.Torn
 
   use GenServer
 
@@ -110,12 +111,12 @@ defmodule Tornex.Scheduler.Bucket do
   end
 
   @doc """
-  Enqueues a `Tornex.Query` to the queue of the `Tornex.Scheduler.Bucket` of the API key's user.
+  Enqueues a `Tornex.Query` or `Tornex.SpecQuery` to the queue of the `Tornex.Scheduler.Bucket` for the API key's user.
 
   The `pid` of the bucket belonging to the API key's user will be retrieved with `Tornex.Scheduler.Bucket.get_by_id/1`, and will be used to enqueue the query for that specific bucket.
   """
-  @spec enqueue(query :: Tornex.Query.t()) :: term()
-  def enqueue(%Tornex.Query{key_owner: key_owner} = query) when is_integer(key_owner) do
+  @spec enqueue(query :: Tornex.Query.t() | Tornex.SpecQuery.t()) :: term()
+  def enqueue(%{key_owner: key_owner} = query) when is_integer(key_owner) do
     pid =
       case get_by_id(key_owner) do
         {:ok, pid} ->
@@ -128,12 +129,26 @@ defmodule Tornex.Scheduler.Bucket do
     enqueue(pid, query)
   end
 
-  @spec enqueue(pid :: pid(), query :: Tornex.Query.t()) :: term()
+  @spec enqueue(pid :: pid(), query :: Tornex.Query.t() | Tornex.SpecQuery.t()) :: term()
   def enqueue(pid, %Tornex.Query{key_owner: key_owner} = query) when is_pid(pid) and is_integer(key_owner) do
     :telemetry.execute([:tornex, :bucket, :enqueue], %{}, %{
       selections: query.selections,
       resource: query.resource,
       resource_id: query.resource_id,
+      user: key_owner
+    })
+
+    GenServer.call(pid, {:enqueue, query}, 60_000)
+  end
+
+  def enqueue(pid, %Tornex.SpecQuery{key_owner: key_owner} = query) when is_pid(pid) and is_integer(key_owner) do
+    {base_path, selections} = Tornex.SpecQuery.path_selections!(query)
+
+    :telemetry.execute([:tornex, :bucket, :enqueue], %{}, %{
+      selections: selections,
+      resource: base_path |> String.split("/") |> Enum.at(0),
+      # TODO: Get ID from query
+      resource_id: nil,
       user: key_owner
     })
 
@@ -224,12 +239,13 @@ defmodule Tornex.Scheduler.Bucket do
   end
 
   # Utility functions
-  @doc false
+  # TODO: Determine type of `from` parameters
+  @spec make_request_task(query :: Tornex.Query.t() | Tornex.SpecQuery.t(), from :: term()) :: :ok
   defp make_request_task(query, from) do
     GenServer.reply(from, Tornex.API.torn_get(query))
   end
 
-  @doc false
+  @spec make_request_task(query :: Tornex.Query.t() | Tornex.SpecQuery.t(), from :: term()) :: Task.t()
   defp make_request(query, from) do
     Task.Supervisor.async_nolink(Tornex.Scheduler.TaskSupervisor, fn ->
       make_request_task(query, from)

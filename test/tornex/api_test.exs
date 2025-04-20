@@ -14,16 +14,18 @@
 
 defmodule Tornex.Test.API do
   @test_api_key "asdf1234asdf1234"
-  @comment_string "&comment=Tornex"
+  @comment_string "&comment=tex-" <> Mix.Project.config()[:version]
 
-  use ExUnit.Case
+  use ExUnit.Case, async: true
+  doctest Tornex.API, only: [query_to_url: 1]
 
   test "current_user_resource_url" do
     assert Tornex.API.query_to_url(%Tornex.Query{
              resource: "user",
              key: @test_api_key,
              selections: []
-           }) == "/user/?selections=&key=" <> @test_api_key <> @comment_string
+           }) ==
+             "https://api.torn.com/user/?selections=&key=" <> @test_api_key <> @comment_string
   end
 
   test "other_user_resource_url" do
@@ -32,7 +34,7 @@ defmodule Tornex.Test.API do
              resource_id: 1,
              key: @test_api_key,
              selections: []
-           }) == "/user/1?selections=&key=" <> @test_api_key <> @comment_string
+           }) == "https://api.torn.com/user/1?selections=&key=" <> @test_api_key <> @comment_string
   end
 
   test "current_user_selection_url" do
@@ -40,13 +42,13 @@ defmodule Tornex.Test.API do
              resource: "user",
              key: @test_api_key,
              selections: ["basic"]
-           }) == "/user/?selections=basic&key=" <> @test_api_key <> @comment_string
+           }) == "https://api.torn.com/user/?selections=basic&key=" <> @test_api_key <> @comment_string
 
     assert Tornex.API.query_to_url(%Tornex.Query{
              resource: "user",
              key: @test_api_key,
              selections: ["basic", "attacks"]
-           }) == "/user/?selections=basic%2Cattacks&key=" <> @test_api_key <> @comment_string
+           }) == "https://api.torn.com/user/?selections=basic,attacks&key=" <> @test_api_key <> @comment_string
   end
 
   test "other_user_selection_url" do
@@ -55,14 +57,14 @@ defmodule Tornex.Test.API do
              resource_id: 1,
              key: @test_api_key,
              selections: ["basic"]
-           }) == "/user/1?selections=basic&key=" <> @test_api_key <> @comment_string
+           }) == "https://api.torn.com/user/1?selections=basic&key=" <> @test_api_key <> @comment_string
 
     assert Tornex.API.query_to_url(%Tornex.Query{
              resource: "user",
              resource_id: 1,
              key: @test_api_key,
              selections: ["basic", "attacks"]
-           }) == "/user/1?selections=basic%2Cattacks&key=" <> @test_api_key <> @comment_string
+           }) == "https://api.torn.com/user/1?selections=basic,attacks&key=" <> @test_api_key <> @comment_string
   end
 
   test "user_resource_params" do
@@ -72,7 +74,9 @@ defmodule Tornex.Test.API do
              key: @test_api_key,
              selections: ["basic"],
              params: [limit: 10, log: 1]
-           }) == "/user/1?selections=basic&key=" <> @test_api_key <> @comment_string <> "&limit=10&log=1"
+           }) ==
+             "https://api.torn.com/user/1?selections=basic&key=" <>
+               @test_api_key <> @comment_string <> "&limit=10&log=1"
   end
 
   test "ee_basic_user_requeset" do

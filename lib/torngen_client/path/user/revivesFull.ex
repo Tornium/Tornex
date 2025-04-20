@@ -18,8 +18,7 @@ defmodule Torngen.Client.Path.User.RevivesFull do
   - User
   """
 
-  # import Torngen.Client.Path, only: [defparameter: 3]
-  require Torngen.Client.Path
+  import Torngen.Client.Path, only: [defparameter: 3]
 
   @behaviour Torngen.Client.Path
 

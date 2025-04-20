@@ -19,19 +19,40 @@ defmodule Tornex.SpecQuery do
   @type parameter :: {atom(), term()}
   @type t :: %__MODULE__{
           paths: [atom()],
-          parameters: [parameter()]
+          parameters: [parameter()],
+          key: String.t() | nil,
+
+          # Values required for the scheduler
+          key_owner: integer(),
+          nice: integer(),
+          origin: GenServer.from() | nil
         }
 
-  defstruct [:paths, :parameters]
+  defstruct [
+    :paths,
+    :parameters,
+    :key,
+
+    # Values required for the scheduler
+    :key_owner,
+    :nice,
+    :origin
+  ]
 
   @doc """
   Initialize an empty query against the OpenAPI specification.
+
+  By default, the niceness of the request will be set to 0 and the key owner will be set to 0. The key owner of 0 is intended to be for requests where the owner of the key is not known (e.g. for determining the owner).
   """
   @spec new() :: t()
   def new() do
     %__MODULE__{
       paths: [],
-      parameters: []
+      parameters: [],
+      key: nil,
+      key_owner: 0,
+      nice: 0,
+      origin: nil
     }
   end
 
@@ -78,7 +99,7 @@ defmodule Tornex.SpecQuery do
   ## Example
   """
   @spec uri(query :: t()) :: URI.t()
-  def uri(%__MODULE__{parameters: parameters, paths: paths} = query) do
+  def uri(%__MODULE__{parameters: parameters, paths: paths, key: key} = query) when is_binary(key) do
     # TODO: Add more documentation
     {path, selections} = path_selections!(query)
 
@@ -86,6 +107,7 @@ defmodule Tornex.SpecQuery do
     |> URI.new!()
     |> URI.append_path("/" <> path <> "/")
     |> append_selections(selections)
+    |> URI.append_query("key=#{key}")
     |> insert_url_path_parameters(paths, parameters)
     |> insert_url_query_parameters(paths, parameters)
     |> validate_url!()

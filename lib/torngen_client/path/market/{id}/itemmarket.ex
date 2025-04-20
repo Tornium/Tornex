@@ -16,8 +16,7 @@ defmodule Torngen.Client.Path.Market.Id.Itemmarket do
   - Market
   """
 
-  # import Torngen.Client.Path, only: [defparameter: 3]
-  require Torngen.Client.Path
+  import Torngen.Client.Path, only: [defparameter: 3]
 
   @behaviour Torngen.Client.Path
 

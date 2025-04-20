@@ -33,18 +33,17 @@ defmodule Tornex.API do
   use Tesla
 
   @type return :: list() | map()
-  @type error :: {:error, :timeout | :cf_challenge | :unknown | any()}
+  @type error :: {:error, :timeout | :cf_challenge | :unknown | term()}
 
   @user_agent [{"User-agent", "tornex" <> Mix.Project.config()[:version]}]
   @base_url Application.compile_env(:tornex, :base_url, "https://api.torn.com")
-  @comment Application.compile_env(:tornex, :comment, "tex/" <> Mix.Project.config()[:version])
+  @comment Application.compile_env(:tornex, :comment, "tex-" <> Mix.Project.config()[:version])
 
-  plug(Tesla.Middleware.BaseUrl, @base_url)
   plug(Tesla.Middleware.Headers, @user_agent)
   plug(Tesla.Middleware.JSON)
 
-  @doc """
-  Converts a `Tornex.Query` to the URL required to make the HTTP request.
+  @doc ~S"""
+  Converts a `Tornex.Query` or `Tornex.SpecQuery` to the URL required to make the HTTP request.
 
       iex> query = %Tornex.Query{
       ...>   resource: "user",
@@ -55,11 +54,20 @@ defmodule Tornex.API do
       ...>   selections: ["basic", "discord"]
       ...> }
       iex> Tornex.API.query_to_url(query)
-      "https://api.torn.com/user/1?selections=basic,discord&key=apikey&comment=tex/#{Mix.Project.config()[:version]}"
+      "https://api.torn.com/user/1?selections=basic,discord&key=apikey&comment=tex-#{Mix.Project.config()[:version]}"
+
+      iex> spec_query =
+      ...>   Tornex.SpecQuery.new()
+      ...>   |> Tornex.SpecQuery.put_path(Torngen.Client.Path.Faction.Id.Basic)
+      ...>   |> Tornex.SpecQuery.put_path(Torngen.Client.Path.Faction.Id.Chains)
+      ...>   |> Tornex.SpecQuery.put_parameter(:id, 89)
+      ...>   |> Tornex.SpecQuery.put_parameter(:limit, 100)
+      iex> Tornex.API.query_to_url(spec_query)
+      "https://api.torn.com/v2/faction/89/?selections=chains,basic&limit=100&comment=tex-#{Mix.Project.config()[:version]}"
   """
   @spec query_to_url(Tornex.Query.t()) :: String.t()
   def query_to_url(%Tornex.Query{} = query) do
-    ("/" <> query.resource <> "/")
+    (@base_url <> "/" <> query.resource <> "/")
     |> append_resource_id(query)
     |> Tesla.build_url(
       [
@@ -71,14 +79,19 @@ defmodule Tornex.API do
         comment: @comment
       ] ++ (query.params || [])
     )
+    |> String.replace("%2C", ",")
   end
 
   @spec query_to_url(Tornex.SpecQuery.t()) :: String.t()
   def query_to_url(%Tornex.SpecQuery{} = query) do
+    query
+    |> Tornex.SpecQuery.uri()
+    |> URI.append_query("comment=" <> @comment)
+    |> URI.to_string()
   end
 
   @doc """
-  Performs a blocking HTTP GET request against the Torn API for the `Tornex.Query`.
+  Performs a blocking HTTP GET request against the Torn API for a `Tornex.Query` or `Tornex.SpecQuery`.
 
   ## Examples
 
@@ -112,10 +125,18 @@ defmodule Tornex.API do
 
   @spec torn_get(Tornex.SpecQuery.t()) :: term() | error()
   def torn_get(%Tornex.SpecQuery{} = query) do
+    {path, selections} = Tornex.SpecQuery.path_selections!(query)
+
+    resource =
+      path
+      |> String.split("/")
+      |> Enum.at(0)
+
     :telemetry.execute([:tornex, :api, :start], %{}, %{
-      resource: query.resource,
-      resource_id: query.resource_id,
-      selections: query.selections,
+      resource: resource,
+      # TODO: Determine the resource ID from the parameters
+      resource_id: nil,
+      selections: selections,
       user: query.key_owner
     })
 
@@ -124,11 +145,19 @@ defmodule Tornex.API do
     # TODO: Switch `torn_get` to `get` and deprecate `torn_get`
     {latency, response} = :timer.tc(&get/1, [query_to_url(query)])
 
-    {path, selections} = Tornex.SpecQuery.path_selections!(query)
+    :telemetry.execute([:tornex, :api, :finish], %{latency: latency}, %{
+      resource: resource,
+      resource_id: nil,
+      selections: selections,
+      user: query.key_owner
+    })
+
+    handle_response(query, response)
   end
 
-  @spec handle_response(query :: Tornex.Query.t(), response :: tuple()) :: {:ok, return()} | error()
-  defp handle_response(%Tornex.Query{} = _query, {:ok, %Tesla.Env{status: 403} = response}) do
+  @spec handle_response(query :: Tornex.Query.t() | Tornex.SpecQuery.t(), response :: tuple()) ::
+          {:ok, return()} | error()
+  defp handle_response(_query, {:ok, %Tesla.Env{status: 403} = response}) do
     if Enum.member?(response.headers, {"cf-mitigated", "challenge"}) do
       {:error, :cf_challenge}
     else
@@ -136,7 +165,7 @@ defmodule Tornex.API do
     end
   end
 
-  defp handle_response(%Tornex.Query{} = _query, {:ok, %Tesla.Env{} = response}) do
+  defp handle_response(_query, {:ok, %Tesla.Env{} = response}) do
     response.body
   end
 
@@ -151,7 +180,26 @@ defmodule Tornex.API do
     {:error, :timeout}
   end
 
-  defp handle_response(%Tornex.Query{} = _query, {:error, reason}) do
+  defp handle_response(%Tornex.SpecQuery{} = query, {:error, :timeout}) do
+    {path, selections} = Tornex.SpecQuery.path_selections!(query)
+
+    resource =
+      path
+      |> String.split("/")
+      |> Enum.at(0)
+
+    :telemetry.execute([:tornex, :api, :timeout], %{}, %{
+      resource: resource,
+      # TODO: Detemrine the resource ID from the parameters
+      resource_id: nil,
+      selections: selections,
+      user: query.key_owner
+    })
+
+    {:error, :timeout}
+  end
+
+  defp handle_response(_query, {:error, reason}) do
     IO.inspect(reason, label: "Unknown Tornex error")
 
     {:error, :unknown}
