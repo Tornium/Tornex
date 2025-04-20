@@ -29,3 +29,5 @@ tornix-*.tar
 
 # IEx configuration
 .iex.exs
+
+openapi.json
