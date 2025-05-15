@@ -10,6 +10,8 @@ defmodule Torngen.Client.Schema.PersonalStatsCrimesV2 do
     :offenses
   ]
 
+  # TODO: Handle required values in schema parser
+  @required []
   @type t :: %__MODULE__{
           version: String.t(),
           skills: %{
@@ -39,4 +41,19 @@ defmodule Torngen.Client.Schema.PersonalStatsCrimesV2 do
             :counterfeiting => integer()
           }
         }
+
+  @spec required() :: list(atom())
+  def required(), do: @required
+
+  @impl true
+  def parse(%{} = data) do
+    %__MODULE__{
+      version: Map.get(data, "version"),
+      skills: Map.get(data, "skills"),
+      offenses: Map.get(data, "offenses")
+    }
+
+    # TODO: Handle values that are not literals
+    # TODO: Handle default values in schema parser and codegen
+  end
 end

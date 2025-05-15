@@ -12,6 +12,8 @@ defmodule Torngen.Client.Schema.UserCrimeDetailsScamming do
     :concerns
   ]
 
+  # TODO: Handle required values in schema parser
+  @required []
   @type t :: %__MODULE__{
           zones: %{
             :temptation => integer(),
@@ -29,4 +31,21 @@ defmodule Torngen.Client.Schema.UserCrimeDetailsScamming do
           emails: %{:scraper => integer(), :phisher => integer()},
           concerns: %{:resolved => integer(), :attempts => integer()}
         }
+
+  @spec required() :: list(atom())
+  def required(), do: @required
+
+  @impl true
+  def parse(%{} = data) do
+    %__MODULE__{
+      zones: Map.get(data, "zones"),
+      payouts: Map.get(data, "payouts"),
+      most_responses: Map.get(data, "most_responses"),
+      emails: Map.get(data, "emails"),
+      concerns: Map.get(data, "concerns")
+    }
+
+    # TODO: Handle values that are not literals
+    # TODO: Handle default values in schema parser and codegen
+  end
 end

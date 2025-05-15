@@ -8,6 +8,8 @@ defmodule Torngen.Client.Schema.PersonalStatsTrading do
     :trading
   ]
 
+  # TODO: Handle required values in schema parser
+  @required []
   @type t :: %__MODULE__{
           trading: %{
             :trades => integer(),
@@ -20,4 +22,17 @@ defmodule Torngen.Client.Schema.PersonalStatsTrading do
             :bazaar => %{:sales => integer(), :profit => integer(), :customers => integer()}
           }
         }
+
+  @spec required() :: list(atom())
+  def required(), do: @required
+
+  @impl true
+  def parse(%{} = data) do
+    %__MODULE__{
+      trading: Map.get(data, "trading")
+    }
+
+    # TODO: Handle values that are not literals
+    # TODO: Handle default values in schema parser and codegen
+  end
 end

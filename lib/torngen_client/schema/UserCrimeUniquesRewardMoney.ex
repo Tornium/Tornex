@@ -9,8 +9,24 @@ defmodule Torngen.Client.Schema.UserCrimeUniquesRewardMoney do
     :max
   ]
 
+  # TODO: Handle required values in schema parser
+  @required []
   @type t :: %__MODULE__{
           min: integer(),
           max: integer()
         }
+
+  @spec required() :: list(atom())
+  def required(), do: @required
+
+  @impl true
+  def parse(%{} = data) do
+    %__MODULE__{
+      min: Map.get(data, "min"),
+      max: Map.get(data, "max")
+    }
+
+    # TODO: Handle values that are not literals
+    # TODO: Handle default values in schema parser and codegen
+  end
 end

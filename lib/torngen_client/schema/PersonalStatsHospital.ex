@@ -8,6 +8,8 @@ defmodule Torngen.Client.Schema.PersonalStatsHospital do
     :hospital
   ]
 
+  # TODO: Handle required values in schema parser
+  @required []
   @type t :: %__MODULE__{
           hospital: %{
             :times_hospitalized => integer(),
@@ -16,4 +18,17 @@ defmodule Torngen.Client.Schema.PersonalStatsHospital do
             :blood_withdrawn => integer()
           }
         }
+
+  @spec required() :: list(atom())
+  def required(), do: @required
+
+  @impl true
+  def parse(%{} = data) do
+    %__MODULE__{
+      hospital: Map.get(data, "hospital")
+    }
+
+    # TODO: Handle values that are not literals
+    # TODO: Handle default values in schema parser and codegen
+  end
 end

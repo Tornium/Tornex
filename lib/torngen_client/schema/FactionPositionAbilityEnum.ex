@@ -29,8 +29,7 @@ defmodule Torngen.Client.Schema.FactionPositionAbilityEnum do
     "Upgrade Management",
     "Newsletter Sending",
     "Announcement Changes",
-    "Description Changes",
-    "Organised Crimes"
+    "Description Changes"
   ]
 
   @spec values() :: [t()]

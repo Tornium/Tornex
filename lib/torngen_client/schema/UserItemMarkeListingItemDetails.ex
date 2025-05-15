@@ -14,6 +14,8 @@ defmodule Torngen.Client.Schema.UserItemMarkeListingItemDetails do
     :bonuses
   ]
 
+  # TODO: Handle required values in schema parser
+  @required []
   @type t :: %__MODULE__{
           uid: nil | Torngen.Client.Schema.ItemUid.t(),
           type: String.t(),
@@ -23,4 +25,23 @@ defmodule Torngen.Client.Schema.UserItemMarkeListingItemDetails do
           id: integer(),
           bonuses: [Torngen.Client.Schema.ItemMarketListingItemBonus.t()]
         }
+
+  @spec required() :: list(atom())
+  def required(), do: @required
+
+  @impl true
+  def parse(%{} = data) do
+    %__MODULE__{
+      uid: Map.get(data, "uid"),
+      type: Map.get(data, "type"),
+      stats: Map.get(data, "stats"),
+      rarity: Map.get(data, "rarity"),
+      name: Map.get(data, "name"),
+      id: Map.get(data, "id"),
+      bonuses: Map.get(data, "bonuses")
+    }
+
+    # TODO: Handle values that are not literals
+    # TODO: Handle default values in schema parser and codegen
+  end
 end

@@ -8,7 +8,22 @@ defmodule Torngen.Client.Schema.FactionContributorsResponse do
     :contributors
   ]
 
+  # TODO: Handle required values in schema parser
+  @required []
   @type t :: %__MODULE__{
           contributors: [Torngen.Client.Schema.FactionContributor.t()]
         }
+
+  @spec required() :: list(atom())
+  def required(), do: @required
+
+  @impl true
+  def parse(%{} = data) do
+    %__MODULE__{
+      contributors: Map.get(data, "contributors")
+    }
+
+    # TODO: Handle values that are not literals
+    # TODO: Handle default values in schema parser and codegen
+  end
 end

@@ -1,0 +1,38 @@
+defmodule Torngen.Client.Schema.FactionTerritoryWarFinishedFaction do
+  @moduledoc """
+  """
+
+  @behaviour Torngen.Client.Schema
+
+  defstruct [
+    :score,
+    :name,
+    :is_aggressor,
+    :id
+  ]
+
+  # TODO: Handle required values in schema parser
+  @required []
+  @type t :: %__MODULE__{
+          score: integer(),
+          name: String.t(),
+          is_aggressor: boolean(),
+          id: Torngen.Client.Schema.FactionId.t()
+        }
+
+  @spec required() :: list(atom())
+  def required(), do: @required
+
+  @impl true
+  def parse(%{} = data) do
+    %__MODULE__{
+      score: Map.get(data, "score"),
+      name: Map.get(data, "name"),
+      is_aggressor: Map.get(data, "is_aggressor"),
+      id: Map.get(data, "id")
+    }
+
+    # TODO: Handle values that are not literals
+    # TODO: Handle default values in schema parser and codegen
+  end
+end

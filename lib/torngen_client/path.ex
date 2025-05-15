@@ -30,11 +30,29 @@ defmodule Torngen.Client.Path do
 
   @optional_callbacks parameter: 2
 
+  @doc """
+  """
+  @callback parse(response :: map() | list()) :: any()
+  # TODO: Add documentation
+  # TODO: Add response type
+
   @doc false
   def path_selection(path) do
     path
     |> String.split("/")
     |> do_path_selection()
+  end
+
+  @doc false
+  @spec parse(response_modules :: [module()], response :: map() | list()) :: list()
+  def parse(response_modules, response) do
+    response_modules
+    |> Enum.map(fn module_name ->
+      Torngen.Client.Schema
+      |> Module.concat(module_name)
+      |> apply(:parse, [response])
+    end)
+    |> Enum.reject(&is_nil/1)
   end
 
   defp do_path_selection(path_sections) when Kernel.length(path_sections) == 3 do

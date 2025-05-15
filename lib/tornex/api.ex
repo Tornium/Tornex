@@ -62,10 +62,11 @@ defmodule Tornex.API do
       ...>   |> Tornex.SpecQuery.put_path(Torngen.Client.Path.Faction.Id.Chains)
       ...>   |> Tornex.SpecQuery.put_parameter(:id, 89)
       ...>   |> Tornex.SpecQuery.put_parameter(:limit, 100)
+      ...>   |> Tornex.SpecQuery.put_key("apikey")
       iex> Tornex.API.query_to_url(spec_query)
-      "https://api.torn.com/v2/faction/89/?selections=chains,basic&limit=100&comment=tex-#{Mix.Project.config()[:version]}"
+      "https://api.torn.com/v2/faction/89/?selections=chains,basic&key=apikey&limit=100&comment=tex-#{Mix.Project.config()[:version]}"
   """
-  @spec query_to_url(Tornex.Query.t()) :: String.t()
+  @spec query_to_url(Tornex.Query.t() | Tornex.SpecQuery.t()) :: String.t()
   def query_to_url(%Tornex.Query{} = query) do
     (@base_url <> "/" <> query.resource <> "/")
     |> append_resource_id(query)
@@ -80,9 +81,10 @@ defmodule Tornex.API do
       ] ++ (query.params || [])
     )
     |> String.replace("%2C", ",")
+
+    # Replacing `%2C` with `,` is necessary when joining the selections where Tesla escapes the comma
   end
 
-  @spec query_to_url(Tornex.SpecQuery.t()) :: String.t()
   def query_to_url(%Tornex.SpecQuery{} = query) do
     query
     |> Tornex.SpecQuery.uri()
@@ -120,7 +122,7 @@ defmodule Tornex.API do
       user: query.key_owner
     })
 
-    handle_response(query, response)
+    handle_response(response, query)
   end
 
   @spec torn_get(Tornex.SpecQuery.t()) :: term() | error()
@@ -143,6 +145,7 @@ defmodule Tornex.API do
     # TODO: Validate query
     # TODO: Replace Tesla.get with some other library (e.g. Req)
     # TODO: Switch `torn_get` to `get` and deprecate `torn_get`
+    # TODO: Switch `torn_get` to use the `Authentication` header instead of a query parameter
     {latency, response} = :timer.tc(&get/1, [query_to_url(query)])
 
     :telemetry.execute([:tornex, :api, :finish], %{latency: latency}, %{
@@ -152,12 +155,12 @@ defmodule Tornex.API do
       user: query.key_owner
     })
 
-    handle_response(query, response)
+    handle_response(response, query)
   end
 
-  @spec handle_response(query :: Tornex.Query.t() | Tornex.SpecQuery.t(), response :: tuple()) ::
+  @spec handle_response(response :: tuple(), query :: Tornex.Query.t() | Tornex.SpecQuery.t()) ::
           {:ok, return()} | error()
-  defp handle_response(_query, {:ok, %Tesla.Env{status: 403} = response}) do
+  defp handle_response({:ok, %Tesla.Env{status: 403} = response}, _query) do
     if Enum.member?(response.headers, {"cf-mitigated", "challenge"}) do
       {:error, :cf_challenge}
     else
@@ -166,16 +169,11 @@ defmodule Tornex.API do
   end
 
   # TODO: Parse error responses into new error struct
-  defp handle_response(%Tornex.Query{} = query, {:ok, %Tesla.Env{} = response}) do
+  defp handle_response({:ok, %Tesla.Env{} = response}, _query) do
     response.body
   end
 
-  defp handle_response(%Tornex.SpecQuery{} = query, {:ok, %Tesla.Env{} = response}) do
-    # TODO: Parse query into response struct(s)
-    response.body
-  end
-
-  defp handle_response(%Tornex.Query{} = query, {:error, :timeout}) do
+  defp handle_response({:error, :timeout}, %Tornex.Query{} = query) do
     :telemetry.execute([:tornex, :api, :timeout], %{}, %{
       resource: query.resource,
       resource_id: query.resource_id,
@@ -186,7 +184,7 @@ defmodule Tornex.API do
     {:error, :timeout}
   end
 
-  defp handle_response(%Tornex.SpecQuery{} = query, {:error, :timeout}) do
+  defp handle_response({:error, :timeout}, %Tornex.SpecQuery{} = query) do
     {path, selections} = Tornex.SpecQuery.path_selections!(query)
 
     resource =
@@ -196,7 +194,7 @@ defmodule Tornex.API do
 
     :telemetry.execute([:tornex, :api, :timeout], %{}, %{
       resource: resource,
-      # TODO: Detemrine the resource ID from the parameters
+      # TODO: Determine the resource ID from the parameters
       resource_id: nil,
       selections: selections,
       user: query.key_owner
@@ -205,7 +203,7 @@ defmodule Tornex.API do
     {:error, :timeout}
   end
 
-  defp handle_response(_query, {:error, reason}) do
+  defp handle_response({:error, reason}, _query) do
     IO.inspect(reason, label: "Unknown Tornex error")
 
     {:error, :unknown}

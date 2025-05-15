@@ -56,6 +56,13 @@ defmodule Tornex.SpecQuery do
     }
   end
 
+  @spec put_key(query :: t(), api_key :: String.t()) :: t()
+  def put_key(query, api_key) when is_binary(api_key) do
+    # TODO: Add documentation
+
+    %__MODULE__{query | key: api_key}
+  end
+
   @doc """
   Add an OpenAPI path to the query.
 
@@ -112,6 +119,14 @@ defmodule Tornex.SpecQuery do
     |> insert_url_query_parameters(paths, parameters)
     |> validate_url!()
     |> validate_required_params!(paths)
+  end
+
+  @spec parse(query :: t(), response :: list() | map()) :: list(term())
+  def parse(%__MODULE__{paths: paths} = _query, response)
+      when (is_list(response) or is_map(response)) and Kernel.length(paths) > 0 do
+    paths
+    |> Enum.map(fn path -> path.parse(response) end)
+    |> List.flatten()
   end
 
   @spec base_path!(query :: t()) :: String.t()

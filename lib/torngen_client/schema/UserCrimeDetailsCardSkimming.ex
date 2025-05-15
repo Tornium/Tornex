@@ -9,6 +9,8 @@ defmodule Torngen.Client.Schema.UserCrimeDetailsCardSkimming do
     :card_details
   ]
 
+  # TODO: Handle required values in schema parser
+  @required []
   @type t :: %__MODULE__{
           skimmers: %{
             :oldest_recovered => integer(),
@@ -24,4 +26,18 @@ defmodule Torngen.Client.Schema.UserCrimeDetailsCardSkimming do
             :areas => [%{:id => integer(), :amount => integer()}]
           }
         }
+
+  @spec required() :: list(atom())
+  def required(), do: @required
+
+  @impl true
+  def parse(%{} = data) do
+    %__MODULE__{
+      skimmers: Map.get(data, "skimmers"),
+      card_details: Map.get(data, "card_details")
+    }
+
+    # TODO: Handle values that are not literals
+    # TODO: Handle default values in schema parser and codegen
+  end
 end

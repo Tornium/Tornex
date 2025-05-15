@@ -8,6 +8,8 @@ defmodule Torngen.Client.Schema.PersonalStatsMissions do
     :missions
   ]
 
+  # TODO: Handle required values in schema parser
+  @required []
   @type t :: %__MODULE__{
           missions: %{
             :missions => integer(),
@@ -15,4 +17,17 @@ defmodule Torngen.Client.Schema.PersonalStatsMissions do
             :contracts => %{:total => integer(), :duke => integer()}
           }
         }
+
+  @spec required() :: list(atom())
+  def required(), do: @required
+
+  @impl true
+  def parse(%{} = data) do
+    %__MODULE__{
+      missions: Map.get(data, "missions")
+    }
+
+    # TODO: Handle values that are not literals
+    # TODO: Handle default values in schema parser and codegen
+  end
 end

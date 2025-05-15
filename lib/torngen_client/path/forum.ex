@@ -14,6 +14,9 @@ defmodule Torngen.Client.Path.Forum do
   - to: Timestamp that sets the upper limit for the data returned
   - offset: N/A
   - cat: Selection category
+  - timestamp: Timestamp to bypass cache
+  - comment: Comment for your tool/service/bot/website to be visible in the logs.
+  - key: API key (Public).<br>It's not required to use this parameter when passing the API key via the Authorization header.
 
   ## Tags
   - Forum
@@ -24,6 +27,14 @@ defmodule Torngen.Client.Path.Forum do
   @behaviour Torngen.Client.Path
 
   @path "forum"
+  @response_modules [
+    TimestampResponse,
+    ForumLookupResponse,
+    ForumPostsResponse,
+    ForumThreadResponse,
+    ForumThreadsResponse,
+    ForumCategoriesResponse
+  ]
 
   Module.register_attribute(__MODULE__, :parameter_keys, accumulate: true)
 
@@ -88,10 +99,31 @@ defmodule Torngen.Client.Path.Forum do
   end
 
   @impl true
+  defparameter :timestamp, value do
+    # Timestamp to bypass cache
+    {:query, :timestamp, value}
+  end
+
+  @impl true
+  defparameter :comment, value do
+    # Comment for your tool/service/bot/website to be visible in the logs.
+    {:query, :comment, value}
+  end
+
+  @impl true
+  defparameter :key, value do
+    # API key (Public).<br>It's not required to use this parameter when passing the API key via the Authorization header.
+    {:query, :key, value}
+  end
+
+  @impl true
   def parameter(parameter_name, _value) when is_atom(parameter_name) do
     :error
   end
 
   @impl true
   def parameters(), do: @parameter_keys
+
+  @impl true
+  def parse(response), do: Torngen.Client.Path.parse(@response_modules, response)
 end

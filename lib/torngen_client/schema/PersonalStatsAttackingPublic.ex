@@ -8,6 +8,8 @@ defmodule Torngen.Client.Schema.PersonalStatsAttackingPublic do
     :attacking
   ]
 
+  # TODO: Handle required values in schema parser
+  @required []
   @type t :: %__MODULE__{
           attacking: %{
             :unarmored_wins => integer(),
@@ -43,4 +45,17 @@ defmodule Torngen.Client.Schema.PersonalStatsAttackingPublic do
             }
           }
         }
+
+  @spec required() :: list(atom())
+  def required(), do: @required
+
+  @impl true
+  def parse(%{} = data) do
+    %__MODULE__{
+      attacking: Map.get(data, "attacking")
+    }
+
+    # TODO: Handle values that are not literals
+    # TODO: Handle default values in schema parser and codegen
+  end
 end

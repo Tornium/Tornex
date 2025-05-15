@@ -20,6 +20,8 @@ defmodule Torngen.Client.Schema.FactionMember do
     :days_in_faction
   ]
 
+  # TODO: Handle required values in schema parser
+  @required []
   @type t :: %__MODULE__{
           status: Torngen.Client.Schema.UserStatus.t(),
           revive_setting: Torngen.Client.Schema.ReviveSetting.t(),
@@ -35,4 +37,29 @@ defmodule Torngen.Client.Schema.FactionMember do
           has_early_discharge: boolean(),
           days_in_faction: integer()
         }
+
+  @spec required() :: list(atom())
+  def required(), do: @required
+
+  @impl true
+  def parse(%{} = data) do
+    %__MODULE__{
+      status: Map.get(data, "status"),
+      revive_setting: Map.get(data, "revive_setting"),
+      position: Map.get(data, "position"),
+      name: Map.get(data, "name"),
+      life: Map.get(data, "life"),
+      level: Map.get(data, "level"),
+      last_action: Map.get(data, "last_action"),
+      is_revivable: Map.get(data, "is_revivable"),
+      is_on_wall: Map.get(data, "is_on_wall"),
+      is_in_oc: Map.get(data, "is_in_oc"),
+      id: Map.get(data, "id"),
+      has_early_discharge: Map.get(data, "has_early_discharge"),
+      days_in_faction: Map.get(data, "days_in_faction")
+    }
+
+    # TODO: Handle values that are not literals
+    # TODO: Handle default values in schema parser and codegen
+  end
 end

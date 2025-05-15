@@ -13,6 +13,8 @@ defmodule Torngen.Client.Schema.Revive do
     :id
   ]
 
+  # TODO: Handle required values in schema parser
+  @required []
   @type t :: %__MODULE__{
           timestamp: integer(),
           target: %{
@@ -33,4 +35,22 @@ defmodule Torngen.Client.Schema.Revive do
           result: String.t(),
           id: Torngen.Client.Schema.ReviveId.t()
         }
+
+  @spec required() :: list(atom())
+  def required(), do: @required
+
+  @impl true
+  def parse(%{} = data) do
+    %__MODULE__{
+      timestamp: Map.get(data, "timestamp"),
+      target: Map.get(data, "target"),
+      success_chance: Map.get(data, "success_chance"),
+      reviver: Map.get(data, "reviver"),
+      result: Map.get(data, "result"),
+      id: Map.get(data, "id")
+    }
+
+    # TODO: Handle values that are not literals
+    # TODO: Handle default values in schema parser and codegen
+  end
 end

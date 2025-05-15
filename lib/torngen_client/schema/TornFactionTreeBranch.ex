@@ -10,6 +10,8 @@ defmodule Torngen.Client.Schema.TornFactionTreeBranch do
     :id
   ]
 
+  # TODO: Handle required values in schema parser
+  @required []
   @type t :: %__MODULE__{
           upgrades: [
             %{
@@ -29,4 +31,19 @@ defmodule Torngen.Client.Schema.TornFactionTreeBranch do
           name: String.t(),
           id: Torngen.Client.Schema.FactionBranchId.t()
         }
+
+  @spec required() :: list(atom())
+  def required(), do: @required
+
+  @impl true
+  def parse(%{} = data) do
+    %__MODULE__{
+      upgrades: Map.get(data, "upgrades"),
+      name: Map.get(data, "name"),
+      id: Map.get(data, "id")
+    }
+
+    # TODO: Handle values that are not literals
+    # TODO: Handle default values in schema parser and codegen
+  end
 end

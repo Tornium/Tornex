@@ -8,6 +8,8 @@ defmodule Torngen.Client.Schema.ForumCategoriesResponse do
     :categories
   ]
 
+  # TODO: Handle required values in schema parser
+  @required []
   @type t :: %__MODULE__{
           categories: [
             %{
@@ -18,4 +20,17 @@ defmodule Torngen.Client.Schema.ForumCategoriesResponse do
             }
           ]
         }
+
+  @spec required() :: list(atom())
+  def required(), do: @required
+
+  @impl true
+  def parse(%{} = data) do
+    %__MODULE__{
+      categories: Map.get(data, "categories")
+    }
+
+    # TODO: Handle values that are not literals
+    # TODO: Handle default values in schema parser and codegen
+  end
 end

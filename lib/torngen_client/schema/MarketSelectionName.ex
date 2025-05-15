@@ -7,7 +7,7 @@ defmodule Torngen.Client.Schema.MarketSelectionName do
 
   @type t :: String.t()
 
-  @values ["itemmarket", "lookup", "timestamp", "pointsmarket"]
+  @values ["itemmarket", "lookup", "timestamp", "pointsmarket", "bazaar"]
 
   @spec values() :: [t()]
   def values, do: @values

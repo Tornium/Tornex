@@ -9,8 +9,24 @@ defmodule Torngen.Client.Schema.UserCrimeRewardAmmo do
     :special
   ]
 
+  # TODO: Handle required values in schema parser
+  @required []
   @type t :: %__MODULE__{
           standard: integer(),
           special: integer()
         }
+
+  @spec required() :: list(atom())
+  def required(), do: @required
+
+  @impl true
+  def parse(%{} = data) do
+    %__MODULE__{
+      standard: Map.get(data, "standard"),
+      special: Map.get(data, "special")
+    }
+
+    # TODO: Handle values that are not literals
+    # TODO: Handle default values in schema parser and codegen
+  end
 end

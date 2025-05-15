@@ -23,11 +23,16 @@ defmodule Torngen.Client.Schema.FactionSelectionName do
     "lookup",
     "members",
     "news",
+    "rackets",
     "rankedwars",
     "rankedwarreport",
     "revives",
     "revivesfull",
     "stats",
+    "territory",
+    "territoryownership",
+    "territorywarreport",
+    "territorywars",
     "timestamp",
     "upgrades",
     "wars",
@@ -41,8 +46,16 @@ defmodule Torngen.Client.Schema.FactionSelectionName do
     "positions",
     "reports",
     "temporary",
-    "territory",
-    "weapons"
+    "weapons",
+    "armorynews",
+    "attacknews",
+    "crimenews",
+    "currency",
+    "donations",
+    "fundsnews",
+    "mainnews",
+    "membershipnews",
+    "territorynews"
   ]
 
   @spec values() :: [t()]

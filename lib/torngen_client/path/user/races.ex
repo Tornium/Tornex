@@ -10,6 +10,9 @@ defmodule Torngen.Client.Path.User.Races do
   - from: Timestamp that sets the lower limit for the data returned
   - to: Timestamp that sets the upper limit for the data returned
   - cat: Category of races returned
+  - timestamp: Timestamp to bypass cache
+  - comment: Comment for your tool/service/bot/website to be visible in the logs.
+  - key: API key (Minimal).<br>It's not required to use this parameter when passing the API key via the Authorization header.
 
   ## Tags
   - User
@@ -20,6 +23,7 @@ defmodule Torngen.Client.Path.User.Races do
   @behaviour Torngen.Client.Path
 
   @path "user/races"
+  @response_modules [UserRacesResponse]
 
   Module.register_attribute(__MODULE__, :parameter_keys, accumulate: true)
 
@@ -60,10 +64,31 @@ defmodule Torngen.Client.Path.User.Races do
   end
 
   @impl true
+  defparameter :timestamp, value do
+    # Timestamp to bypass cache
+    {:query, :timestamp, value}
+  end
+
+  @impl true
+  defparameter :comment, value do
+    # Comment for your tool/service/bot/website to be visible in the logs.
+    {:query, :comment, value}
+  end
+
+  @impl true
+  defparameter :key, value do
+    # API key (Minimal).<br>It's not required to use this parameter when passing the API key via the Authorization header.
+    {:query, :key, value}
+  end
+
+  @impl true
   def parameter(parameter_name, _value) when is_atom(parameter_name) do
     :error
   end
 
   @impl true
   def parameters(), do: @parameter_keys
+
+  @impl true
+  def parse(response), do: Torngen.Client.Path.parse(@response_modules, response)
 end
