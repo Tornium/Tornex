@@ -27,7 +27,11 @@ defmodule Torngen.Client.Schema.PersonalStatsCategoryEnum do
     "missions",
     "racing",
     "networth",
-    "other"
+    "other",
+    "itemmarketcustomers",
+    "itemmarketsales",
+    "itemmarketrevenue",
+    "itemmarketfees"
   ]
 
   @spec values() :: [t()]

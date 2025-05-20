@@ -27,7 +27,9 @@ defmodule Torngen.Client.Schema.KeyInfoResponse do
             :access => %{
               :type => Torngen.Client.Schema.ApiKeyAccessTypeEnum.t(),
               :level => integer(),
+              :faction_id => nil | Torngen.Client.Schema.FactionId.t(),
               :faction => boolean(),
+              :company_id => nil | Torngen.Client.Schema.CompanyId.t(),
               :company => boolean()
             }
           }
@@ -48,7 +50,9 @@ defmodule Torngen.Client.Schema.KeyInfoResponse do
                {:object,
                 %{
                   "company" => {:static, :boolean},
+                  "company_id" => {:one_of, [{:static, :null}, Torngen.Client.Schema.CompanyId]},
                   "faction" => {:static, :boolean},
+                  "faction_id" => {:one_of, [{:static, :null}, Torngen.Client.Schema.FactionId]},
                   "level" => {:static, :integer},
                   "type" => Torngen.Client.Schema.ApiKeyAccessTypeEnum
                 }},

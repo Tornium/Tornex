@@ -8,7 +8,6 @@ defmodule Torngen.Client.Schema.ItemMarketListingNonstackable do
   defstruct [
     :price,
     :item_details,
-    :itemDetails,
     :amount
   ]
 
@@ -17,7 +16,6 @@ defmodule Torngen.Client.Schema.ItemMarketListingNonstackable do
   @type t :: %__MODULE__{
           price: integer(),
           item_details: Torngen.Client.Schema.ItemMarketListingItemDetails.t(),
-          itemDetails: Torngen.Client.Schema.ItemMarketListingItemDetails.t(),
           amount: integer()
         }
 
@@ -30,9 +28,6 @@ defmodule Torngen.Client.Schema.ItemMarketListingNonstackable do
       price: Map.get(data, "price") |> Torngen.Client.Schema.parse({:static, :integer}),
       item_details:
         Map.get(data, "item_details") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ItemMarketListingItemDetails),
-      itemDetails:
-        Map.get(data, "itemDetails")
-        |> Torngen.Client.Schema.parse({:all_of, [Torngen.Client.Schema.ItemMarketListingItemDetails]}),
       amount: Map.get(data, "amount") |> Torngen.Client.Schema.parse({:static, :integer})
     }
 

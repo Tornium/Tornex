@@ -20,6 +20,7 @@ defmodule Torngen.Client.Schema.PersonalStatsTrading do
               :bought => %{:shops => integer(), :market => integer()},
               :auctions => %{:won => integer(), :sold => integer()}
             },
+            :item_market => %{:sales => integer(), :revenue => integer(), :fees => integer(), :customers => integer()},
             :bazaar => %{:sales => integer(), :profit => integer(), :customers => integer()}
           }
         }
@@ -38,6 +39,14 @@ defmodule Torngen.Client.Schema.PersonalStatsTrading do
              "bazaar" =>
                {:object,
                 %{"customers" => {:static, :integer}, "profit" => {:static, :integer}, "sales" => {:static, :integer}}},
+             "item_market" =>
+               {:object,
+                %{
+                  "customers" => {:static, :integer},
+                  "fees" => {:static, :integer},
+                  "revenue" => {:static, :integer},
+                  "sales" => {:static, :integer}
+                }},
              "items" =>
                {:object,
                 %{

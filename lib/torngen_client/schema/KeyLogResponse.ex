@@ -18,7 +18,8 @@ defmodule Torngen.Client.Schema.KeyLogResponse do
               :timestamp => integer(),
               :selections => String.t(),
               :ip => String.t(),
-              :id => nil | integer()
+              :id => nil | integer(),
+              :comment => nil | String.t()
             }
           ]
         }
@@ -35,6 +36,7 @@ defmodule Torngen.Client.Schema.KeyLogResponse do
           {:array,
            {:object,
             %{
+              "comment" => {:one_of, [static: :null, static: :string]},
               "id" => {:one_of, [static: :null, static: :integer]},
               "ip" => {:static, :string},
               "selections" => {:static, :string},
