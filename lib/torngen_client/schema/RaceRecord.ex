@@ -3,7 +3,11 @@ defmodule Torngen.Client.Schema.RaceRecord do
   [SHORT DESCRIPTION]
   """
 
+  use Torngen.Client.SchemaObjectAccess, deprecated: []
+
   @behaviour Torngen.Client.Schema
+
+  @keys [:lap_time, :driver_name, :driver_id, :car_item_name, :car_item_id]
 
   defstruct [
     :lap_time,
@@ -13,8 +17,6 @@ defmodule Torngen.Client.Schema.RaceRecord do
     :car_item_id
   ]
 
-  # TODO: Handle required values in schema parser
-  @required []
   @type t :: %__MODULE__{
           lap_time: integer() | float(),
           driver_name: String.t(),
@@ -22,9 +24,6 @@ defmodule Torngen.Client.Schema.RaceRecord do
           car_item_name: String.t(),
           car_item_id: Torngen.Client.Schema.ItemId.t()
         }
-
-  @spec required() :: list(atom())
-  def required(), do: @required
 
   @impl true
   def parse(%{} = data) do
@@ -38,4 +37,35 @@ defmodule Torngen.Client.Schema.RaceRecord do
 
     # TODO: Handle default values in schema parser and codegen
   end
+
+  @impl true
+  def validate(%{} = data) do
+    @keys
+    |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
+    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
+    |> Enum.any?()
+  end
+
+  defp validate_key(:lap_time, value) do
+    Torngen.Client.Schema.validate(value, {:static, :number})
+  end
+
+  defp validate_key(:driver_name, value) do
+    Torngen.Client.Schema.validate(value, {:static, :string})
+  end
+
+  defp validate_key(:driver_id, value) do
+    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.UserId)
+  end
+
+  defp validate_key(:car_item_name, value) do
+    Torngen.Client.Schema.validate(value, {:static, :string})
+  end
+
+  defp validate_key(:car_item_id, value) do
+    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.ItemId)
+  end
+
+  @spec keys() :: list(atom())
+  def keys(), do: @keys
 end

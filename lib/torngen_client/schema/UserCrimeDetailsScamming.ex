@@ -3,7 +3,11 @@ defmodule Torngen.Client.Schema.UserCrimeDetailsScamming do
   [SHORT DESCRIPTION]
   """
 
+  use Torngen.Client.SchemaObjectAccess, deprecated: []
+
   @behaviour Torngen.Client.Schema
+
+  @keys [:zones, :payouts, :most_responses, :emails, :concerns]
 
   defstruct [
     :zones,
@@ -13,8 +17,6 @@ defmodule Torngen.Client.Schema.UserCrimeDetailsScamming do
     :concerns
   ]
 
-  # TODO: Handle required values in schema parser
-  @required []
   @type t :: %__MODULE__{
           zones: %{
             :temptation => integer(),
@@ -32,9 +34,6 @@ defmodule Torngen.Client.Schema.UserCrimeDetailsScamming do
           emails: %{:scraper => integer(), :phisher => integer()},
           concerns: %{:resolved => integer(), :attempts => integer()}
         }
-
-  @spec required() :: list(atom())
-  def required(), do: @required
 
   @impl true
   def parse(%{} = data) do
@@ -73,4 +72,58 @@ defmodule Torngen.Client.Schema.UserCrimeDetailsScamming do
 
     # TODO: Handle default values in schema parser and codegen
   end
+
+  @impl true
+  def validate(%{} = data) do
+    @keys
+    |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
+    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
+    |> Enum.any?()
+  end
+
+  defp validate_key(:zones, value) do
+    Torngen.Client.Schema.validate(
+      value,
+      {:object,
+       %{
+         "concern" => {:static, :integer},
+         "hesitation" => {:static, :integer},
+         "high_reward" => {:static, :integer},
+         "low_reward" => {:static, :integer},
+         "medium_reward" => {:static, :integer},
+         "neutral" => {:static, :integer},
+         "red" => {:static, :integer},
+         "sensitivity" => {:static, :integer},
+         "temptation" => {:static, :integer}
+       }}
+    )
+  end
+
+  defp validate_key(:payouts, value) do
+    Torngen.Client.Schema.validate(
+      value,
+      {:object, %{"high" => {:static, :integer}, "low" => {:static, :integer}, "medium" => {:static, :integer}}}
+    )
+  end
+
+  defp validate_key(:most_responses, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:emails, value) do
+    Torngen.Client.Schema.validate(
+      value,
+      {:object, %{"phisher" => {:static, :integer}, "scraper" => {:static, :integer}}}
+    )
+  end
+
+  defp validate_key(:concerns, value) do
+    Torngen.Client.Schema.validate(
+      value,
+      {:object, %{"attempts" => {:static, :integer}, "resolved" => {:static, :integer}}}
+    )
+  end
+
+  @spec keys() :: list(atom())
+  def keys(), do: @keys
 end

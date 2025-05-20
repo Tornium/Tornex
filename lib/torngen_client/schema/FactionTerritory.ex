@@ -3,7 +3,11 @@ defmodule Torngen.Client.Schema.FactionTerritory do
   [SHORT DESCRIPTION]
   """
 
+  use Torngen.Client.SchemaObjectAccess, deprecated: []
+
   @behaviour Torngen.Client.Schema
+
+  @keys [:slots, :size, :sector, :respect, :racket, :id, :density, :coordinates, :acquired_at]
 
   defstruct [
     :slots,
@@ -17,8 +21,6 @@ defmodule Torngen.Client.Schema.FactionTerritory do
     :acquired_at
   ]
 
-  # TODO: Handle required values in schema parser
-  @required []
   @type t :: %__MODULE__{
           slots: integer(),
           size: integer(),
@@ -30,9 +32,6 @@ defmodule Torngen.Client.Schema.FactionTerritory do
           coordinates: Torngen.Client.Schema.TornTerritoryCoordinates.t(),
           acquired_at: integer()
         }
-
-  @spec required() :: list(atom())
-  def required(), do: @required
 
   @impl true
   def parse(%{} = data) do
@@ -53,4 +52,51 @@ defmodule Torngen.Client.Schema.FactionTerritory do
 
     # TODO: Handle default values in schema parser and codegen
   end
+
+  @impl true
+  def validate(%{} = data) do
+    @keys
+    |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
+    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
+    |> Enum.any?()
+  end
+
+  defp validate_key(:slots, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:size, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:sector, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:respect, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:racket, value) do
+    Torngen.Client.Schema.validate(value, {:one_of, [{:static, :null}, Torngen.Client.Schema.TornRacket]})
+  end
+
+  defp validate_key(:id, value) do
+    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.FactionTerritoryEnum)
+  end
+
+  defp validate_key(:density, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:coordinates, value) do
+    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.TornTerritoryCoordinates)
+  end
+
+  defp validate_key(:acquired_at, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  @spec keys() :: list(atom())
+  def keys(), do: @keys
 end

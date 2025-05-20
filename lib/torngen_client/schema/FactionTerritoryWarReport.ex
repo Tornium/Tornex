@@ -3,7 +3,11 @@ defmodule Torngen.Client.Schema.FactionTerritoryWarReport do
   [SHORT DESCRIPTION]
   """
 
+  use Torngen.Client.SchemaObjectAccess, deprecated: []
+
   @behaviour Torngen.Client.Schema
+
+  @keys [:winner, :territory, :started_at, :result, :id, :factions, :ended_at]
 
   defstruct [
     :winner,
@@ -15,8 +19,6 @@ defmodule Torngen.Client.Schema.FactionTerritoryWarReport do
     :ended_at
   ]
 
-  # TODO: Handle required values in schema parser
-  @required []
   @type t :: %__MODULE__{
           winner: Torngen.Client.Schema.FactionId.t(),
           territory: Torngen.Client.Schema.FactionTerritoryEnum.t(),
@@ -26,9 +28,6 @@ defmodule Torngen.Client.Schema.FactionTerritoryWarReport do
           factions: [Torngen.Client.Schema.FactionTerritoryWarReportFaction.t()],
           ended_at: integer()
         }
-
-  @spec required() :: list(atom())
-  def required(), do: @required
 
   @impl true
   def parse(%{} = data) do
@@ -46,4 +45,43 @@ defmodule Torngen.Client.Schema.FactionTerritoryWarReport do
 
     # TODO: Handle default values in schema parser and codegen
   end
+
+  @impl true
+  def validate(%{} = data) do
+    @keys
+    |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
+    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
+    |> Enum.any?()
+  end
+
+  defp validate_key(:winner, value) do
+    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.FactionId)
+  end
+
+  defp validate_key(:territory, value) do
+    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.FactionTerritoryEnum)
+  end
+
+  defp validate_key(:started_at, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:result, value) do
+    Torngen.Client.Schema.validate(value, {:static, :string})
+  end
+
+  defp validate_key(:id, value) do
+    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.TerritoryWarId)
+  end
+
+  defp validate_key(:factions, value) do
+    Torngen.Client.Schema.validate(value, {:array, Torngen.Client.Schema.FactionTerritoryWarReportFaction})
+  end
+
+  defp validate_key(:ended_at, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  @spec keys() :: list(atom())
+  def keys(), do: @keys
 end

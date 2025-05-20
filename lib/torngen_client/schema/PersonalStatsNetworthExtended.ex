@@ -3,14 +3,16 @@ defmodule Torngen.Client.Schema.PersonalStatsNetworthExtended do
   [SHORT DESCRIPTION]
   """
 
+  use Torngen.Client.SchemaObjectAccess, deprecated: []
+
   @behaviour Torngen.Client.Schema
+
+  @keys [:networth]
 
   defstruct [
     :networth
   ]
 
-  # TODO: Handle required values in schema parser
-  @required []
   @type t :: %__MODULE__{
           networth: %{
             :wallet => integer(),
@@ -35,9 +37,6 @@ defmodule Torngen.Client.Schema.PersonalStatsNetworthExtended do
             :auction_house => integer()
           }
         }
-
-  @spec required() :: list(atom())
-  def required(), do: @required
 
   @impl true
   def parse(%{} = data) do
@@ -73,4 +72,44 @@ defmodule Torngen.Client.Schema.PersonalStatsNetworthExtended do
 
     # TODO: Handle default values in schema parser and codegen
   end
+
+  @impl true
+  def validate(%{} = data) do
+    @keys
+    |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
+    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
+    |> Enum.any?()
+  end
+
+  defp validate_key(:networth, value) do
+    Torngen.Client.Schema.validate(
+      value,
+      {:object,
+       %{
+         "auction_house" => {:static, :integer},
+         "bank" => {:static, :integer},
+         "bazaar" => {:static, :integer},
+         "bookie" => {:static, :integer},
+         "company" => {:static, :integer},
+         "display_case" => {:static, :integer},
+         "enlisted_cars" => {:static, :integer},
+         "inventory" => {:static, :integer},
+         "item_market" => {:static, :integer},
+         "loans" => {:static, :integer},
+         "overseas_bank" => {:static, :integer},
+         "pending" => {:static, :integer},
+         "piggy_bank" => {:static, :integer},
+         "points" => {:static, :integer},
+         "property" => {:static, :integer},
+         "stock_market" => {:static, :integer},
+         "total" => {:static, :integer},
+         "unpaid_fees" => {:static, :integer},
+         "vaults" => {:static, :integer},
+         "wallet" => {:static, :integer}
+       }}
+    )
+  end
+
+  @spec keys() :: list(atom())
+  def keys(), do: @keys
 end

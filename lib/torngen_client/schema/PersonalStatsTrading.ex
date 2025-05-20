@@ -3,14 +3,16 @@ defmodule Torngen.Client.Schema.PersonalStatsTrading do
   [SHORT DESCRIPTION]
   """
 
+  use Torngen.Client.SchemaObjectAccess, deprecated: []
+
   @behaviour Torngen.Client.Schema
+
+  @keys [:trading]
 
   defstruct [
     :trading
   ]
 
-  # TODO: Handle required values in schema parser
-  @required []
   @type t :: %__MODULE__{
           trading: %{
             :trades => integer(),
@@ -24,9 +26,6 @@ defmodule Torngen.Client.Schema.PersonalStatsTrading do
             :bazaar => %{:sales => integer(), :profit => integer(), :customers => integer()}
           }
         }
-
-  @spec required() :: list(atom())
-  def required(), do: @required
 
   @impl true
   def parse(%{} = data) do
@@ -62,4 +61,44 @@ defmodule Torngen.Client.Schema.PersonalStatsTrading do
 
     # TODO: Handle default values in schema parser and codegen
   end
+
+  @impl true
+  def validate(%{} = data) do
+    @keys
+    |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
+    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
+    |> Enum.any?()
+  end
+
+  defp validate_key(:trading, value) do
+    Torngen.Client.Schema.validate(
+      value,
+      {:object,
+       %{
+         "bazaar" =>
+           {:object,
+            %{"customers" => {:static, :integer}, "profit" => {:static, :integer}, "sales" => {:static, :integer}}},
+         "item_market" =>
+           {:object,
+            %{
+              "customers" => {:static, :integer},
+              "fees" => {:static, :integer},
+              "revenue" => {:static, :integer},
+              "sales" => {:static, :integer}
+            }},
+         "items" =>
+           {:object,
+            %{
+              "auctions" => {:object, %{"sold" => {:static, :integer}, "won" => {:static, :integer}}},
+              "bought" => {:object, %{"market" => {:static, :integer}, "shops" => {:static, :integer}}},
+              "sent" => {:static, :integer}
+            }},
+         "points" => {:object, %{"bought" => {:static, :integer}, "sold" => {:static, :integer}}},
+         "trades" => {:static, :integer}
+       }}
+    )
+  end
+
+  @spec keys() :: list(atom())
+  def keys(), do: @keys
 end

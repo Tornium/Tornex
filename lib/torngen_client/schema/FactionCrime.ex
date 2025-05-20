@@ -3,7 +3,24 @@ defmodule Torngen.Client.Schema.FactionCrime do
   [SHORT DESCRIPTION]
   """
 
+  use Torngen.Client.SchemaObjectAccess, deprecated: []
+
   @behaviour Torngen.Client.Schema
+
+  @keys [
+    :status,
+    :slots,
+    :rewards,
+    :ready_at,
+    :previous_crime_id,
+    :planning_at,
+    :name,
+    :id,
+    :expired_at,
+    :executed_at,
+    :difficulty,
+    :created_at
+  ]
 
   defstruct [
     :status,
@@ -20,8 +37,6 @@ defmodule Torngen.Client.Schema.FactionCrime do
     :created_at
   ]
 
-  # TODO: Handle required values in schema parser
-  @required []
   @type t :: %__MODULE__{
           status: Torngen.Client.Schema.FactionCrimeStatusEnum.t(),
           slots: [Torngen.Client.Schema.FactionCrimeSlot.t()],
@@ -36,9 +51,6 @@ defmodule Torngen.Client.Schema.FactionCrime do
           difficulty: integer(),
           created_at: integer()
         }
-
-  @spec required() :: list(atom())
-  def required(), do: @required
 
   @impl true
   def parse(%{} = data) do
@@ -65,4 +77,63 @@ defmodule Torngen.Client.Schema.FactionCrime do
 
     # TODO: Handle default values in schema parser and codegen
   end
+
+  @impl true
+  def validate(%{} = data) do
+    @keys
+    |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
+    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
+    |> Enum.any?()
+  end
+
+  defp validate_key(:status, value) do
+    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.FactionCrimeStatusEnum)
+  end
+
+  defp validate_key(:slots, value) do
+    Torngen.Client.Schema.validate(value, {:array, Torngen.Client.Schema.FactionCrimeSlot})
+  end
+
+  defp validate_key(:rewards, value) do
+    Torngen.Client.Schema.validate(value, {:one_of, [{:static, :null}, Torngen.Client.Schema.FactionCrimeReward]})
+  end
+
+  defp validate_key(:ready_at, value) do
+    Torngen.Client.Schema.validate(value, {:one_of, [static: :null, static: :integer]})
+  end
+
+  defp validate_key(:previous_crime_id, value) do
+    Torngen.Client.Schema.validate(value, {:one_of, [{:static, :null}, Torngen.Client.Schema.FactionCrimeId]})
+  end
+
+  defp validate_key(:planning_at, value) do
+    Torngen.Client.Schema.validate(value, {:one_of, [static: :null, static: :integer]})
+  end
+
+  defp validate_key(:name, value) do
+    Torngen.Client.Schema.validate(value, {:static, :string})
+  end
+
+  defp validate_key(:id, value) do
+    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.FactionCrimeId)
+  end
+
+  defp validate_key(:expired_at, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:executed_at, value) do
+    Torngen.Client.Schema.validate(value, {:one_of, [static: :null, static: :integer]})
+  end
+
+  defp validate_key(:difficulty, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:created_at, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  @spec keys() :: list(atom())
+  def keys(), do: @keys
 end

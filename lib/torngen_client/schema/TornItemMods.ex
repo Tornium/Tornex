@@ -3,7 +3,11 @@ defmodule Torngen.Client.Schema.TornItemMods do
   [SHORT DESCRIPTION]
   """
 
+  use Torngen.Client.SchemaObjectAccess, deprecated: []
+
   @behaviour Torngen.Client.Schema
+
+  @keys [:weapons, :name, :id, :dual_fit, :description]
 
   defstruct [
     :weapons,
@@ -13,8 +17,6 @@ defmodule Torngen.Client.Schema.TornItemMods do
     :description
   ]
 
-  # TODO: Handle required values in schema parser
-  @required []
   @type t :: %__MODULE__{
           weapons: [Torngen.Client.Schema.TornItemWeaponTypeEnum.t()],
           name: String.t(),
@@ -22,9 +24,6 @@ defmodule Torngen.Client.Schema.TornItemMods do
           dual_fit: boolean(),
           description: String.t()
         }
-
-  @spec required() :: list(atom())
-  def required(), do: @required
 
   @impl true
   def parse(%{} = data) do
@@ -39,4 +38,35 @@ defmodule Torngen.Client.Schema.TornItemMods do
 
     # TODO: Handle default values in schema parser and codegen
   end
+
+  @impl true
+  def validate(%{} = data) do
+    @keys
+    |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
+    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
+    |> Enum.any?()
+  end
+
+  defp validate_key(:weapons, value) do
+    Torngen.Client.Schema.validate(value, {:array, Torngen.Client.Schema.TornItemWeaponTypeEnum})
+  end
+
+  defp validate_key(:name, value) do
+    Torngen.Client.Schema.validate(value, {:static, :string})
+  end
+
+  defp validate_key(:id, value) do
+    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.ItemModId)
+  end
+
+  defp validate_key(:dual_fit, value) do
+    Torngen.Client.Schema.validate(value, {:static, :boolean})
+  end
+
+  defp validate_key(:description, value) do
+    Torngen.Client.Schema.validate(value, {:static, :string})
+  end
+
+  @spec keys() :: list(atom())
+  def keys(), do: @keys
 end

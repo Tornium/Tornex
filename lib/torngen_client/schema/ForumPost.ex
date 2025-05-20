@@ -3,7 +3,26 @@ defmodule Torngen.Client.Schema.ForumPost do
   [SHORT DESCRIPTION]
   """
 
+  use Torngen.Client.SchemaObjectAccess, deprecated: []
+
   @behaviour Torngen.Client.Schema
+
+  @keys [
+    :thread_id,
+    :quoted_post_id,
+    :likes,
+    :is_topic,
+    :is_pinned,
+    :is_legacy,
+    :is_edited,
+    :id,
+    :has_quote,
+    :edited_by,
+    :dislikes,
+    :created_time,
+    :content,
+    :author
+  ]
 
   defstruct [
     :thread_id,
@@ -22,8 +41,6 @@ defmodule Torngen.Client.Schema.ForumPost do
     :author
   ]
 
-  # TODO: Handle required values in schema parser
-  @required []
   @type t :: %__MODULE__{
           thread_id: Torngen.Client.Schema.ForumThreadId.t(),
           quoted_post_id: nil | integer(),
@@ -40,9 +57,6 @@ defmodule Torngen.Client.Schema.ForumPost do
           content: String.t(),
           author: Torngen.Client.Schema.ForumThreadAuthor.t()
         }
-
-  @spec required() :: list(atom())
-  def required(), do: @required
 
   @impl true
   def parse(%{} = data) do
@@ -68,4 +82,71 @@ defmodule Torngen.Client.Schema.ForumPost do
 
     # TODO: Handle default values in schema parser and codegen
   end
+
+  @impl true
+  def validate(%{} = data) do
+    @keys
+    |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
+    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
+    |> Enum.any?()
+  end
+
+  defp validate_key(:thread_id, value) do
+    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.ForumThreadId)
+  end
+
+  defp validate_key(:quoted_post_id, value) do
+    Torngen.Client.Schema.validate(value, {:one_of, [static: :null, static: :integer]})
+  end
+
+  defp validate_key(:likes, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:is_topic, value) do
+    Torngen.Client.Schema.validate(value, {:static, :boolean})
+  end
+
+  defp validate_key(:is_pinned, value) do
+    Torngen.Client.Schema.validate(value, {:static, :boolean})
+  end
+
+  defp validate_key(:is_legacy, value) do
+    Torngen.Client.Schema.validate(value, {:static, :boolean})
+  end
+
+  defp validate_key(:is_edited, value) do
+    Torngen.Client.Schema.validate(value, {:static, :boolean})
+  end
+
+  defp validate_key(:id, value) do
+    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.ForumPostId)
+  end
+
+  defp validate_key(:has_quote, value) do
+    Torngen.Client.Schema.validate(value, {:static, :boolean})
+  end
+
+  defp validate_key(:edited_by, value) do
+    Torngen.Client.Schema.validate(value, {:one_of, [{:static, :null}, Torngen.Client.Schema.UserId]})
+  end
+
+  defp validate_key(:dislikes, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:created_time, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:content, value) do
+    Torngen.Client.Schema.validate(value, {:static, :string})
+  end
+
+  defp validate_key(:author, value) do
+    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.ForumThreadAuthor)
+  end
+
+  @spec keys() :: list(atom())
+  def keys(), do: @keys
 end

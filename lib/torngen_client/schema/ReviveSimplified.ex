@@ -3,7 +3,11 @@ defmodule Torngen.Client.Schema.ReviveSimplified do
   [SHORT DESCRIPTION]
   """
 
+  use Torngen.Client.SchemaObjectAccess, deprecated: []
+
   @behaviour Torngen.Client.Schema
+
+  @keys [:timestamp, :target, :success_chance, :reviver, :result, :id]
 
   defstruct [
     :timestamp,
@@ -14,8 +18,6 @@ defmodule Torngen.Client.Schema.ReviveSimplified do
     :id
   ]
 
-  # TODO: Handle required values in schema parser
-  @required []
   @type t :: %__MODULE__{
           timestamp: integer(),
           target: %{
@@ -31,9 +33,6 @@ defmodule Torngen.Client.Schema.ReviveSimplified do
           result: String.t(),
           id: Torngen.Client.Schema.ReviveId.t()
         }
-
-  @spec required() :: list(atom())
-  def required(), do: @required
 
   @impl true
   def parse(%{} = data) do
@@ -68,4 +67,57 @@ defmodule Torngen.Client.Schema.ReviveSimplified do
 
     # TODO: Handle default values in schema parser and codegen
   end
+
+  @impl true
+  def validate(%{} = data) do
+    @keys
+    |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
+    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
+    |> Enum.any?()
+  end
+
+  defp validate_key(:timestamp, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:target, value) do
+    Torngen.Client.Schema.validate(
+      value,
+      {:object,
+       %{
+         "early_discharge" => {:static, :boolean},
+         "faction_id" => {:one_of, [{:static, :null}, Torngen.Client.Schema.FactionId]},
+         "hospital_reason" => {:static, :string},
+         "id" => Torngen.Client.Schema.UserId,
+         "last_action" => {:static, :integer},
+         "online_status" => {:static, :string}
+       }}
+    )
+  end
+
+  defp validate_key(:success_chance, value) do
+    Torngen.Client.Schema.validate(value, {:static, :number})
+  end
+
+  defp validate_key(:reviver, value) do
+    Torngen.Client.Schema.validate(
+      value,
+      {:object,
+       %{
+         "faction_id" => {:one_of, [{:static, :null}, Torngen.Client.Schema.FactionId]},
+         "id" => Torngen.Client.Schema.UserId
+       }}
+    )
+  end
+
+  defp validate_key(:result, value) do
+    Torngen.Client.Schema.validate(value, {:static, :string})
+  end
+
+  defp validate_key(:id, value) do
+    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.ReviveId)
+  end
+
+  @spec keys() :: list(atom())
+  def keys(), do: @keys
 end

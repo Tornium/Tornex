@@ -3,7 +3,11 @@ defmodule Torngen.Client.Schema.ForumSubscribedThread do
   [SHORT DESCRIPTION]
   """
 
+  use Torngen.Client.SchemaObjectAccess, deprecated: []
+
   @behaviour Torngen.Client.Schema
+
+  @keys [:title, :posts, :id, :forum_id, :author]
 
   defstruct [
     :title,
@@ -13,8 +17,6 @@ defmodule Torngen.Client.Schema.ForumSubscribedThread do
     :author
   ]
 
-  # TODO: Handle required values in schema parser
-  @required []
   @type t :: %__MODULE__{
           title: String.t(),
           posts: Torngen.Client.Schema.ForumSubscribedThreadPostsCount.t(),
@@ -22,9 +24,6 @@ defmodule Torngen.Client.Schema.ForumSubscribedThread do
           forum_id: Torngen.Client.Schema.ForumId.t(),
           author: Torngen.Client.Schema.ForumThreadAuthor.t()
         }
-
-  @spec required() :: list(atom())
-  def required(), do: @required
 
   @impl true
   def parse(%{} = data) do
@@ -39,4 +38,35 @@ defmodule Torngen.Client.Schema.ForumSubscribedThread do
 
     # TODO: Handle default values in schema parser and codegen
   end
+
+  @impl true
+  def validate(%{} = data) do
+    @keys
+    |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
+    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
+    |> Enum.any?()
+  end
+
+  defp validate_key(:title, value) do
+    Torngen.Client.Schema.validate(value, {:static, :string})
+  end
+
+  defp validate_key(:posts, value) do
+    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.ForumSubscribedThreadPostsCount)
+  end
+
+  defp validate_key(:id, value) do
+    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.ForumThreadId)
+  end
+
+  defp validate_key(:forum_id, value) do
+    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.ForumId)
+  end
+
+  defp validate_key(:author, value) do
+    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.ForumThreadAuthor)
+  end
+
+  @spec keys() :: list(atom())
+  def keys(), do: @keys
 end

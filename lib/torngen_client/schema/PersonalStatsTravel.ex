@@ -3,14 +3,16 @@ defmodule Torngen.Client.Schema.PersonalStatsTravel do
   [SHORT DESCRIPTION]
   """
 
+  use Torngen.Client.SchemaObjectAccess, deprecated: []
+
   @behaviour Torngen.Client.Schema
+
+  @keys [:travel]
 
   defstruct [
     :travel
   ]
 
-  # TODO: Handle required values in schema parser
-  @required []
   @type t :: %__MODULE__{
           travel: %{
             :united_kingdom => integer(),
@@ -32,9 +34,6 @@ defmodule Torngen.Client.Schema.PersonalStatsTravel do
             :argentina => integer()
           }
         }
-
-  @spec required() :: list(atom())
-  def required(), do: @required
 
   @impl true
   def parse(%{} = data) do
@@ -67,4 +66,41 @@ defmodule Torngen.Client.Schema.PersonalStatsTravel do
 
     # TODO: Handle default values in schema parser and codegen
   end
+
+  @impl true
+  def validate(%{} = data) do
+    @keys
+    |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
+    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
+    |> Enum.any?()
+  end
+
+  defp validate_key(:travel, value) do
+    Torngen.Client.Schema.validate(
+      value,
+      {:object,
+       %{
+         "argentina" => {:static, :integer},
+         "attacks_won" => {:static, :integer},
+         "canada" => {:static, :integer},
+         "cayman_islands" => {:static, :integer},
+         "china" => {:static, :integer},
+         "defends_lost" => {:static, :integer},
+         "hawaii" => {:static, :integer},
+         "hunting" => {:object, %{"skill" => {:static, :integer}}},
+         "items_bought" => {:static, :integer},
+         "japan" => {:static, :integer},
+         "mexico" => {:static, :integer},
+         "south_africa" => {:static, :integer},
+         "switzerland" => {:static, :integer},
+         "time_spent" => {:static, :integer},
+         "total" => {:static, :integer},
+         "united_arab_emirates" => {:static, :integer},
+         "united_kingdom" => {:static, :integer}
+       }}
+    )
+  end
+
+  @spec keys() :: list(atom())
+  def keys(), do: @keys
 end

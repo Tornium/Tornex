@@ -3,7 +3,24 @@ defmodule Torngen.Client.Schema.TornHof do
   [SHORT DESCRIPTION]
   """
 
+  use Torngen.Client.SchemaObjectAccess, deprecated: []
+
   @behaviour Torngen.Client.Schema
+
+  @keys [
+    :value,
+    :username,
+    :signed_up,
+    :rank_number,
+    :rank_name,
+    :rank,
+    :position,
+    :level,
+    :last_action,
+    :id,
+    :faction_id,
+    :age_in_days
+  ]
 
   defstruct [
     :value,
@@ -20,8 +37,6 @@ defmodule Torngen.Client.Schema.TornHof do
     :age_in_days
   ]
 
-  # TODO: Handle required values in schema parser
-  @required []
   @type t :: %__MODULE__{
           value: term(),
           username: String.t(),
@@ -36,9 +51,6 @@ defmodule Torngen.Client.Schema.TornHof do
           faction_id: Torngen.Client.Schema.FactionId.t(),
           age_in_days: integer()
         }
-
-  @spec required() :: list(atom())
-  def required(), do: @required
 
   @impl true
   def parse(%{} = data) do
@@ -59,4 +71,63 @@ defmodule Torngen.Client.Schema.TornHof do
 
     # TODO: Handle default values in schema parser and codegen
   end
+
+  @impl true
+  def validate(%{} = data) do
+    @keys
+    |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
+    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
+    |> Enum.any?()
+  end
+
+  defp validate_key(:value, value) do
+    Torngen.Client.Schema.validate(value, :any)
+  end
+
+  defp validate_key(:username, value) do
+    Torngen.Client.Schema.validate(value, {:static, :string})
+  end
+
+  defp validate_key(:signed_up, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:rank_number, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:rank_name, value) do
+    Torngen.Client.Schema.validate(value, {:static, :string})
+  end
+
+  defp validate_key(:rank, value) do
+    Torngen.Client.Schema.validate(value, {:static, :string})
+  end
+
+  defp validate_key(:position, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:level, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:last_action, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:id, value) do
+    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.UserId)
+  end
+
+  defp validate_key(:faction_id, value) do
+    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.FactionId)
+  end
+
+  defp validate_key(:age_in_days, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  @spec keys() :: list(atom())
+  def keys(), do: @keys
 end

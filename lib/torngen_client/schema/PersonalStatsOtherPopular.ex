@@ -3,14 +3,16 @@ defmodule Torngen.Client.Schema.PersonalStatsOtherPopular do
   [SHORT DESCRIPTION]
   """
 
+  use Torngen.Client.SchemaObjectAccess, deprecated: []
+
   @behaviour Torngen.Client.Schema
+
+  @keys [:other]
 
   defstruct [
     :other
   ]
 
-  # TODO: Handle required values in schema parser
-  @required []
   @type t :: %__MODULE__{
           other: %{
             :refills => %{:nerve => integer(), :energy => integer()},
@@ -21,9 +23,6 @@ defmodule Torngen.Client.Schema.PersonalStatsOtherPopular do
             :activity => %{:time => integer(), :streak => %{:current => integer(), :best => integer()}}
           }
         }
-
-  @spec required() :: list(atom())
-  def required(), do: @required
 
   @impl true
   def parse(%{} = data) do
@@ -50,4 +49,35 @@ defmodule Torngen.Client.Schema.PersonalStatsOtherPopular do
 
     # TODO: Handle default values in schema parser and codegen
   end
+
+  @impl true
+  def validate(%{} = data) do
+    @keys
+    |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
+    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
+    |> Enum.any?()
+  end
+
+  defp validate_key(:other, value) do
+    Torngen.Client.Schema.validate(
+      value,
+      {:object,
+       %{
+         "activity" =>
+           {:object,
+            %{
+              "streak" => {:object, %{"best" => {:static, :integer}, "current" => {:static, :integer}}},
+              "time" => {:static, :integer}
+            }},
+         "awards" => {:static, :integer},
+         "donator_days" => {:static, :integer},
+         "merits_bought" => {:static, :integer},
+         "ranked_war_wins" => {:static, :integer},
+         "refills" => {:object, %{"energy" => {:static, :integer}, "nerve" => {:static, :integer}}}
+       }}
+    )
+  end
+
+  @spec keys() :: list(atom())
+  def keys(), do: @keys
 end

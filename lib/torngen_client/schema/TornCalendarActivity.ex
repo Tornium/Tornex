@@ -3,7 +3,11 @@ defmodule Torngen.Client.Schema.TornCalendarActivity do
   [SHORT DESCRIPTION]
   """
 
+  use Torngen.Client.SchemaObjectAccess, deprecated: []
+
   @behaviour Torngen.Client.Schema
+
+  @keys [:title, :start, :end, :description]
 
   defstruct [
     :title,
@@ -12,17 +16,12 @@ defmodule Torngen.Client.Schema.TornCalendarActivity do
     :description
   ]
 
-  # TODO: Handle required values in schema parser
-  @required []
   @type t :: %__MODULE__{
           title: String.t(),
           start: integer(),
           end: integer(),
           description: String.t()
         }
-
-  @spec required() :: list(atom())
-  def required(), do: @required
 
   @impl true
   def parse(%{} = data) do
@@ -35,4 +34,31 @@ defmodule Torngen.Client.Schema.TornCalendarActivity do
 
     # TODO: Handle default values in schema parser and codegen
   end
+
+  @impl true
+  def validate(%{} = data) do
+    @keys
+    |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
+    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
+    |> Enum.any?()
+  end
+
+  defp validate_key(:title, value) do
+    Torngen.Client.Schema.validate(value, {:static, :string})
+  end
+
+  defp validate_key(:start, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:end, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:description, value) do
+    Torngen.Client.Schema.validate(value, {:static, :string})
+  end
+
+  @spec keys() :: list(atom())
+  def keys(), do: @keys
 end

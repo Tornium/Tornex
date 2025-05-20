@@ -3,7 +3,27 @@ defmodule Torngen.Client.Schema.FactionChainReportDetails do
   [SHORT DESCRIPTION]
   """
 
+  use Torngen.Client.SchemaObjectAccess, deprecated: []
+
   @behaviour Torngen.Client.Schema
+
+  @keys [
+    :war,
+    :targets,
+    :retaliations,
+    :respect,
+    :overseas,
+    :mug,
+    :members,
+    :losses,
+    :leave,
+    :hospitalize,
+    :escapes,
+    :draws,
+    :chain,
+    :best,
+    :assists
+  ]
 
   defstruct [
     :war,
@@ -23,8 +43,6 @@ defmodule Torngen.Client.Schema.FactionChainReportDetails do
     :assists
   ]
 
-  # TODO: Handle required values in schema parser
-  @required []
   @type t :: %__MODULE__{
           war: integer(),
           targets: integer(),
@@ -42,9 +60,6 @@ defmodule Torngen.Client.Schema.FactionChainReportDetails do
           best: integer() | float(),
           assists: integer()
         }
-
-  @spec required() :: list(atom())
-  def required(), do: @required
 
   @impl true
   def parse(%{} = data) do
@@ -68,4 +83,75 @@ defmodule Torngen.Client.Schema.FactionChainReportDetails do
 
     # TODO: Handle default values in schema parser and codegen
   end
+
+  @impl true
+  def validate(%{} = data) do
+    @keys
+    |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
+    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
+    |> Enum.any?()
+  end
+
+  defp validate_key(:war, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:targets, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:retaliations, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:respect, value) do
+    Torngen.Client.Schema.validate(value, {:static, :number})
+  end
+
+  defp validate_key(:overseas, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:mug, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:members, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:losses, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:leave, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:hospitalize, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:escapes, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:draws, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:chain, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:best, value) do
+    Torngen.Client.Schema.validate(value, {:static, :number})
+  end
+
+  defp validate_key(:assists, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  @spec keys() :: list(atom())
+  def keys(), do: @keys
 end

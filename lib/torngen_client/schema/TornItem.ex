@@ -3,7 +3,26 @@ defmodule Torngen.Client.Schema.TornItem do
   [SHORT DESCRIPTION]
   """
 
+  use Torngen.Client.SchemaObjectAccess, deprecated: []
+
   @behaviour Torngen.Client.Schema
+
+  @keys [
+    :value,
+    :type,
+    :sub_type,
+    :requirement,
+    :name,
+    :is_tradable,
+    :is_masked,
+    :is_found_in_city,
+    :image,
+    :id,
+    :effect,
+    :details,
+    :description,
+    :circulation
+  ]
 
   defstruct [
     :value,
@@ -22,8 +41,6 @@ defmodule Torngen.Client.Schema.TornItem do
     :circulation
   ]
 
-  # TODO: Handle required values in schema parser
-  @required []
   @type t :: %__MODULE__{
           value: %{
             :vendor => nil | %{:name => String.t(), :country => String.t()},
@@ -46,9 +63,6 @@ defmodule Torngen.Client.Schema.TornItem do
           description: String.t(),
           circulation: integer()
         }
-
-  @spec required() :: list(atom())
-  def required(), do: @required
 
   @impl true
   def parse(%{} = data) do
@@ -90,4 +104,85 @@ defmodule Torngen.Client.Schema.TornItem do
 
     # TODO: Handle default values in schema parser and codegen
   end
+
+  @impl true
+  def validate(%{} = data) do
+    @keys
+    |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
+    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
+    |> Enum.any?()
+  end
+
+  defp validate_key(:value, value) do
+    Torngen.Client.Schema.validate(
+      value,
+      {:object,
+       %{
+         "buy_price" => {:one_of, [static: :null, static: :integer]},
+         "market_price" => {:static, :integer},
+         "sell_price" => {:one_of, [static: :null, static: :integer]},
+         "vendor" =>
+           {:one_of, [static: :null, object: %{"country" => {:static, :string}, "name" => {:static, :string}}]}
+       }}
+    )
+  end
+
+  defp validate_key(:type, value) do
+    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.TornItemTypeEnum)
+  end
+
+  defp validate_key(:sub_type, value) do
+    Torngen.Client.Schema.validate(value, {:one_of, [{:static, :null}, Torngen.Client.Schema.TornItemWeaponTypeEnum]})
+  end
+
+  defp validate_key(:requirement, value) do
+    Torngen.Client.Schema.validate(value, {:one_of, [static: :null, static: :string]})
+  end
+
+  defp validate_key(:name, value) do
+    Torngen.Client.Schema.validate(value, {:static, :string})
+  end
+
+  defp validate_key(:is_tradable, value) do
+    Torngen.Client.Schema.validate(value, {:static, :boolean})
+  end
+
+  defp validate_key(:is_masked, value) do
+    Torngen.Client.Schema.validate(value, {:static, :boolean})
+  end
+
+  defp validate_key(:is_found_in_city, value) do
+    Torngen.Client.Schema.validate(value, {:static, :boolean})
+  end
+
+  defp validate_key(:image, value) do
+    Torngen.Client.Schema.validate(value, {:static, :string})
+  end
+
+  defp validate_key(:id, value) do
+    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.ItemId)
+  end
+
+  defp validate_key(:effect, value) do
+    Torngen.Client.Schema.validate(value, {:one_of, [static: :null, static: :string]})
+  end
+
+  defp validate_key(:details, value) do
+    Torngen.Client.Schema.validate(
+      value,
+      {:one_of,
+       [{:static, :null}, Torngen.Client.Schema.TornItemArmorDetails, Torngen.Client.Schema.TornItemWeaponDetails]}
+    )
+  end
+
+  defp validate_key(:description, value) do
+    Torngen.Client.Schema.validate(value, {:static, :string})
+  end
+
+  defp validate_key(:circulation, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  @spec keys() :: list(atom())
+  def keys(), do: @keys
 end

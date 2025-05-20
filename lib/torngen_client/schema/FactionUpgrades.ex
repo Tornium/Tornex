@@ -3,7 +3,11 @@ defmodule Torngen.Client.Schema.FactionUpgrades do
   [SHORT DESCRIPTION]
   """
 
+  use Torngen.Client.SchemaObjectAccess, deprecated: []
+
   @behaviour Torngen.Client.Schema
+
+  @keys [:war, :peace, :core]
 
   defstruct [
     :war,
@@ -11,16 +15,11 @@ defmodule Torngen.Client.Schema.FactionUpgrades do
     :core
   ]
 
-  # TODO: Handle required values in schema parser
-  @required []
   @type t :: %__MODULE__{
           war: [Torngen.Client.Schema.FactionBranchDetails.t()],
           peace: [Torngen.Client.Schema.FactionBranchDetails.t()],
           core: %{:upgrades => [Torngen.Client.Schema.FactionUpgradeDetails.t()]}
         }
-
-  @spec required() :: list(atom())
-  def required(), do: @required
 
   @impl true
   def parse(%{} = data) do
@@ -37,4 +36,30 @@ defmodule Torngen.Client.Schema.FactionUpgrades do
 
     # TODO: Handle default values in schema parser and codegen
   end
+
+  @impl true
+  def validate(%{} = data) do
+    @keys
+    |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
+    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
+    |> Enum.any?()
+  end
+
+  defp validate_key(:war, value) do
+    Torngen.Client.Schema.validate(value, {:array, Torngen.Client.Schema.FactionBranchDetails})
+  end
+
+  defp validate_key(:peace, value) do
+    Torngen.Client.Schema.validate(value, {:array, Torngen.Client.Schema.FactionBranchDetails})
+  end
+
+  defp validate_key(:core, value) do
+    Torngen.Client.Schema.validate(
+      value,
+      {:object, %{"upgrades" => {:array, Torngen.Client.Schema.FactionUpgradeDetails}}}
+    )
+  end
+
+  @spec keys() :: list(atom())
+  def keys(), do: @keys
 end

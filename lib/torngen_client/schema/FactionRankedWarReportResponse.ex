@@ -3,14 +3,16 @@ defmodule Torngen.Client.Schema.FactionRankedWarReportResponse do
   [SHORT DESCRIPTION]
   """
 
+  use Torngen.Client.SchemaObjectAccess, deprecated: []
+
   @behaviour Torngen.Client.Schema
+
+  @keys [:rankedwarreport]
 
   defstruct [
     :rankedwarreport
   ]
 
-  # TODO: Handle required values in schema parser
-  @required []
   @type t :: %__MODULE__{
           rankedwarreport: %{
             :winner => Torngen.Client.Schema.FactionId.t(),
@@ -43,9 +45,6 @@ defmodule Torngen.Client.Schema.FactionRankedWarReportResponse do
             :end => integer()
           }
         }
-
-  @spec required() :: list(atom())
-  def required(), do: @required
 
   @impl true
   def parse(%{} = data) do
@@ -100,4 +99,63 @@ defmodule Torngen.Client.Schema.FactionRankedWarReportResponse do
 
     # TODO: Handle default values in schema parser and codegen
   end
+
+  @impl true
+  def validate(%{} = data) do
+    @keys
+    |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
+    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
+    |> Enum.any?()
+  end
+
+  defp validate_key(:rankedwarreport, value) do
+    Torngen.Client.Schema.validate(
+      value,
+      {:object,
+       %{
+         "end" => {:static, :integer},
+         "factions" =>
+           {:array,
+            {:object,
+             %{
+               "attacks" => {:static, :integer},
+               "id" => Torngen.Client.Schema.FactionId,
+               "members" =>
+                 {:array,
+                  {:object,
+                   %{
+                     "attacks" => {:static, :integer},
+                     "id" => Torngen.Client.Schema.UserId,
+                     "level" => {:static, :integer},
+                     "name" => {:static, :string},
+                     "score" => {:static, :number}
+                   }}},
+               "name" => {:static, :string},
+               "rank" => {:object, %{"after" => {:static, :string}, "before" => {:static, :string}}},
+               "rewards" =>
+                 {:object,
+                  %{
+                    "items" =>
+                      {:array,
+                       {:object,
+                        %{
+                          "id" => Torngen.Client.Schema.ItemId,
+                          "name" => {:static, :string},
+                          "quantity" => {:static, :integer}
+                        }}},
+                    "points" => {:static, :integer},
+                    "respect" => {:static, :integer}
+                  }},
+               "score" => {:static, :integer}
+             }}},
+         "forfeit" => {:static, :boolean},
+         "id" => Torngen.Client.Schema.RankedWarId,
+         "start" => {:static, :integer},
+         "winner" => Torngen.Client.Schema.FactionId
+       }}
+    )
+  end
+
+  @spec keys() :: list(atom())
+  def keys(), do: @keys
 end

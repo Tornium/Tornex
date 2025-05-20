@@ -3,7 +3,25 @@ defmodule Torngen.Client.Schema.ForumThreadBase do
   [SHORT DESCRIPTION]
   """
 
+  use Torngen.Client.SchemaObjectAccess, deprecated: []
+
   @behaviour Torngen.Client.Schema
+
+  @keys [
+    :views,
+    :title,
+    :rating,
+    :posts,
+    :last_poster,
+    :last_post_time,
+    :is_sticky,
+    :is_locked,
+    :id,
+    :has_poll,
+    :forum_id,
+    :first_post_time,
+    :author
+  ]
 
   defstruct [
     :views,
@@ -21,8 +39,6 @@ defmodule Torngen.Client.Schema.ForumThreadBase do
     :author
   ]
 
-  # TODO: Handle required values in schema parser
-  @required []
   @type t :: %__MODULE__{
           views: integer(),
           title: String.t(),
@@ -38,9 +54,6 @@ defmodule Torngen.Client.Schema.ForumThreadBase do
           first_post_time: integer(),
           author: Torngen.Client.Schema.ForumThreadAuthor.t()
         }
-
-  @spec required() :: list(atom())
-  def required(), do: @required
 
   @impl true
   def parse(%{} = data) do
@@ -65,4 +78,67 @@ defmodule Torngen.Client.Schema.ForumThreadBase do
 
     # TODO: Handle default values in schema parser and codegen
   end
+
+  @impl true
+  def validate(%{} = data) do
+    @keys
+    |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
+    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
+    |> Enum.any?()
+  end
+
+  defp validate_key(:views, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:title, value) do
+    Torngen.Client.Schema.validate(value, {:static, :string})
+  end
+
+  defp validate_key(:rating, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:posts, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:last_poster, value) do
+    Torngen.Client.Schema.validate(value, {:one_of, [{:static, :null}, Torngen.Client.Schema.ForumThreadAuthor]})
+  end
+
+  defp validate_key(:last_post_time, value) do
+    Torngen.Client.Schema.validate(value, {:one_of, [static: :null, static: :integer]})
+  end
+
+  defp validate_key(:is_sticky, value) do
+    Torngen.Client.Schema.validate(value, {:static, :boolean})
+  end
+
+  defp validate_key(:is_locked, value) do
+    Torngen.Client.Schema.validate(value, {:static, :boolean})
+  end
+
+  defp validate_key(:id, value) do
+    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.ForumThreadId)
+  end
+
+  defp validate_key(:has_poll, value) do
+    Torngen.Client.Schema.validate(value, {:static, :boolean})
+  end
+
+  defp validate_key(:forum_id, value) do
+    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.ForumId)
+  end
+
+  defp validate_key(:first_post_time, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:author, value) do
+    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.ForumThreadAuthor)
+  end
+
+  @spec keys() :: list(atom())
+  def keys(), do: @keys
 end

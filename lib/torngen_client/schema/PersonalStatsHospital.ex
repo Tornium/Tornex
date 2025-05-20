@@ -3,14 +3,16 @@ defmodule Torngen.Client.Schema.PersonalStatsHospital do
   [SHORT DESCRIPTION]
   """
 
+  use Torngen.Client.SchemaObjectAccess, deprecated: []
+
   @behaviour Torngen.Client.Schema
+
+  @keys [:hospital]
 
   defstruct [
     :hospital
   ]
 
-  # TODO: Handle required values in schema parser
-  @required []
   @type t :: %__MODULE__{
           hospital: %{
             :times_hospitalized => integer(),
@@ -19,9 +21,6 @@ defmodule Torngen.Client.Schema.PersonalStatsHospital do
             :blood_withdrawn => integer()
           }
         }
-
-  @spec required() :: list(atom())
-  def required(), do: @required
 
   @impl true
   def parse(%{} = data) do
@@ -47,4 +46,34 @@ defmodule Torngen.Client.Schema.PersonalStatsHospital do
 
     # TODO: Handle default values in schema parser and codegen
   end
+
+  @impl true
+  def validate(%{} = data) do
+    @keys
+    |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
+    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
+    |> Enum.any?()
+  end
+
+  defp validate_key(:hospital, value) do
+    Torngen.Client.Schema.validate(
+      value,
+      {:object,
+       %{
+         "blood_withdrawn" => {:static, :integer},
+         "medical_items_used" => {:static, :integer},
+         "reviving" =>
+           {:object,
+            %{
+              "revives" => {:static, :integer},
+              "revives_received" => {:static, :integer},
+              "skill" => {:static, :integer}
+            }},
+         "times_hospitalized" => {:static, :integer}
+       }}
+    )
+  end
+
+  @spec keys() :: list(atom())
+  def keys(), do: @keys
 end

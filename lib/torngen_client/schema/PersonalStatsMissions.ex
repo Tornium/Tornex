@@ -3,14 +3,16 @@ defmodule Torngen.Client.Schema.PersonalStatsMissions do
   [SHORT DESCRIPTION]
   """
 
+  use Torngen.Client.SchemaObjectAccess, deprecated: []
+
   @behaviour Torngen.Client.Schema
+
+  @keys [:missions]
 
   defstruct [
     :missions
   ]
 
-  # TODO: Handle required values in schema parser
-  @required []
   @type t :: %__MODULE__{
           missions: %{
             :missions => integer(),
@@ -18,9 +20,6 @@ defmodule Torngen.Client.Schema.PersonalStatsMissions do
             :contracts => %{:total => integer(), :duke => integer()}
           }
         }
-
-  @spec required() :: list(atom())
-  def required(), do: @required
 
   @impl true
   def parse(%{} = data) do
@@ -39,4 +38,27 @@ defmodule Torngen.Client.Schema.PersonalStatsMissions do
 
     # TODO: Handle default values in schema parser and codegen
   end
+
+  @impl true
+  def validate(%{} = data) do
+    @keys
+    |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
+    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
+    |> Enum.any?()
+  end
+
+  defp validate_key(:missions, value) do
+    Torngen.Client.Schema.validate(
+      value,
+      {:object,
+       %{
+         "contracts" => {:object, %{"duke" => {:static, :integer}, "total" => {:static, :integer}}},
+         "credits" => {:static, :integer},
+         "missions" => {:static, :integer}
+       }}
+    )
+  end
+
+  @spec keys() :: list(atom())
+  def keys(), do: @keys
 end

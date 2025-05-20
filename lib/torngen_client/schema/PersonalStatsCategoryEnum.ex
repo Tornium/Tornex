@@ -39,4 +39,13 @@ defmodule Torngen.Client.Schema.PersonalStatsCategoryEnum do
 
   @spec valid?(term()) :: boolean()
   def valid?(value), do: value in @values
+
+  def parse(data) do
+    if Enum.member?(@values, data) do
+      data
+    else
+      IO.inspect(data, label: "Invalid enum value of PersonalStatsCategoryEnum")
+      nil
+    end
+  end
 end

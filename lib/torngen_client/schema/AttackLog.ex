@@ -3,7 +3,11 @@ defmodule Torngen.Client.Schema.AttackLog do
   [SHORT DESCRIPTION]
   """
 
+  use Torngen.Client.SchemaObjectAccess, deprecated: []
+
   @behaviour Torngen.Client.Schema
+
+  @keys [:timestamp, :text, :icon, :defender, :attacker, :action]
 
   defstruct [
     :timestamp,
@@ -14,8 +18,6 @@ defmodule Torngen.Client.Schema.AttackLog do
     :action
   ]
 
-  # TODO: Handle required values in schema parser
-  @required []
   @type t :: %__MODULE__{
           timestamp: integer(),
           text: String.t(),
@@ -30,9 +32,6 @@ defmodule Torngen.Client.Schema.AttackLog do
               },
           action: Torngen.Client.Schema.AttackActionEnum.t()
         }
-
-  @spec required() :: list(atom())
-  def required(), do: @required
 
   @impl true
   def parse(%{} = data) do
@@ -65,4 +64,54 @@ defmodule Torngen.Client.Schema.AttackLog do
 
     # TODO: Handle default values in schema parser and codegen
   end
+
+  @impl true
+  def validate(%{} = data) do
+    @keys
+    |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
+    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
+    |> Enum.any?()
+  end
+
+  defp validate_key(:timestamp, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:text, value) do
+    Torngen.Client.Schema.validate(value, {:static, :string})
+  end
+
+  defp validate_key(:icon, value) do
+    Torngen.Client.Schema.validate(value, {:static, :string})
+  end
+
+  defp validate_key(:defender, value) do
+    Torngen.Client.Schema.validate(
+      value,
+      {:one_of, [static: :null, object: %{"id" => Torngen.Client.Schema.UserId, "name" => {:static, :string}}]}
+    )
+  end
+
+  defp validate_key(:attacker, value) do
+    Torngen.Client.Schema.validate(
+      value,
+      {:one_of,
+       [
+         static: :null,
+         object: %{
+           "id" => Torngen.Client.Schema.UserId,
+           "item" =>
+             {:one_of, [static: :null, object: %{"id" => Torngen.Client.Schema.ItemId, "name" => {:static, :string}}]},
+           "name" => {:static, :string}
+         }
+       ]}
+    )
+  end
+
+  defp validate_key(:action, value) do
+    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.AttackActionEnum)
+  end
+
+  @spec keys() :: list(atom())
+  def keys(), do: @keys
 end

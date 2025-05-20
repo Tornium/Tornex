@@ -3,7 +3,11 @@ defmodule Torngen.Client.Schema.ItemMarketListingItemStats do
   [SHORT DESCRIPTION]
   """
 
+  use Torngen.Client.SchemaObjectAccess, deprecated: []
+
   @behaviour Torngen.Client.Schema
+
+  @keys [:quality, :damage, :armor, :accuracy]
 
   defstruct [
     :quality,
@@ -12,17 +16,12 @@ defmodule Torngen.Client.Schema.ItemMarketListingItemStats do
     :accuracy
   ]
 
-  # TODO: Handle required values in schema parser
-  @required []
   @type t :: %__MODULE__{
           quality: integer() | float(),
           damage: nil | integer() | float(),
           armor: nil | integer() | float(),
           accuracy: nil | integer() | float()
         }
-
-  @spec required() :: list(atom())
-  def required(), do: @required
 
   @impl true
   def parse(%{} = data) do
@@ -35,4 +34,31 @@ defmodule Torngen.Client.Schema.ItemMarketListingItemStats do
 
     # TODO: Handle default values in schema parser and codegen
   end
+
+  @impl true
+  def validate(%{} = data) do
+    @keys
+    |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
+    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
+    |> Enum.any?()
+  end
+
+  defp validate_key(:quality, value) do
+    Torngen.Client.Schema.validate(value, {:static, :number})
+  end
+
+  defp validate_key(:damage, value) do
+    Torngen.Client.Schema.validate(value, {:one_of, [static: :null, static: :number]})
+  end
+
+  defp validate_key(:armor, value) do
+    Torngen.Client.Schema.validate(value, {:one_of, [static: :null, static: :number]})
+  end
+
+  defp validate_key(:accuracy, value) do
+    Torngen.Client.Schema.validate(value, {:one_of, [static: :null, static: :number]})
+  end
+
+  @spec keys() :: list(atom())
+  def keys(), do: @keys
 end

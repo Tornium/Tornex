@@ -3,7 +3,11 @@ defmodule Torngen.Client.Schema.PersonalStatsCrimesV2 do
   [SHORT DESCRIPTION]
   """
 
+  use Torngen.Client.SchemaObjectAccess, deprecated: []
+
   @behaviour Torngen.Client.Schema
+
+  @keys [:version, :skills, :offenses]
 
   defstruct [
     :version,
@@ -11,8 +15,6 @@ defmodule Torngen.Client.Schema.PersonalStatsCrimesV2 do
     :offenses
   ]
 
-  # TODO: Handle required values in schema parser
-  @required []
   @type t :: %__MODULE__{
           version: String.t(),
           skills: %{
@@ -42,9 +44,6 @@ defmodule Torngen.Client.Schema.PersonalStatsCrimesV2 do
             :counterfeiting => integer()
           }
         }
-
-  @spec required() :: list(atom())
-  def required(), do: @required
 
   @impl true
   def parse(%{} = data) do
@@ -90,4 +89,59 @@ defmodule Torngen.Client.Schema.PersonalStatsCrimesV2 do
 
     # TODO: Handle default values in schema parser and codegen
   end
+
+  @impl true
+  def validate(%{} = data) do
+    @keys
+    |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
+    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
+    |> Enum.any?()
+  end
+
+  defp validate_key(:version, value) do
+    Torngen.Client.Schema.validate(value, {:static, :string})
+  end
+
+  defp validate_key(:skills, value) do
+    Torngen.Client.Schema.validate(
+      value,
+      {:object,
+       %{
+         "bootlegging" => {:static, :integer},
+         "burglary" => {:static, :integer},
+         "card_skimming" => {:static, :integer},
+         "cracking" => {:static, :integer},
+         "disposal" => {:static, :integer},
+         "forgery" => {:static, :integer},
+         "graffiti" => {:static, :integer},
+         "hustling" => {:static, :integer},
+         "pickpocketing" => {:static, :integer},
+         "scamming" => {:static, :integer},
+         "search_for_cash" => {:static, :integer},
+         "shoplifting" => {:static, :integer}
+       }}
+    )
+  end
+
+  defp validate_key(:offenses, value) do
+    Torngen.Client.Schema.validate(
+      value,
+      {:object,
+       %{
+         "counterfeiting" => {:static, :integer},
+         "cybercrime" => {:static, :integer},
+         "extortion" => {:static, :integer},
+         "fraud" => {:static, :integer},
+         "illegal_production" => {:static, :integer},
+         "illicit_services" => {:static, :integer},
+         "organized_crimes" => {:static, :integer},
+         "theft" => {:static, :integer},
+         "total" => {:static, :integer},
+         "vandalism" => {:static, :integer}
+       }}
+    )
+  end
+
+  @spec keys() :: list(atom())
+  def keys(), do: @keys
 end

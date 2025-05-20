@@ -3,14 +3,16 @@ defmodule Torngen.Client.Schema.PersonalStatsItems do
   [SHORT DESCRIPTION]
   """
 
+  use Torngen.Client.SchemaObjectAccess, deprecated: []
+
   @behaviour Torngen.Client.Schema
+
+  @keys [:items]
 
   defstruct [
     :items
   ]
 
-  # TODO: Handle required values in schema parser
-  @required []
   @type t :: %__MODULE__{
           items: %{
             :viruses_coded => integer(),
@@ -28,9 +30,6 @@ defmodule Torngen.Client.Schema.PersonalStatsItems do
             :found => %{:easter_eggs => integer(), :dump => integer(), :city => integer()}
           }
         }
-
-  @spec required() :: list(atom())
-  def required(), do: @required
 
   @impl true
   def parse(%{} = data) do
@@ -63,4 +62,41 @@ defmodule Torngen.Client.Schema.PersonalStatsItems do
 
     # TODO: Handle default values in schema parser and codegen
   end
+
+  @impl true
+  def validate(%{} = data) do
+    @keys
+    |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
+    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
+    |> Enum.any?()
+  end
+
+  defp validate_key(:items, value) do
+    Torngen.Client.Schema.validate(
+      value,
+      {:object,
+       %{
+         "found" =>
+           {:object,
+            %{"city" => {:static, :integer}, "dump" => {:static, :integer}, "easter_eggs" => {:static, :integer}}},
+         "trashed" => {:static, :integer},
+         "used" =>
+           {:object,
+            %{
+              "alcohol" => {:static, :integer},
+              "books" => {:static, :integer},
+              "boosters" => {:static, :integer},
+              "candy" => {:static, :integer},
+              "consumables" => {:static, :integer},
+              "easter_eggs" => {:static, :integer},
+              "energy_drinks" => {:static, :integer},
+              "stat_enhancers" => {:static, :integer}
+            }},
+         "viruses_coded" => {:static, :integer}
+       }}
+    )
+  end
+
+  @spec keys() :: list(atom())
+  def keys(), do: @keys
 end

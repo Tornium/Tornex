@@ -3,14 +3,16 @@ defmodule Torngen.Client.Schema.PersonalStatsAttackingPublic do
   [SHORT DESCRIPTION]
   """
 
+  use Torngen.Client.SchemaObjectAccess, deprecated: []
+
   @behaviour Torngen.Client.Schema
+
+  @keys [:attacking]
 
   defstruct [
     :attacking
   ]
 
-  # TODO: Handle required values in schema parser
-  @required []
   @type t :: %__MODULE__{
           attacking: %{
             :unarmored_wins => integer(),
@@ -46,9 +48,6 @@ defmodule Torngen.Client.Schema.PersonalStatsAttackingPublic do
             }
           }
         }
-
-  @spec required() :: list(atom())
-  def required(), do: @required
 
   @impl true
   def parse(%{} = data) do
@@ -127,4 +126,87 @@ defmodule Torngen.Client.Schema.PersonalStatsAttackingPublic do
 
     # TODO: Handle default values in schema parser and codegen
   end
+
+  @impl true
+  def validate(%{} = data) do
+    @keys
+    |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
+    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
+    |> Enum.any?()
+  end
+
+  defp validate_key(:attacking, value) do
+    Torngen.Client.Schema.validate(
+      value,
+      {:object,
+       %{
+         "ammunition" =>
+           {:object,
+            %{
+              "hollow_point" => {:static, :integer},
+              "incendiary" => {:static, :integer},
+              "piercing" => {:static, :integer},
+              "special" => {:static, :integer},
+              "total" => {:static, :integer},
+              "tracer" => {:static, :integer}
+            }},
+         "attacks" =>
+           {:object,
+            %{
+              "assist" => {:static, :integer},
+              "lost" => {:static, :integer},
+              "stalemate" => {:static, :integer},
+              "stealth" => {:static, :integer},
+              "won" => {:static, :integer}
+            }},
+         "damage" => {:object, %{"best" => {:static, :integer}, "total" => {:static, :integer}}},
+         "defends" =>
+           {:object,
+            %{
+              "lost" => {:static, :integer},
+              "stalemate" => {:static, :integer},
+              "total" => {:static, :integer},
+              "won" => {:static, :integer}
+            }},
+         "elo" => {:static, :integer},
+         "escapes" => {:object, %{"foes" => {:static, :integer}, "player" => {:static, :integer}}},
+         "faction" =>
+           {:object,
+            %{
+              "raid_hits" => {:static, :integer},
+              "ranked_war_hits" => {:static, :integer},
+              "respect" => {:static, :integer},
+              "retaliations" => {:static, :integer},
+              "territory" =>
+                {:object,
+                 %{
+                   "wall_clears" => {:static, :integer},
+                   "wall_joins" => {:static, :integer},
+                   "wall_time" => {:static, :integer}
+                 }}
+            }},
+         "highest_level_beaten" => {:static, :integer},
+         "hits" =>
+           {:object,
+            %{
+              "critical" => {:static, :integer},
+              "miss" => {:static, :integer},
+              "one_hit_kills" => {:static, :integer},
+              "success" => {:static, :integer}
+            }},
+         "killstreak" => {:object, %{"best" => {:static, :integer}}},
+         "networth" =>
+           {:object,
+            %{
+              "items_looted" => {:static, :integer},
+              "largest_mug" => {:static, :integer},
+              "money_mugged" => {:static, :integer}
+            }},
+         "unarmored_wins" => {:static, :integer}
+       }}
+    )
+  end
+
+  @spec keys() :: list(atom())
+  def keys(), do: @keys
 end

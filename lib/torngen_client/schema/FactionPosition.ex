@@ -3,7 +3,11 @@ defmodule Torngen.Client.Schema.FactionPosition do
   [SHORT DESCRIPTION]
   """
 
+  use Torngen.Client.SchemaObjectAccess, deprecated: []
+
   @behaviour Torngen.Client.Schema
+
+  @keys [:name, :is_default, :abilities]
 
   defstruct [
     :name,
@@ -11,16 +15,11 @@ defmodule Torngen.Client.Schema.FactionPosition do
     :abilities
   ]
 
-  # TODO: Handle required values in schema parser
-  @required []
   @type t :: %__MODULE__{
           name: String.t(),
           is_default: boolean(),
           abilities: [Torngen.Client.Schema.FactionPositionAbilityEnum.t()]
         }
-
-  @spec required() :: list(atom())
-  def required(), do: @required
 
   @impl true
   def parse(%{} = data) do
@@ -34,4 +33,27 @@ defmodule Torngen.Client.Schema.FactionPosition do
 
     # TODO: Handle default values in schema parser and codegen
   end
+
+  @impl true
+  def validate(%{} = data) do
+    @keys
+    |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
+    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
+    |> Enum.any?()
+  end
+
+  defp validate_key(:name, value) do
+    Torngen.Client.Schema.validate(value, {:static, :string})
+  end
+
+  defp validate_key(:is_default, value) do
+    Torngen.Client.Schema.validate(value, {:static, :boolean})
+  end
+
+  defp validate_key(:abilities, value) do
+    Torngen.Client.Schema.validate(value, {:array, Torngen.Client.Schema.FactionPositionAbilityEnum})
+  end
+
+  @spec keys() :: list(atom())
+  def keys(), do: @keys
 end

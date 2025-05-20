@@ -3,7 +3,11 @@ defmodule Torngen.Client.Schema.UserCrimeDetailsBootlegging do
   [SHORT DESCRIPTION]
   """
 
+  use Torngen.Client.SchemaObjectAccess, deprecated: []
+
   @behaviour Torngen.Client.Schema
+
+  @keys [:online_store, :dvds_copied, :dvd_sales]
 
   defstruct [
     :online_store,
@@ -11,8 +15,6 @@ defmodule Torngen.Client.Schema.UserCrimeDetailsBootlegging do
     :dvd_sales
   ]
 
-  # TODO: Handle required values in schema parser
-  @required []
   @type t :: %__MODULE__{
           online_store: %{:visits => integer(), :sales => integer(), :earnings => integer(), :customers => integer()},
           dvds_copied: integer(),
@@ -30,9 +32,6 @@ defmodule Torngen.Client.Schema.UserCrimeDetailsBootlegging do
             :action => integer()
           }
         }
-
-  @spec required() :: list(atom())
-  def required(), do: @required
 
   @impl true
   def parse(%{} = data) do
@@ -71,4 +70,52 @@ defmodule Torngen.Client.Schema.UserCrimeDetailsBootlegging do
 
     # TODO: Handle default values in schema parser and codegen
   end
+
+  @impl true
+  def validate(%{} = data) do
+    @keys
+    |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
+    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
+    |> Enum.any?()
+  end
+
+  defp validate_key(:online_store, value) do
+    Torngen.Client.Schema.validate(
+      value,
+      {:object,
+       %{
+         "customers" => {:static, :integer},
+         "earnings" => {:static, :integer},
+         "sales" => {:static, :integer},
+         "visits" => {:static, :integer}
+       }}
+    )
+  end
+
+  defp validate_key(:dvds_copied, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:dvd_sales, value) do
+    Torngen.Client.Schema.validate(
+      value,
+      {:object,
+       %{
+         "action" => {:static, :integer},
+         "comedy" => {:static, :integer},
+         "drama" => {:static, :integer},
+         "earnings" => {:static, :integer},
+         "fantasy" => {:static, :integer},
+         "horror" => {:static, :integer},
+         "romance" => {:static, :integer},
+         "sci-fi" => {:static, :integer},
+         "sci_fi" => {:static, :integer},
+         "thriller" => {:static, :integer},
+         "total" => {:static, :integer}
+       }}
+    )
+  end
+
+  @spec keys() :: list(atom())
+  def keys(), do: @keys
 end

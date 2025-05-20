@@ -3,7 +3,21 @@ defmodule Torngen.Client.Schema.TornCrime do
   [SHORT DESCRIPTION]
   """
 
+  use Torngen.Client.SchemaObjectAccess, deprecated: []
+
   @behaviour Torngen.Client.Schema
+
+  @keys [
+    :unique_outcomes_ids,
+    :unique_outcomes_count,
+    :notes,
+    :name,
+    :id,
+    :enhancer_name,
+    :enhancer_id,
+    :category_name,
+    :category_id
+  ]
 
   defstruct [
     :unique_outcomes_ids,
@@ -17,8 +31,6 @@ defmodule Torngen.Client.Schema.TornCrime do
     :category_id
   ]
 
-  # TODO: Handle required values in schema parser
-  @required []
   @type t :: %__MODULE__{
           unique_outcomes_ids: [integer()],
           unique_outcomes_count: integer(),
@@ -30,9 +42,6 @@ defmodule Torngen.Client.Schema.TornCrime do
           category_name: String.t(),
           category_id: integer()
         }
-
-  @spec required() :: list(atom())
-  def required(), do: @required
 
   @impl true
   def parse(%{} = data) do
@@ -51,4 +60,51 @@ defmodule Torngen.Client.Schema.TornCrime do
 
     # TODO: Handle default values in schema parser and codegen
   end
+
+  @impl true
+  def validate(%{} = data) do
+    @keys
+    |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
+    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
+    |> Enum.any?()
+  end
+
+  defp validate_key(:unique_outcomes_ids, value) do
+    Torngen.Client.Schema.validate(value, {:array, {:static, :integer}})
+  end
+
+  defp validate_key(:unique_outcomes_count, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:notes, value) do
+    Torngen.Client.Schema.validate(value, {:array, {:static, :string}})
+  end
+
+  defp validate_key(:name, value) do
+    Torngen.Client.Schema.validate(value, {:static, :string})
+  end
+
+  defp validate_key(:id, value) do
+    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.TornCrimeId)
+  end
+
+  defp validate_key(:enhancer_name, value) do
+    Torngen.Client.Schema.validate(value, {:static, :string})
+  end
+
+  defp validate_key(:enhancer_id, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  defp validate_key(:category_name, value) do
+    Torngen.Client.Schema.validate(value, {:static, :string})
+  end
+
+  defp validate_key(:category_id, value) do
+    Torngen.Client.Schema.validate(value, {:static, :integer})
+  end
+
+  @spec keys() :: list(atom())
+  def keys(), do: @keys
 end
