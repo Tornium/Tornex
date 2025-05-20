@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.TornCalendarActivity do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -26,13 +27,12 @@ defmodule Torngen.Client.Schema.TornCalendarActivity do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      title: Map.get(data, "title"),
-      start: Map.get(data, "start"),
-      end: Map.get(data, "end"),
-      description: Map.get(data, "description")
+      title: Map.get(data, "title") |> Torngen.Client.Schema.parse({:static, :string}),
+      start: Map.get(data, "start") |> Torngen.Client.Schema.parse({:static, :integer}),
+      end: Map.get(data, "end") |> Torngen.Client.Schema.parse({:static, :integer}),
+      description: Map.get(data, "description") |> Torngen.Client.Schema.parse({:static, :string})
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

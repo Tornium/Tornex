@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.FactionTerritoryWarReportResponse do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -20,10 +21,11 @@ defmodule Torngen.Client.Schema.FactionTerritoryWarReportResponse do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      territorywarreport: Map.get(data, "territorywarreport")
+      territorywarreport:
+        Map.get(data, "territorywarreport")
+        |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.FactionTerritoryWarReport})
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.FactionMember do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -44,22 +45,22 @@ defmodule Torngen.Client.Schema.FactionMember do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      status: Map.get(data, "status"),
-      revive_setting: Map.get(data, "revive_setting"),
-      position: Map.get(data, "position"),
-      name: Map.get(data, "name"),
-      life: Map.get(data, "life"),
-      level: Map.get(data, "level"),
-      last_action: Map.get(data, "last_action"),
-      is_revivable: Map.get(data, "is_revivable"),
-      is_on_wall: Map.get(data, "is_on_wall"),
-      is_in_oc: Map.get(data, "is_in_oc"),
-      id: Map.get(data, "id"),
-      has_early_discharge: Map.get(data, "has_early_discharge"),
-      days_in_faction: Map.get(data, "days_in_faction")
+      status: Map.get(data, "status") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserStatus),
+      revive_setting:
+        Map.get(data, "revive_setting") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ReviveSetting),
+      position: Map.get(data, "position") |> Torngen.Client.Schema.parse({:static, :string}),
+      name: Map.get(data, "name") |> Torngen.Client.Schema.parse({:static, :string}),
+      life: Map.get(data, "life") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserLife),
+      level: Map.get(data, "level") |> Torngen.Client.Schema.parse({:static, :integer}),
+      last_action: Map.get(data, "last_action") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserLastAction),
+      is_revivable: Map.get(data, "is_revivable") |> Torngen.Client.Schema.parse({:static, :boolean}),
+      is_on_wall: Map.get(data, "is_on_wall") |> Torngen.Client.Schema.parse({:static, :boolean}),
+      is_in_oc: Map.get(data, "is_in_oc") |> Torngen.Client.Schema.parse({:static, :boolean}),
+      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId),
+      has_early_discharge: Map.get(data, "has_early_discharge") |> Torngen.Client.Schema.parse({:static, :boolean}),
+      days_in_faction: Map.get(data, "days_in_faction") |> Torngen.Client.Schema.parse({:static, :integer})
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

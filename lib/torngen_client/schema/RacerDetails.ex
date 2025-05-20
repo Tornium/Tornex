@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.RacerDetails do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -38,19 +39,21 @@ defmodule Torngen.Client.Schema.RacerDetails do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      time_ended: Map.get(data, "time_ended"),
-      race_time: Map.get(data, "race_time"),
-      position: Map.get(data, "position"),
-      has_crashed: Map.get(data, "has_crashed"),
-      driver_id: Map.get(data, "driver_id"),
-      car_item_name: Map.get(data, "car_item_name"),
-      car_item_id: Map.get(data, "car_item_id"),
-      car_id: Map.get(data, "car_id"),
-      car_class: Map.get(data, "car_class"),
-      best_lap_time: Map.get(data, "best_lap_time")
+      time_ended:
+        Map.get(data, "time_ended") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :integer]}),
+      race_time: Map.get(data, "race_time") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :number]}),
+      position: Map.get(data, "position") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :integer]}),
+      has_crashed:
+        Map.get(data, "has_crashed") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :boolean]}),
+      driver_id: Map.get(data, "driver_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId),
+      car_item_name: Map.get(data, "car_item_name") |> Torngen.Client.Schema.parse({:static, :string}),
+      car_item_id: Map.get(data, "car_item_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ItemId),
+      car_id: Map.get(data, "car_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RaceCarId),
+      car_class: Map.get(data, "car_class") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RaceClassEnum),
+      best_lap_time:
+        Map.get(data, "best_lap_time") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :number]})
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

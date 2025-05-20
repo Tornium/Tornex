@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.UserPersonalStatsCategory do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -36,10 +37,31 @@ defmodule Torngen.Client.Schema.UserPersonalStatsCategory do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      personalstats: Map.get(data, "personalstats")
+      personalstats:
+        Map.get(data, "personalstats")
+        |> Torngen.Client.Schema.parse(
+          {:one_of,
+           [
+             Torngen.Client.Schema.PersonalStatsOther,
+             Torngen.Client.Schema.PersonalStatsNetworthPublic,
+             Torngen.Client.Schema.PersonalStatsRacing,
+             Torngen.Client.Schema.PersonalStatsMissions,
+             Torngen.Client.Schema.PersonalStatsDrugs,
+             Torngen.Client.Schema.PersonalStatsTravel,
+             Torngen.Client.Schema.PersonalStatsItems,
+             Torngen.Client.Schema.PersonalStatsBounties,
+             Torngen.Client.Schema.PersonalStatsCrimes,
+             Torngen.Client.Schema.PersonalStatsCommunication,
+             Torngen.Client.Schema.PersonalStatsFinishingHits,
+             Torngen.Client.Schema.PersonalStatsHospital,
+             Torngen.Client.Schema.PersonalStatsJail,
+             Torngen.Client.Schema.PersonalStatsTrading,
+             Torngen.Client.Schema.PersonalStatsJobsPublic,
+             Torngen.Client.Schema.PersonalStatsAttackingPublic
+           ]}
+        )
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

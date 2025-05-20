@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.UserStatus do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -26,13 +27,12 @@ defmodule Torngen.Client.Schema.UserStatus do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      until: Map.get(data, "until"),
-      state: Map.get(data, "state"),
-      details: Map.get(data, "details"),
-      description: Map.get(data, "description")
+      until: Map.get(data, "until") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :integer]}),
+      state: Map.get(data, "state") |> Torngen.Client.Schema.parse({:static, :string}),
+      details: Map.get(data, "details") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :string]}),
+      description: Map.get(data, "description") |> Torngen.Client.Schema.parse({:static, :string})
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

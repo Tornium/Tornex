@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.ForumPost do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -46,23 +47,25 @@ defmodule Torngen.Client.Schema.ForumPost do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      thread_id: Map.get(data, "thread_id"),
-      quoted_post_id: Map.get(data, "quoted_post_id"),
-      likes: Map.get(data, "likes"),
-      is_topic: Map.get(data, "is_topic"),
-      is_pinned: Map.get(data, "is_pinned"),
-      is_legacy: Map.get(data, "is_legacy"),
-      is_edited: Map.get(data, "is_edited"),
-      id: Map.get(data, "id"),
-      has_quote: Map.get(data, "has_quote"),
-      edited_by: Map.get(data, "edited_by"),
-      dislikes: Map.get(data, "dislikes"),
-      created_time: Map.get(data, "created_time"),
-      content: Map.get(data, "content"),
-      author: Map.get(data, "author")
+      thread_id: Map.get(data, "thread_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ForumThreadId),
+      quoted_post_id:
+        Map.get(data, "quoted_post_id") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :integer]}),
+      likes: Map.get(data, "likes") |> Torngen.Client.Schema.parse({:static, :integer}),
+      is_topic: Map.get(data, "is_topic") |> Torngen.Client.Schema.parse({:static, :boolean}),
+      is_pinned: Map.get(data, "is_pinned") |> Torngen.Client.Schema.parse({:static, :boolean}),
+      is_legacy: Map.get(data, "is_legacy") |> Torngen.Client.Schema.parse({:static, :boolean}),
+      is_edited: Map.get(data, "is_edited") |> Torngen.Client.Schema.parse({:static, :boolean}),
+      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ForumPostId),
+      has_quote: Map.get(data, "has_quote") |> Torngen.Client.Schema.parse({:static, :boolean}),
+      edited_by:
+        Map.get(data, "edited_by")
+        |> Torngen.Client.Schema.parse({:one_of, [{:static, :null}, Torngen.Client.Schema.UserId]}),
+      dislikes: Map.get(data, "dislikes") |> Torngen.Client.Schema.parse({:static, :integer}),
+      created_time: Map.get(data, "created_time") |> Torngen.Client.Schema.parse({:static, :integer}),
+      content: Map.get(data, "content") |> Torngen.Client.Schema.parse({:static, :string}),
+      author: Map.get(data, "author") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ForumThreadAuthor)
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

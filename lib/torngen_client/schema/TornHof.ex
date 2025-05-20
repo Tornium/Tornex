@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.TornHof do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -42,21 +43,20 @@ defmodule Torngen.Client.Schema.TornHof do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      value: Map.get(data, "value"),
-      username: Map.get(data, "username"),
-      signed_up: Map.get(data, "signed_up"),
-      rank_number: Map.get(data, "rank_number"),
-      rank_name: Map.get(data, "rank_name"),
-      rank: Map.get(data, "rank"),
-      position: Map.get(data, "position"),
-      level: Map.get(data, "level"),
-      last_action: Map.get(data, "last_action"),
-      id: Map.get(data, "id"),
-      faction_id: Map.get(data, "faction_id"),
-      age_in_days: Map.get(data, "age_in_days")
+      value: Map.get(data, "value") |> Torngen.Client.Schema.parse(:any),
+      username: Map.get(data, "username") |> Torngen.Client.Schema.parse({:static, :string}),
+      signed_up: Map.get(data, "signed_up") |> Torngen.Client.Schema.parse({:static, :integer}),
+      rank_number: Map.get(data, "rank_number") |> Torngen.Client.Schema.parse({:static, :integer}),
+      rank_name: Map.get(data, "rank_name") |> Torngen.Client.Schema.parse({:static, :string}),
+      rank: Map.get(data, "rank") |> Torngen.Client.Schema.parse({:static, :string}),
+      position: Map.get(data, "position") |> Torngen.Client.Schema.parse({:static, :integer}),
+      level: Map.get(data, "level") |> Torngen.Client.Schema.parse({:static, :integer}),
+      last_action: Map.get(data, "last_action") |> Torngen.Client.Schema.parse({:static, :integer}),
+      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId),
+      faction_id: Map.get(data, "faction_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionId),
+      age_in_days: Map.get(data, "age_in_days") |> Torngen.Client.Schema.parse({:static, :integer})
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

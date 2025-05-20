@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.UserCrime do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -40,16 +41,30 @@ defmodule Torngen.Client.Schema.UserCrime do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      uniques: Map.get(data, "uniques"),
-      skill: Map.get(data, "skill"),
-      rewards: Map.get(data, "rewards"),
-      progression_bonus: Map.get(data, "progression_bonus"),
-      nerve_spent: Map.get(data, "nerve_spent"),
-      miscellaneous: Map.get(data, "miscellaneous"),
-      attempts: Map.get(data, "attempts")
+      uniques:
+        Map.get(data, "uniques") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.UserCrimeUniques}),
+      skill: Map.get(data, "skill") |> Torngen.Client.Schema.parse({:static, :integer}),
+      rewards: Map.get(data, "rewards") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserCrimeRewards),
+      progression_bonus: Map.get(data, "progression_bonus") |> Torngen.Client.Schema.parse({:static, :integer}),
+      nerve_spent: Map.get(data, "nerve_spent") |> Torngen.Client.Schema.parse({:static, :integer}),
+      miscellaneous:
+        Map.get(data, "miscellaneous")
+        |> Torngen.Client.Schema.parse(
+          {:one_of,
+           [
+             {:static, :null},
+             Torngen.Client.Schema.UserCrimeDetailsScamming,
+             Torngen.Client.Schema.UserCrimeDetailsCracking,
+             Torngen.Client.Schema.UserCrimeDetailsHustling,
+             Torngen.Client.Schema.UserCrimeDetailsCardSkimming,
+             Torngen.Client.Schema.UserCrimeDetailsShoplifting,
+             Torngen.Client.Schema.UserCrimeDetailsGraffiti,
+             Torngen.Client.Schema.UserCrimeDetailsBootlegging
+           ]}
+        ),
+      attempts: Map.get(data, "attempts") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserCrimeAttempts)
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.FactionTerritoryWarReport do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -32,16 +33,17 @@ defmodule Torngen.Client.Schema.FactionTerritoryWarReport do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      winner: Map.get(data, "winner"),
-      territory: Map.get(data, "territory"),
-      started_at: Map.get(data, "started_at"),
-      result: Map.get(data, "result"),
-      id: Map.get(data, "id"),
-      factions: Map.get(data, "factions"),
-      ended_at: Map.get(data, "ended_at")
+      winner: Map.get(data, "winner") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionId),
+      territory: Map.get(data, "territory") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionTerritoryEnum),
+      started_at: Map.get(data, "started_at") |> Torngen.Client.Schema.parse({:static, :integer}),
+      result: Map.get(data, "result") |> Torngen.Client.Schema.parse({:static, :string}),
+      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.TerritoryWarId),
+      factions:
+        Map.get(data, "factions")
+        |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.FactionTerritoryWarReportFaction}),
+      ended_at: Map.get(data, "ended_at") |> Torngen.Client.Schema.parse({:static, :integer})
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

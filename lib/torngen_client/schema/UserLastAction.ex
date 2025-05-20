@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.UserLastAction do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -24,12 +25,11 @@ defmodule Torngen.Client.Schema.UserLastAction do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      timestamp: Map.get(data, "timestamp"),
-      status: Map.get(data, "status"),
-      relative: Map.get(data, "relative")
+      timestamp: Map.get(data, "timestamp") |> Torngen.Client.Schema.parse({:static, :integer}),
+      status: Map.get(data, "status") |> Torngen.Client.Schema.parse({:static, :string}),
+      relative: Map.get(data, "relative") |> Torngen.Client.Schema.parse({:static, :string})
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

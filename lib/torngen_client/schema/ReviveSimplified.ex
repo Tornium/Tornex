@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.ReviveSimplified do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -37,15 +38,34 @@ defmodule Torngen.Client.Schema.ReviveSimplified do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      timestamp: Map.get(data, "timestamp"),
-      target: Map.get(data, "target"),
-      success_chance: Map.get(data, "success_chance"),
-      reviver: Map.get(data, "reviver"),
-      result: Map.get(data, "result"),
-      id: Map.get(data, "id")
+      timestamp: Map.get(data, "timestamp") |> Torngen.Client.Schema.parse({:static, :integer}),
+      target:
+        Map.get(data, "target")
+        |> Torngen.Client.Schema.parse(
+          {:object,
+           %{
+             "early_discharge" => {:static, :boolean},
+             "faction_id" => {:one_of, [{:static, :null}, Torngen.Client.Schema.FactionId]},
+             "hospital_reason" => {:static, :string},
+             "id" => Torngen.Client.Schema.UserId,
+             "last_action" => {:static, :integer},
+             "online_status" => {:static, :string}
+           }}
+        ),
+      success_chance: Map.get(data, "success_chance") |> Torngen.Client.Schema.parse({:static, :number}),
+      reviver:
+        Map.get(data, "reviver")
+        |> Torngen.Client.Schema.parse(
+          {:object,
+           %{
+             "faction_id" => {:one_of, [{:static, :null}, Torngen.Client.Schema.FactionId]},
+             "id" => Torngen.Client.Schema.UserId
+           }}
+        ),
+      result: Map.get(data, "result") |> Torngen.Client.Schema.parse({:static, :string}),
+      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ReviveId)
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.ItemMarket do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -25,11 +26,16 @@ defmodule Torngen.Client.Schema.ItemMarket do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      listings: Map.get(data, "listings"),
-      item: Map.get(data, "item")
+      listings:
+        Map.get(data, "listings")
+        |> Torngen.Client.Schema.parse(
+          {:array,
+           {:one_of,
+            [Torngen.Client.Schema.ItemMarketListingStackable, Torngen.Client.Schema.ItemMarketListingNonstackable]}}
+        ),
+      item: Map.get(data, "item") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ItemMarketItem)
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

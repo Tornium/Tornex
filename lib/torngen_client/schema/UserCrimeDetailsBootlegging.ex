@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.UserCrimeDetailsBootlegging do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -36,12 +37,38 @@ defmodule Torngen.Client.Schema.UserCrimeDetailsBootlegging do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      online_store: Map.get(data, "online_store"),
-      dvds_copied: Map.get(data, "dvds_copied"),
-      dvd_sales: Map.get(data, "dvd_sales")
+      online_store:
+        Map.get(data, "online_store")
+        |> Torngen.Client.Schema.parse(
+          {:object,
+           %{
+             "customers" => {:static, :integer},
+             "earnings" => {:static, :integer},
+             "sales" => {:static, :integer},
+             "visits" => {:static, :integer}
+           }}
+        ),
+      dvds_copied: Map.get(data, "dvds_copied") |> Torngen.Client.Schema.parse({:static, :integer}),
+      dvd_sales:
+        Map.get(data, "dvd_sales")
+        |> Torngen.Client.Schema.parse(
+          {:object,
+           %{
+             "action" => {:static, :integer},
+             "comedy" => {:static, :integer},
+             "drama" => {:static, :integer},
+             "earnings" => {:static, :integer},
+             "fantasy" => {:static, :integer},
+             "horror" => {:static, :integer},
+             "romance" => {:static, :integer},
+             "sci-fi" => {:static, :integer},
+             "sci_fi" => {:static, :integer},
+             "thriller" => {:static, :integer},
+             "total" => {:static, :integer}
+           }}
+        )
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.UserJobRanks do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -30,15 +31,15 @@ defmodule Torngen.Client.Schema.UserJobRanks do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      medical: Map.get(data, "medical"),
-      law: Map.get(data, "law"),
-      grocer: Map.get(data, "grocer"),
-      education: Map.get(data, "education"),
-      casino: Map.get(data, "casino"),
-      army: Map.get(data, "army")
+      medical: Map.get(data, "medical") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.JobPositionMedicalEnum),
+      law: Map.get(data, "law") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.JobPositionLawEnum),
+      grocer: Map.get(data, "grocer") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.JobPositionGrocerEnum),
+      education:
+        Map.get(data, "education") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.JobPositionEducationEnum),
+      casino: Map.get(data, "casino") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.JobPositionCasinoEnum),
+      army: Map.get(data, "army") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.JobPositionArmyEnum)
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

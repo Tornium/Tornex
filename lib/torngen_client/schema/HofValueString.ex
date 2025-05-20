@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.HofValueString do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -22,11 +23,10 @@ defmodule Torngen.Client.Schema.HofValueString do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      value: Map.get(data, "value"),
-      rank: Map.get(data, "rank")
+      value: Map.get(data, "value") |> Torngen.Client.Schema.parse({:static, :string}),
+      rank: Map.get(data, "rank") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :number]})
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

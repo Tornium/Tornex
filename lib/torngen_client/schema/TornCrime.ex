@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.TornCrime do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -36,18 +37,18 @@ defmodule Torngen.Client.Schema.TornCrime do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      unique_outcomes_ids: Map.get(data, "unique_outcomes_ids"),
-      unique_outcomes_count: Map.get(data, "unique_outcomes_count"),
-      notes: Map.get(data, "notes"),
-      name: Map.get(data, "name"),
-      id: Map.get(data, "id"),
-      enhancer_name: Map.get(data, "enhancer_name"),
-      enhancer_id: Map.get(data, "enhancer_id"),
-      category_name: Map.get(data, "category_name"),
-      category_id: Map.get(data, "category_id")
+      unique_outcomes_ids:
+        Map.get(data, "unique_outcomes_ids") |> Torngen.Client.Schema.parse({:array, {:static, :integer}}),
+      unique_outcomes_count: Map.get(data, "unique_outcomes_count") |> Torngen.Client.Schema.parse({:static, :integer}),
+      notes: Map.get(data, "notes") |> Torngen.Client.Schema.parse({:array, {:static, :string}}),
+      name: Map.get(data, "name") |> Torngen.Client.Schema.parse({:static, :string}),
+      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.TornCrimeId),
+      enhancer_name: Map.get(data, "enhancer_name") |> Torngen.Client.Schema.parse({:static, :string}),
+      enhancer_id: Map.get(data, "enhancer_id") |> Torngen.Client.Schema.parse({:static, :integer}),
+      category_name: Map.get(data, "category_name") |> Torngen.Client.Schema.parse({:static, :string}),
+      category_id: Map.get(data, "category_id") |> Torngen.Client.Schema.parse({:static, :integer})
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

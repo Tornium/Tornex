@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.UserHofStats do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -48,24 +49,25 @@ defmodule Torngen.Client.Schema.UserHofStats do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      working_stats: Map.get(data, "working_stats"),
-      travel_time: Map.get(data, "travel_time"),
-      revives: Map.get(data, "revives"),
-      rank: Map.get(data, "rank"),
-      racing_wins: Map.get(data, "racing_wins"),
-      racing_skill: Map.get(data, "racing_skill"),
-      racing_points: Map.get(data, "racing_points"),
-      offences: Map.get(data, "offences"),
-      networth: Map.get(data, "networth"),
-      level: Map.get(data, "level"),
-      defends: Map.get(data, "defends"),
-      busts: Map.get(data, "busts"),
-      battle_stats: Map.get(data, "battle_stats"),
-      awards: Map.get(data, "awards"),
-      attacks: Map.get(data, "attacks")
+      working_stats: Map.get(data, "working_stats") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.HofValue),
+      travel_time: Map.get(data, "travel_time") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.HofValue),
+      revives: Map.get(data, "revives") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.HofValue),
+      rank: Map.get(data, "rank") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.HofValue),
+      racing_wins: Map.get(data, "racing_wins") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.HofValue),
+      racing_skill: Map.get(data, "racing_skill") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.HofValue),
+      racing_points: Map.get(data, "racing_points") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.HofValue),
+      offences: Map.get(data, "offences") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.HofValue),
+      networth: Map.get(data, "networth") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.HofValue),
+      level: Map.get(data, "level") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.HofValue),
+      defends: Map.get(data, "defends") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.HofValue),
+      busts: Map.get(data, "busts") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.HofValue),
+      battle_stats:
+        Map.get(data, "battle_stats")
+        |> Torngen.Client.Schema.parse({:one_of, [{:static, :null}, Torngen.Client.Schema.HofValue]}),
+      awards: Map.get(data, "awards") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.HofValue),
+      attacks: Map.get(data, "attacks") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.HofValue)
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

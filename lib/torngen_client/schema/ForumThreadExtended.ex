@@ -1,5 +1,8 @@
 defmodule Torngen.Client.Schema.ForumThreadExtended do
   @moduledoc """
+  [SHORT DESCRIPTION]
+
+  Type: AllOf
   """
 
   @behaviour Torngen.Client.Schema

@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.ForumPollVote do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -22,11 +23,10 @@ defmodule Torngen.Client.Schema.ForumPollVote do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      votes: Map.get(data, "votes"),
-      answer: Map.get(data, "answer")
+      votes: Map.get(data, "votes") |> Torngen.Client.Schema.parse({:static, :integer}),
+      answer: Map.get(data, "answer") |> Torngen.Client.Schema.parse({:static, :string})
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.TornTerritoryCoordinates do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -22,11 +23,10 @@ defmodule Torngen.Client.Schema.TornTerritoryCoordinates do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      y: Map.get(data, "y"),
-      x: Map.get(data, "x")
+      y: Map.get(data, "y") |> Torngen.Client.Schema.parse({:static, :number}),
+      x: Map.get(data, "x") |> Torngen.Client.Schema.parse({:static, :number})
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

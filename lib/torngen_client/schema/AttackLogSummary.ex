@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.AttackLogSummary do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -28,14 +29,14 @@ defmodule Torngen.Client.Schema.AttackLogSummary do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      name: Map.get(data, "name"),
-      misses: Map.get(data, "misses"),
-      id: Map.get(data, "id"),
-      hits: Map.get(data, "hits"),
-      damage: Map.get(data, "damage")
+      name: Map.get(data, "name") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :string]}),
+      misses: Map.get(data, "misses") |> Torngen.Client.Schema.parse({:static, :integer}),
+      id:
+        Map.get(data, "id") |> Torngen.Client.Schema.parse({:one_of, [{:static, :null}, Torngen.Client.Schema.UserId]}),
+      hits: Map.get(data, "hits") |> Torngen.Client.Schema.parse({:static, :integer}),
+      damage: Map.get(data, "damage") |> Torngen.Client.Schema.parse({:static, :integer})
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

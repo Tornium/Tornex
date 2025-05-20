@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.FactionUpgrades do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -24,12 +25,16 @@ defmodule Torngen.Client.Schema.FactionUpgrades do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      war: Map.get(data, "war"),
-      peace: Map.get(data, "peace"),
-      core: Map.get(data, "core")
+      war: Map.get(data, "war") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.FactionBranchDetails}),
+      peace:
+        Map.get(data, "peace") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.FactionBranchDetails}),
+      core:
+        Map.get(data, "core")
+        |> Torngen.Client.Schema.parse(
+          {:object, %{"upgrades" => {:array, Torngen.Client.Schema.FactionUpgradeDetails}}}
+        )
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

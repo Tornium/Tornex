@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.UserLife do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -22,11 +23,10 @@ defmodule Torngen.Client.Schema.UserLife do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      maximum: Map.get(data, "maximum"),
-      current: Map.get(data, "current")
+      maximum: Map.get(data, "maximum") |> Torngen.Client.Schema.parse({:static, :integer}),
+      current: Map.get(data, "current") |> Torngen.Client.Schema.parse({:static, :integer})
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

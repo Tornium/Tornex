@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.RevivesFullResponse do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -22,11 +23,12 @@ defmodule Torngen.Client.Schema.RevivesFullResponse do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      revives: Map.get(data, "revives"),
-      _metadata: Map.get(data, "_metadata")
+      revives:
+        Map.get(data, "revives") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.ReviveSimplified}),
+      _metadata:
+        Map.get(data, "_metadata") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RequestMetadataWithLinks)
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

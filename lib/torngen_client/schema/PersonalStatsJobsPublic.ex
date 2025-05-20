@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.PersonalStatsJobsPublic do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -20,10 +21,13 @@ defmodule Torngen.Client.Schema.PersonalStatsJobsPublic do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      jobs: Map.get(data, "jobs")
+      jobs:
+        Map.get(data, "jobs")
+        |> Torngen.Client.Schema.parse(
+          {:object, %{"job_points_used" => {:static, :integer}, "trains_received" => {:static, :integer}}}
+        )
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

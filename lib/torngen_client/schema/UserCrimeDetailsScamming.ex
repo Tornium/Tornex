@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.UserCrimeDetailsScamming do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -38,14 +39,38 @@ defmodule Torngen.Client.Schema.UserCrimeDetailsScamming do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      zones: Map.get(data, "zones"),
-      payouts: Map.get(data, "payouts"),
-      most_responses: Map.get(data, "most_responses"),
-      emails: Map.get(data, "emails"),
-      concerns: Map.get(data, "concerns")
+      zones:
+        Map.get(data, "zones")
+        |> Torngen.Client.Schema.parse(
+          {:object,
+           %{
+             "concern" => {:static, :integer},
+             "hesitation" => {:static, :integer},
+             "high_reward" => {:static, :integer},
+             "low_reward" => {:static, :integer},
+             "medium_reward" => {:static, :integer},
+             "neutral" => {:static, :integer},
+             "red" => {:static, :integer},
+             "sensitivity" => {:static, :integer},
+             "temptation" => {:static, :integer}
+           }}
+        ),
+      payouts:
+        Map.get(data, "payouts")
+        |> Torngen.Client.Schema.parse(
+          {:object, %{"high" => {:static, :integer}, "low" => {:static, :integer}, "medium" => {:static, :integer}}}
+        ),
+      most_responses: Map.get(data, "most_responses") |> Torngen.Client.Schema.parse({:static, :integer}),
+      emails:
+        Map.get(data, "emails")
+        |> Torngen.Client.Schema.parse({:object, %{"phisher" => {:static, :integer}, "scraper" => {:static, :integer}}}),
+      concerns:
+        Map.get(data, "concerns")
+        |> Torngen.Client.Schema.parse(
+          {:object, %{"attempts" => {:static, :integer}, "resolved" => {:static, :integer}}}
+        )
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

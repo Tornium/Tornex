@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.RaceRecord do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -28,14 +29,13 @@ defmodule Torngen.Client.Schema.RaceRecord do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      lap_time: Map.get(data, "lap_time"),
-      driver_name: Map.get(data, "driver_name"),
-      driver_id: Map.get(data, "driver_id"),
-      car_item_name: Map.get(data, "car_item_name"),
-      car_item_id: Map.get(data, "car_item_id")
+      lap_time: Map.get(data, "lap_time") |> Torngen.Client.Schema.parse({:static, :number}),
+      driver_name: Map.get(data, "driver_name") |> Torngen.Client.Schema.parse({:static, :string}),
+      driver_id: Map.get(data, "driver_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId),
+      car_item_name: Map.get(data, "car_item_name") |> Torngen.Client.Schema.parse({:static, :string}),
+      car_item_id: Map.get(data, "car_item_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ItemId)
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

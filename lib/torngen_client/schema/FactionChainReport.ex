@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.FactionChainReport do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -36,17 +37,20 @@ defmodule Torngen.Client.Schema.FactionChainReport do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      start: Map.get(data, "start"),
-      non_attackers: Map.get(data, "non_attackers"),
-      id: Map.get(data, "id"),
-      faction_id: Map.get(data, "faction_id"),
-      end: Map.get(data, "end"),
-      details: Map.get(data, "details"),
-      bonuses: Map.get(data, "bonuses"),
-      attackers: Map.get(data, "attackers")
+      start: Map.get(data, "start") |> Torngen.Client.Schema.parse({:static, :integer}),
+      non_attackers:
+        Map.get(data, "non_attackers") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.UserId}),
+      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ChainId),
+      faction_id: Map.get(data, "faction_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionId),
+      end: Map.get(data, "end") |> Torngen.Client.Schema.parse({:static, :integer}),
+      details: Map.get(data, "details") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionChainReportDetails),
+      bonuses:
+        Map.get(data, "bonuses") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.FactionChainReportBonus}),
+      attackers:
+        Map.get(data, "attackers")
+        |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.FactionChainReportAttacker})
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

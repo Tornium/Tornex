@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.TornLogCategoriesResponse do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -20,10 +21,10 @@ defmodule Torngen.Client.Schema.TornLogCategoriesResponse do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      logcategories: Map.get(data, "logcategories")
+      logcategories:
+        Map.get(data, "logcategories") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.TornLogCategory})
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

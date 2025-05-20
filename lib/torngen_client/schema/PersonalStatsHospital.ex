@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.PersonalStatsHospital do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -25,10 +26,25 @@ defmodule Torngen.Client.Schema.PersonalStatsHospital do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      hospital: Map.get(data, "hospital")
+      hospital:
+        Map.get(data, "hospital")
+        |> Torngen.Client.Schema.parse(
+          {:object,
+           %{
+             "blood_withdrawn" => {:static, :integer},
+             "medical_items_used" => {:static, :integer},
+             "reviving" =>
+               {:object,
+                %{
+                  "revives" => {:static, :integer},
+                  "revives_received" => {:static, :integer},
+                  "skill" => {:static, :integer}
+                }},
+             "times_hospitalized" => {:static, :integer}
+           }}
+        )
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

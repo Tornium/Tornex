@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.FactionBasicResponse do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -20,10 +21,9 @@ defmodule Torngen.Client.Schema.FactionBasicResponse do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      basic: Map.get(data, "basic")
+      basic: Map.get(data, "basic") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionBasic)
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

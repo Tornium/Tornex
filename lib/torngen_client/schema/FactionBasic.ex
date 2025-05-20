@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.FactionBasic do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -46,22 +47,22 @@ defmodule Torngen.Client.Schema.FactionBasic do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      tag_image: Map.get(data, "tag_image"),
-      tag: Map.get(data, "tag"),
-      respect: Map.get(data, "respect"),
-      rank: Map.get(data, "rank"),
-      name: Map.get(data, "name"),
-      members: Map.get(data, "members"),
-      leader_id: Map.get(data, "leader_id"),
-      is_enlisted: Map.get(data, "is_enlisted"),
-      id: Map.get(data, "id"),
-      days_old: Map.get(data, "days_old"),
-      co_leader_id: Map.get(data, "co_leader_id"),
-      capacity: Map.get(data, "capacity"),
-      best_chain: Map.get(data, "best_chain")
+      tag_image: Map.get(data, "tag_image") |> Torngen.Client.Schema.parse({:static, :string}),
+      tag: Map.get(data, "tag") |> Torngen.Client.Schema.parse({:static, :string}),
+      respect: Map.get(data, "respect") |> Torngen.Client.Schema.parse({:static, :integer}),
+      rank: Map.get(data, "rank") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionRank),
+      name: Map.get(data, "name") |> Torngen.Client.Schema.parse({:static, :string}),
+      members: Map.get(data, "members") |> Torngen.Client.Schema.parse({:static, :integer}),
+      leader_id: Map.get(data, "leader_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId),
+      is_enlisted:
+        Map.get(data, "is_enlisted") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :boolean]}),
+      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionId),
+      days_old: Map.get(data, "days_old") |> Torngen.Client.Schema.parse({:static, :integer}),
+      co_leader_id: Map.get(data, "co_leader_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId),
+      capacity: Map.get(data, "capacity") |> Torngen.Client.Schema.parse({:static, :integer}),
+      best_chain: Map.get(data, "best_chain") |> Torngen.Client.Schema.parse({:static, :integer})
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

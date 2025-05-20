@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.FactionOngoingChain do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -34,17 +35,16 @@ defmodule Torngen.Client.Schema.FactionOngoingChain do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      timeout: Map.get(data, "timeout"),
-      start: Map.get(data, "start"),
-      modifier: Map.get(data, "modifier"),
-      max: Map.get(data, "max"),
-      id: Map.get(data, "id"),
-      end: Map.get(data, "end"),
-      current: Map.get(data, "current"),
-      cooldown: Map.get(data, "cooldown")
+      timeout: Map.get(data, "timeout") |> Torngen.Client.Schema.parse({:static, :integer}),
+      start: Map.get(data, "start") |> Torngen.Client.Schema.parse({:static, :integer}),
+      modifier: Map.get(data, "modifier") |> Torngen.Client.Schema.parse({:static, :number}),
+      max: Map.get(data, "max") |> Torngen.Client.Schema.parse({:static, :integer}),
+      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ChainId),
+      end: Map.get(data, "end") |> Torngen.Client.Schema.parse({:static, :integer}),
+      current: Map.get(data, "current") |> Torngen.Client.Schema.parse({:static, :integer}),
+      cooldown: Map.get(data, "cooldown") |> Torngen.Client.Schema.parse({:static, :integer})
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

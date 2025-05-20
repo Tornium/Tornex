@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.RaceCarUpgrade do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -42,17 +43,33 @@ defmodule Torngen.Client.Schema.RaceCarUpgrade do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      subcategory: Map.get(data, "subcategory"),
-      name: Map.get(data, "name"),
-      id: Map.get(data, "id"),
-      effects: Map.get(data, "effects"),
-      description: Map.get(data, "description"),
-      cost: Map.get(data, "cost"),
-      class_required: Map.get(data, "class_required"),
-      category: Map.get(data, "category")
+      subcategory:
+        Map.get(data, "subcategory") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RaceCarUpgradeSubCategory),
+      name: Map.get(data, "name") |> Torngen.Client.Schema.parse({:static, :string}),
+      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RaceCarUpgradeId),
+      effects:
+        Map.get(data, "effects")
+        |> Torngen.Client.Schema.parse(
+          {:object,
+           %{
+             "acceleration" => {:static, :integer},
+             "braking" => {:static, :integer},
+             "dirt" => {:static, :integer},
+             "handling" => {:static, :integer},
+             "safety" => {:static, :integer},
+             "tarmac" => {:static, :integer},
+             "top_speed" => {:static, :integer}
+           }}
+        ),
+      description: Map.get(data, "description") |> Torngen.Client.Schema.parse({:static, :string}),
+      cost:
+        Map.get(data, "cost")
+        |> Torngen.Client.Schema.parse({:object, %{"cash" => {:static, :integer}, "points" => {:static, :integer}}}),
+      class_required:
+        Map.get(data, "class_required") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RaceClassEnum),
+      category: Map.get(data, "category") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RaceCarUpgradeCategory)
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.Attack do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -58,25 +59,41 @@ defmodule Torngen.Client.Schema.Attack do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      started: Map.get(data, "started"),
-      result: Map.get(data, "result"),
-      respect_loss: Map.get(data, "respect_loss"),
-      respect_gain: Map.get(data, "respect_gain"),
-      modifiers: Map.get(data, "modifiers"),
-      is_stealthed: Map.get(data, "is_stealthed"),
-      is_ranked_war: Map.get(data, "is_ranked_war"),
-      is_raid: Map.get(data, "is_raid"),
-      is_interrupted: Map.get(data, "is_interrupted"),
-      id: Map.get(data, "id"),
-      finishing_hit_effects: Map.get(data, "finishing_hit_effects"),
-      ended: Map.get(data, "ended"),
-      defender: Map.get(data, "defender"),
-      code: Map.get(data, "code"),
-      chain: Map.get(data, "chain"),
-      attacker: Map.get(data, "attacker")
+      started: Map.get(data, "started") |> Torngen.Client.Schema.parse({:static, :integer}),
+      result: Map.get(data, "result") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionAttackResult),
+      respect_loss: Map.get(data, "respect_loss") |> Torngen.Client.Schema.parse({:static, :number}),
+      respect_gain: Map.get(data, "respect_gain") |> Torngen.Client.Schema.parse({:static, :number}),
+      modifiers:
+        Map.get(data, "modifiers")
+        |> Torngen.Client.Schema.parse(
+          {:object,
+           %{
+             "chain" => {:static, :number},
+             "fair_fight" => {:static, :number},
+             "group" => {:static, :number},
+             "overseas" => {:static, :number},
+             "retaliation" => {:static, :number},
+             "war" => {:static, :number},
+             "warlord" => {:static, :number}
+           }}
+        ),
+      is_stealthed: Map.get(data, "is_stealthed") |> Torngen.Client.Schema.parse({:static, :boolean}),
+      is_ranked_war: Map.get(data, "is_ranked_war") |> Torngen.Client.Schema.parse({:static, :boolean}),
+      is_raid: Map.get(data, "is_raid") |> Torngen.Client.Schema.parse({:static, :boolean}),
+      is_interrupted: Map.get(data, "is_interrupted") |> Torngen.Client.Schema.parse({:static, :boolean}),
+      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.AttackId),
+      finishing_hit_effects:
+        Map.get(data, "finishing_hit_effects")
+        |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.AttackingFinishingHitEffects}),
+      ended: Map.get(data, "ended") |> Torngen.Client.Schema.parse({:static, :integer}),
+      defender: Map.get(data, "defender") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.AttackPlayer),
+      code: Map.get(data, "code") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.AttackCode),
+      chain: Map.get(data, "chain") |> Torngen.Client.Schema.parse({:static, :integer}),
+      attacker:
+        Map.get(data, "attacker")
+        |> Torngen.Client.Schema.parse({:one_of, [{:static, :null}, Torngen.Client.Schema.AttackPlayer]})
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

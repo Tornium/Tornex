@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.ForumThreadBase do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -44,22 +45,24 @@ defmodule Torngen.Client.Schema.ForumThreadBase do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      views: Map.get(data, "views"),
-      title: Map.get(data, "title"),
-      rating: Map.get(data, "rating"),
-      posts: Map.get(data, "posts"),
-      last_poster: Map.get(data, "last_poster"),
-      last_post_time: Map.get(data, "last_post_time"),
-      is_sticky: Map.get(data, "is_sticky"),
-      is_locked: Map.get(data, "is_locked"),
-      id: Map.get(data, "id"),
-      has_poll: Map.get(data, "has_poll"),
-      forum_id: Map.get(data, "forum_id"),
-      first_post_time: Map.get(data, "first_post_time"),
-      author: Map.get(data, "author")
+      views: Map.get(data, "views") |> Torngen.Client.Schema.parse({:static, :integer}),
+      title: Map.get(data, "title") |> Torngen.Client.Schema.parse({:static, :string}),
+      rating: Map.get(data, "rating") |> Torngen.Client.Schema.parse({:static, :integer}),
+      posts: Map.get(data, "posts") |> Torngen.Client.Schema.parse({:static, :integer}),
+      last_poster:
+        Map.get(data, "last_poster")
+        |> Torngen.Client.Schema.parse({:one_of, [{:static, :null}, Torngen.Client.Schema.ForumThreadAuthor]}),
+      last_post_time:
+        Map.get(data, "last_post_time") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :integer]}),
+      is_sticky: Map.get(data, "is_sticky") |> Torngen.Client.Schema.parse({:static, :boolean}),
+      is_locked: Map.get(data, "is_locked") |> Torngen.Client.Schema.parse({:static, :boolean}),
+      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ForumThreadId),
+      has_poll: Map.get(data, "has_poll") |> Torngen.Client.Schema.parse({:static, :boolean}),
+      forum_id: Map.get(data, "forum_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ForumId),
+      first_post_time: Map.get(data, "first_post_time") |> Torngen.Client.Schema.parse({:static, :integer}),
+      author: Map.get(data, "author") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ForumThreadAuthor)
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

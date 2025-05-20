@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.TornEducationCourses do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -32,16 +33,16 @@ defmodule Torngen.Client.Schema.TornEducationCourses do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      rewards: Map.get(data, "rewards"),
-      prerequisites: Map.get(data, "prerequisites"),
-      name: Map.get(data, "name"),
-      id: Map.get(data, "id"),
-      duration: Map.get(data, "duration"),
-      description: Map.get(data, "description"),
-      code: Map.get(data, "code")
+      rewards: Map.get(data, "rewards") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.TornEducationRewards),
+      prerequisites:
+        Map.get(data, "prerequisites") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.TornEducationPrerequisites),
+      name: Map.get(data, "name") |> Torngen.Client.Schema.parse({:static, :string}),
+      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.EducationId),
+      duration: Map.get(data, "duration") |> Torngen.Client.Schema.parse({:static, :integer}),
+      description: Map.get(data, "description") |> Torngen.Client.Schema.parse({:static, :string}),
+      code: Map.get(data, "code") |> Torngen.Client.Schema.parse({:static, :string})
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

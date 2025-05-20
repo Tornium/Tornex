@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.KeyLogResponse do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -28,10 +29,21 @@ defmodule Torngen.Client.Schema.KeyLogResponse do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      log: Map.get(data, "log")
+      log:
+        Map.get(data, "log")
+        |> Torngen.Client.Schema.parse(
+          {:array,
+           {:object,
+            %{
+              "id" => {:one_of, [static: :null, static: :integer]},
+              "ip" => {:static, :string},
+              "selections" => {:static, :string},
+              "timestamp" => {:static, :integer},
+              "type" => {:static, :string}
+            }}}
+        )
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

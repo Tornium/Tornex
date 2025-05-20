@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.FactionRankedWarReportResponse do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -49,10 +50,54 @@ defmodule Torngen.Client.Schema.FactionRankedWarReportResponse do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      rankedwarreport: Map.get(data, "rankedwarreport")
+      rankedwarreport:
+        Map.get(data, "rankedwarreport")
+        |> Torngen.Client.Schema.parse(
+          {:object,
+           %{
+             "end" => {:static, :integer},
+             "factions" =>
+               {:array,
+                {:object,
+                 %{
+                   "attacks" => {:static, :integer},
+                   "id" => Torngen.Client.Schema.FactionId,
+                   "members" =>
+                     {:array,
+                      {:object,
+                       %{
+                         "attacks" => {:static, :integer},
+                         "id" => Torngen.Client.Schema.UserId,
+                         "level" => {:static, :integer},
+                         "name" => {:static, :string},
+                         "score" => {:static, :number}
+                       }}},
+                   "name" => {:static, :string},
+                   "rank" => {:object, %{"after" => {:static, :string}, "before" => {:static, :string}}},
+                   "rewards" =>
+                     {:object,
+                      %{
+                        "items" =>
+                          {:array,
+                           {:object,
+                            %{
+                              "id" => Torngen.Client.Schema.ItemId,
+                              "name" => {:static, :string},
+                              "quantity" => {:static, :integer}
+                            }}},
+                        "points" => {:static, :integer},
+                        "respect" => {:static, :integer}
+                      }},
+                   "score" => {:static, :integer}
+                 }}},
+             "forfeit" => {:static, :boolean},
+             "id" => Torngen.Client.Schema.RankedWarId,
+             "start" => {:static, :integer},
+             "winner" => Torngen.Client.Schema.FactionId
+           }}
+        )
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

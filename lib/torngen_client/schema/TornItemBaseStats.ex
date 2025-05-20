@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.TornItemBaseStats do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -24,12 +25,11 @@ defmodule Torngen.Client.Schema.TornItemBaseStats do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      damage: Map.get(data, "damage"),
-      armor: Map.get(data, "armor"),
-      accuracy: Map.get(data, "accuracy")
+      damage: Map.get(data, "damage") |> Torngen.Client.Schema.parse({:static, :integer}),
+      armor: Map.get(data, "armor") |> Torngen.Client.Schema.parse({:static, :integer}),
+      accuracy: Map.get(data, "accuracy") |> Torngen.Client.Schema.parse({:static, :integer})
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

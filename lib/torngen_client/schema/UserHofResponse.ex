@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.UserHofResponse do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -20,10 +21,9 @@ defmodule Torngen.Client.Schema.UserHofResponse do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      hof: Map.get(data, "hof")
+      hof: Map.get(data, "hof") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserHofStats)
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.TornHofResponse do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -22,11 +23,11 @@ defmodule Torngen.Client.Schema.TornHofResponse do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      hof: Map.get(data, "hof"),
-      _metadata: Map.get(data, "_metadata")
+      hof: Map.get(data, "hof") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.TornHof}),
+      _metadata:
+        Map.get(data, "_metadata") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RequestMetadataWithLinks)
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

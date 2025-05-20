@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.TornRacket do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -30,15 +31,14 @@ defmodule Torngen.Client.Schema.TornRacket do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      reward: Map.get(data, "reward"),
-      name: Map.get(data, "name"),
-      level: Map.get(data, "level"),
-      description: Map.get(data, "description"),
-      created_at: Map.get(data, "created_at"),
-      changed_at: Map.get(data, "changed_at")
+      reward: Map.get(data, "reward") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.TornRacketReward),
+      name: Map.get(data, "name") |> Torngen.Client.Schema.parse({:static, :string}),
+      level: Map.get(data, "level") |> Torngen.Client.Schema.parse({:static, :integer}),
+      description: Map.get(data, "description") |> Torngen.Client.Schema.parse({:static, :string}),
+      created_at: Map.get(data, "created_at") |> Torngen.Client.Schema.parse({:static, :integer}),
+      changed_at: Map.get(data, "changed_at") |> Torngen.Client.Schema.parse({:static, :integer})
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

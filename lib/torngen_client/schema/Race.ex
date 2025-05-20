@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.Race do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -43,18 +44,44 @@ defmodule Torngen.Client.Schema.Race do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      track_id: Map.get(data, "track_id"),
-      title: Map.get(data, "title"),
-      status: Map.get(data, "status"),
-      schedule: Map.get(data, "schedule"),
-      requirements: Map.get(data, "requirements"),
-      participants: Map.get(data, "participants"),
-      laps: Map.get(data, "laps"),
-      id: Map.get(data, "id"),
-      creator_id: Map.get(data, "creator_id")
+      track_id: Map.get(data, "track_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RaceTrackId),
+      title: Map.get(data, "title") |> Torngen.Client.Schema.parse({:static, :string}),
+      status: Map.get(data, "status") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RaceStatusEnum),
+      schedule:
+        Map.get(data, "schedule")
+        |> Torngen.Client.Schema.parse(
+          {:object,
+           %{
+             "end" => {:one_of, [static: :null, static: :integer]},
+             "join_from" => {:static, :integer},
+             "join_until" => {:static, :integer},
+             "start" => {:static, :integer}
+           }}
+        ),
+      requirements:
+        Map.get(data, "requirements")
+        |> Torngen.Client.Schema.parse(
+          {:object,
+           %{
+             "car_class" => {:one_of, [{:static, :null}, Torngen.Client.Schema.RaceClassEnum]},
+             "car_item_id" => {:one_of, [{:static, :null}, Torngen.Client.Schema.ItemId]},
+             "driver_class" => {:one_of, [{:static, :null}, Torngen.Client.Schema.RaceClassEnum]},
+             "join_fee" => {:static, :integer},
+             "requires_password" => {:static, :boolean},
+             "requires_stock_car" => {:static, :boolean}
+           }}
+        ),
+      participants:
+        Map.get(data, "participants")
+        |> Torngen.Client.Schema.parse(
+          {:object,
+           %{"current" => {:static, :integer}, "maximum" => {:static, :integer}, "minimum" => {:static, :integer}}}
+        ),
+      laps: Map.get(data, "laps") |> Torngen.Client.Schema.parse({:static, :integer}),
+      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RaceId),
+      creator_id: Map.get(data, "creator_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId)
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

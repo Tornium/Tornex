@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.UserFactionBalanceResponse do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -20,10 +21,11 @@ defmodule Torngen.Client.Schema.UserFactionBalanceResponse do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      factionBalance: Map.get(data, "factionBalance")
+      factionBalance:
+        Map.get(data, "factionBalance")
+        |> Torngen.Client.Schema.parse({:one_of, [{:static, :null}, Torngen.Client.Schema.UserFactionBalance]})
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

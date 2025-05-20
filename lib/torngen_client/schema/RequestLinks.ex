@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.RequestLinks do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -22,11 +23,10 @@ defmodule Torngen.Client.Schema.RequestLinks do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      prev: Map.get(data, "prev"),
-      next: Map.get(data, "next")
+      prev: Map.get(data, "prev") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :string]}),
+      next: Map.get(data, "next") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :string]})
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

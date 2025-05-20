@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.ForumThreadAuthor do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -24,12 +25,11 @@ defmodule Torngen.Client.Schema.ForumThreadAuthor do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      username: Map.get(data, "username"),
-      karma: Map.get(data, "karma"),
-      id: Map.get(data, "id")
+      username: Map.get(data, "username") |> Torngen.Client.Schema.parse({:static, :string}),
+      karma: Map.get(data, "karma") |> Torngen.Client.Schema.parse({:static, :integer}),
+      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId)
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

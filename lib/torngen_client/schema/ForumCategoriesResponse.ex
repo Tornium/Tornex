@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.ForumCategoriesResponse do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -27,10 +28,20 @@ defmodule Torngen.Client.Schema.ForumCategoriesResponse do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      categories: Map.get(data, "categories")
+      categories:
+        Map.get(data, "categories")
+        |> Torngen.Client.Schema.parse(
+          {:array,
+           {:object,
+            %{
+              "acronym" => {:static, :string},
+              "id" => Torngen.Client.Schema.ForumId,
+              "threads" => {:static, :integer},
+              "title" => {:static, :string}
+            }}}
+        )
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

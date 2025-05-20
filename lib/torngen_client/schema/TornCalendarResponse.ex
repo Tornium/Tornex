@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.TornCalendarResponse do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -23,10 +24,17 @@ defmodule Torngen.Client.Schema.TornCalendarResponse do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      calendar: Map.get(data, "calendar")
+      calendar:
+        Map.get(data, "calendar")
+        |> Torngen.Client.Schema.parse(
+          {:object,
+           %{
+             "competitions" => {:array, Torngen.Client.Schema.TornCalendarActivity},
+             "events" => {:array, Torngen.Client.Schema.TornCalendarActivity}
+           }}
+        )
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

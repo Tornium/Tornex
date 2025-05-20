@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.PersonalStatsTravel do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -38,10 +39,32 @@ defmodule Torngen.Client.Schema.PersonalStatsTravel do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      travel: Map.get(data, "travel")
+      travel:
+        Map.get(data, "travel")
+        |> Torngen.Client.Schema.parse(
+          {:object,
+           %{
+             "argentina" => {:static, :integer},
+             "attacks_won" => {:static, :integer},
+             "canada" => {:static, :integer},
+             "cayman_islands" => {:static, :integer},
+             "china" => {:static, :integer},
+             "defends_lost" => {:static, :integer},
+             "hawaii" => {:static, :integer},
+             "hunting" => {:object, %{"skill" => {:static, :integer}}},
+             "items_bought" => {:static, :integer},
+             "japan" => {:static, :integer},
+             "mexico" => {:static, :integer},
+             "south_africa" => {:static, :integer},
+             "switzerland" => {:static, :integer},
+             "time_spent" => {:static, :integer},
+             "total" => {:static, :integer},
+             "united_arab_emirates" => {:static, :integer},
+             "united_kingdom" => {:static, :integer}
+           }}
+        )
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

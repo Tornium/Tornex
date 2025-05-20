@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.TornFactionHof do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -30,15 +31,14 @@ defmodule Torngen.Client.Schema.TornFactionHof do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      values: Map.get(data, "values"),
-      rank: Map.get(data, "rank"),
-      position: Map.get(data, "position"),
-      name: Map.get(data, "name"),
-      members: Map.get(data, "members"),
-      id: Map.get(data, "id")
+      values: Map.get(data, "values") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionHofValues),
+      rank: Map.get(data, "rank") |> Torngen.Client.Schema.parse({:static, :string}),
+      position: Map.get(data, "position") |> Torngen.Client.Schema.parse({:static, :integer}),
+      name: Map.get(data, "name") |> Torngen.Client.Schema.parse({:static, :string}),
+      members: Map.get(data, "members") |> Torngen.Client.Schema.parse({:static, :integer}),
+      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionId)
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

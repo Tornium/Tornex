@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.UserCalendar do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -20,10 +21,9 @@ defmodule Torngen.Client.Schema.UserCalendar do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      start_time: Map.get(data, "start_time")
+      start_time: Map.get(data, "start_time") |> Torngen.Client.Schema.parse({:static, :string})
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

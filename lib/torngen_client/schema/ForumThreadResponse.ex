@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.ForumThreadResponse do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -20,10 +21,9 @@ defmodule Torngen.Client.Schema.ForumThreadResponse do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      thread: Map.get(data, "thread")
+      thread: Map.get(data, "thread") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ForumThreadExtended)
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

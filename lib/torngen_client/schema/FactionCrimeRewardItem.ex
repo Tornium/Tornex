@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.FactionCrimeRewardItem do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -22,11 +23,10 @@ defmodule Torngen.Client.Schema.FactionCrimeRewardItem do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      quantity: Map.get(data, "quantity"),
-      id: Map.get(data, "id")
+      quantity: Map.get(data, "quantity") |> Torngen.Client.Schema.parse({:static, :integer}),
+      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ItemId)
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

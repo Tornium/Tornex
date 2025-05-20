@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.TimestampResponse do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -20,10 +21,9 @@ defmodule Torngen.Client.Schema.TimestampResponse do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      timestamp: Map.get(data, "timestamp")
+      timestamp: Map.get(data, "timestamp") |> Torngen.Client.Schema.parse({:static, :integer})
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.PersonalStatsNetworthExtended do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -41,10 +42,35 @@ defmodule Torngen.Client.Schema.PersonalStatsNetworthExtended do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      networth: Map.get(data, "networth")
+      networth:
+        Map.get(data, "networth")
+        |> Torngen.Client.Schema.parse(
+          {:object,
+           %{
+             "auction_house" => {:static, :integer},
+             "bank" => {:static, :integer},
+             "bazaar" => {:static, :integer},
+             "bookie" => {:static, :integer},
+             "company" => {:static, :integer},
+             "display_case" => {:static, :integer},
+             "enlisted_cars" => {:static, :integer},
+             "inventory" => {:static, :integer},
+             "item_market" => {:static, :integer},
+             "loans" => {:static, :integer},
+             "overseas_bank" => {:static, :integer},
+             "pending" => {:static, :integer},
+             "piggy_bank" => {:static, :integer},
+             "points" => {:static, :integer},
+             "property" => {:static, :integer},
+             "stock_market" => {:static, :integer},
+             "total" => {:static, :integer},
+             "unpaid_fees" => {:static, :integer},
+             "vaults" => {:static, :integer},
+             "wallet" => {:static, :integer}
+           }}
+        )
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

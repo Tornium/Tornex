@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.TornItemMods do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -28,14 +29,14 @@ defmodule Torngen.Client.Schema.TornItemMods do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      weapons: Map.get(data, "weapons"),
-      name: Map.get(data, "name"),
-      id: Map.get(data, "id"),
-      dual_fit: Map.get(data, "dual_fit"),
-      description: Map.get(data, "description")
+      weapons:
+        Map.get(data, "weapons") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.TornItemWeaponTypeEnum}),
+      name: Map.get(data, "name") |> Torngen.Client.Schema.parse({:static, :string}),
+      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ItemModId),
+      dual_fit: Map.get(data, "dual_fit") |> Torngen.Client.Schema.parse({:static, :boolean}),
+      description: Map.get(data, "description") |> Torngen.Client.Schema.parse({:static, :string})
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

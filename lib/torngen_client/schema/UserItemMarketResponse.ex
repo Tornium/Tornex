@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.UserItemMarketResponse do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -22,11 +23,13 @@ defmodule Torngen.Client.Schema.UserItemMarketResponse do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      itemmarket: Map.get(data, "itemmarket"),
-      _metadata: Map.get(data, "_metadata")
+      itemmarket:
+        Map.get(data, "itemmarket")
+        |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.UserItemMarketListing}),
+      _metadata:
+        Map.get(data, "_metadata") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RequestMetadataWithLinks)
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

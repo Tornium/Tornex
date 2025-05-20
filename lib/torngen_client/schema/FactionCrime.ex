@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.FactionCrime do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -42,21 +43,26 @@ defmodule Torngen.Client.Schema.FactionCrime do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      status: Map.get(data, "status"),
-      slots: Map.get(data, "slots"),
-      rewards: Map.get(data, "rewards"),
-      ready_at: Map.get(data, "ready_at"),
-      previous_crime_id: Map.get(data, "previous_crime_id"),
-      planning_at: Map.get(data, "planning_at"),
-      name: Map.get(data, "name"),
-      id: Map.get(data, "id"),
-      expired_at: Map.get(data, "expired_at"),
-      executed_at: Map.get(data, "executed_at"),
-      difficulty: Map.get(data, "difficulty"),
-      created_at: Map.get(data, "created_at")
+      status: Map.get(data, "status") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionCrimeStatusEnum),
+      slots: Map.get(data, "slots") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.FactionCrimeSlot}),
+      rewards:
+        Map.get(data, "rewards")
+        |> Torngen.Client.Schema.parse({:one_of, [{:static, :null}, Torngen.Client.Schema.FactionCrimeReward]}),
+      ready_at: Map.get(data, "ready_at") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :integer]}),
+      previous_crime_id:
+        Map.get(data, "previous_crime_id")
+        |> Torngen.Client.Schema.parse({:one_of, [{:static, :null}, Torngen.Client.Schema.FactionCrimeId]}),
+      planning_at:
+        Map.get(data, "planning_at") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :integer]}),
+      name: Map.get(data, "name") |> Torngen.Client.Schema.parse({:static, :string}),
+      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionCrimeId),
+      expired_at: Map.get(data, "expired_at") |> Torngen.Client.Schema.parse({:static, :integer}),
+      executed_at:
+        Map.get(data, "executed_at") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :integer]}),
+      difficulty: Map.get(data, "difficulty") |> Torngen.Client.Schema.parse({:static, :integer}),
+      created_at: Map.get(data, "created_at") |> Torngen.Client.Schema.parse({:static, :integer})
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.ItemMarketListingItemStats do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -26,13 +27,12 @@ defmodule Torngen.Client.Schema.ItemMarketListingItemStats do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      quality: Map.get(data, "quality"),
-      damage: Map.get(data, "damage"),
-      armor: Map.get(data, "armor"),
-      accuracy: Map.get(data, "accuracy")
+      quality: Map.get(data, "quality") |> Torngen.Client.Schema.parse({:static, :number}),
+      damage: Map.get(data, "damage") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :number]}),
+      armor: Map.get(data, "armor") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :number]}),
+      accuracy: Map.get(data, "accuracy") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :number]})
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

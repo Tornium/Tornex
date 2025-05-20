@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.KeyInfoResponse do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -38,10 +39,36 @@ defmodule Torngen.Client.Schema.KeyInfoResponse do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      info: Map.get(data, "info")
+      info:
+        Map.get(data, "info")
+        |> Torngen.Client.Schema.parse(
+          {:object,
+           %{
+             "access" =>
+               {:object,
+                %{
+                  "company" => {:static, :boolean},
+                  "faction" => {:static, :boolean},
+                  "level" => {:static, :integer},
+                  "type" => Torngen.Client.Schema.ApiKeyAccessTypeEnum
+                }},
+             "selections" =>
+               {:object,
+                %{
+                  "company" => {:array, {:static, :string}},
+                  "faction" => {:array, Torngen.Client.Schema.FactionSelectionName},
+                  "forum" => {:array, Torngen.Client.Schema.ForumSelectionName},
+                  "key" => {:array, Torngen.Client.Schema.KeySelectionName},
+                  "market" => {:array, Torngen.Client.Schema.MarketSelectionName},
+                  "property" => {:array, {:static, :string}},
+                  "racing" => {:array, Torngen.Client.Schema.RacingSelectionName},
+                  "torn" => {:array, Torngen.Client.Schema.TornSelectionName},
+                  "user" => {:array, Torngen.Client.Schema.UserSelectionName}
+                }}
+           }}
+        )
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

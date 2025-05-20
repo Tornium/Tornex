@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.FactionChainReportAttackerAttacks do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -42,21 +43,20 @@ defmodule Torngen.Client.Schema.FactionChainReportAttackerAttacks do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      war: Map.get(data, "war"),
-      total: Map.get(data, "total"),
-      retaliations: Map.get(data, "retaliations"),
-      overseas: Map.get(data, "overseas"),
-      mug: Map.get(data, "mug"),
-      losses: Map.get(data, "losses"),
-      leave: Map.get(data, "leave"),
-      hospitalize: Map.get(data, "hospitalize"),
-      escapes: Map.get(data, "escapes"),
-      draws: Map.get(data, "draws"),
-      bonuses: Map.get(data, "bonuses"),
-      assists: Map.get(data, "assists")
+      war: Map.get(data, "war") |> Torngen.Client.Schema.parse({:static, :integer}),
+      total: Map.get(data, "total") |> Torngen.Client.Schema.parse({:static, :integer}),
+      retaliations: Map.get(data, "retaliations") |> Torngen.Client.Schema.parse({:static, :integer}),
+      overseas: Map.get(data, "overseas") |> Torngen.Client.Schema.parse({:static, :integer}),
+      mug: Map.get(data, "mug") |> Torngen.Client.Schema.parse({:static, :integer}),
+      losses: Map.get(data, "losses") |> Torngen.Client.Schema.parse({:static, :integer}),
+      leave: Map.get(data, "leave") |> Torngen.Client.Schema.parse({:static, :integer}),
+      hospitalize: Map.get(data, "hospitalize") |> Torngen.Client.Schema.parse({:static, :integer}),
+      escapes: Map.get(data, "escapes") |> Torngen.Client.Schema.parse({:static, :integer}),
+      draws: Map.get(data, "draws") |> Torngen.Client.Schema.parse({:static, :integer}),
+      bonuses: Map.get(data, "bonuses") |> Torngen.Client.Schema.parse({:static, :integer}),
+      assists: Map.get(data, "assists") |> Torngen.Client.Schema.parse({:static, :integer})
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end

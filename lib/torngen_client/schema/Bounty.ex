@@ -1,5 +1,6 @@
 defmodule Torngen.Client.Schema.Bounty do
   @moduledoc """
+  [SHORT DESCRIPTION]
   """
 
   @behaviour Torngen.Client.Schema
@@ -38,19 +39,21 @@ defmodule Torngen.Client.Schema.Bounty do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      valid_until: Map.get(data, "valid_until"),
-      target_name: Map.get(data, "target_name"),
-      target_level: Map.get(data, "target_level"),
-      target_id: Map.get(data, "target_id"),
-      reward: Map.get(data, "reward"),
-      reason: Map.get(data, "reason"),
-      quantity: Map.get(data, "quantity"),
-      lister_name: Map.get(data, "lister_name"),
-      lister_id: Map.get(data, "lister_id"),
-      is_anonymous: Map.get(data, "is_anonymous")
+      valid_until: Map.get(data, "valid_until") |> Torngen.Client.Schema.parse({:static, :integer}),
+      target_name: Map.get(data, "target_name") |> Torngen.Client.Schema.parse({:static, :string}),
+      target_level: Map.get(data, "target_level") |> Torngen.Client.Schema.parse({:static, :integer}),
+      target_id: Map.get(data, "target_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId),
+      reward: Map.get(data, "reward") |> Torngen.Client.Schema.parse({:static, :integer}),
+      reason: Map.get(data, "reason") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :string]}),
+      quantity: Map.get(data, "quantity") |> Torngen.Client.Schema.parse({:static, :integer}),
+      lister_name:
+        Map.get(data, "lister_name") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :string]}),
+      lister_id:
+        Map.get(data, "lister_id")
+        |> Torngen.Client.Schema.parse({:one_of, [{:static, :null}, Torngen.Client.Schema.UserId]}),
+      is_anonymous: Map.get(data, "is_anonymous") |> Torngen.Client.Schema.parse({:static, :boolean})
     }
 
-    # TODO: Handle values that are not literals
     # TODO: Handle default values in schema parser and codegen
   end
 end
