@@ -21,11 +21,10 @@ defmodule Torngen.Client.Schema.UserFactionBalanceResponse do
   def parse(%{} = data) do
     %__MODULE__{
       factionBalance:
-        Map.get(data, "factionBalance")
+        data
+        |> Map.get("factionBalance")
         |> Torngen.Client.Schema.parse({:one_of, [{:static, :null}, Torngen.Client.Schema.UserFactionBalance]})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

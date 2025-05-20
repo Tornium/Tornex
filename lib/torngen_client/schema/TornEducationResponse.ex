@@ -21,10 +21,8 @@ defmodule Torngen.Client.Schema.TornEducationResponse do
   def parse(%{} = data) do
     %__MODULE__{
       education:
-        Map.get(data, "education") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.TornEducation})
+        data |> Map.get("education") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.TornEducation})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

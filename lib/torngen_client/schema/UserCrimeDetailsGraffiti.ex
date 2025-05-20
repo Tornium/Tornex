@@ -29,15 +29,13 @@ defmodule Torngen.Client.Schema.UserCrimeDetailsGraffiti do
   def parse(%{} = data) do
     %__MODULE__{
       most_graffiti_simultaneously:
-        Map.get(data, "most_graffiti_simultaneously") |> Torngen.Client.Schema.parse({:static, :integer}),
+        data |> Map.get("most_graffiti_simultaneously") |> Torngen.Client.Schema.parse({:static, :integer}),
       most_graffiti_in_one_area:
-        Map.get(data, "most_graffiti_in_one_area") |> Torngen.Client.Schema.parse({:static, :integer}),
-      graffiti_removed: Map.get(data, "graffiti_removed") |> Torngen.Client.Schema.parse({:static, :integer}),
-      cost_to_city: Map.get(data, "cost_to_city") |> Torngen.Client.Schema.parse({:static, :integer}),
-      cans_used: Map.get(data, "cans_used") |> Torngen.Client.Schema.parse({:static, :integer})
+        data |> Map.get("most_graffiti_in_one_area") |> Torngen.Client.Schema.parse({:static, :integer}),
+      graffiti_removed: data |> Map.get("graffiti_removed") |> Torngen.Client.Schema.parse({:static, :integer}),
+      cost_to_city: data |> Map.get("cost_to_city") |> Torngen.Client.Schema.parse({:static, :integer}),
+      cans_used: data |> Map.get("cans_used") |> Torngen.Client.Schema.parse({:static, :integer})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

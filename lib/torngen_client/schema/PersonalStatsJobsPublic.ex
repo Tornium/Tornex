@@ -21,13 +21,12 @@ defmodule Torngen.Client.Schema.PersonalStatsJobsPublic do
   def parse(%{} = data) do
     %__MODULE__{
       jobs:
-        Map.get(data, "jobs")
+        data
+        |> Map.get("jobs")
         |> Torngen.Client.Schema.parse(
           {:object, %{"job_points_used" => {:static, :integer}, "trains_received" => {:static, :integer}}}
         )
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

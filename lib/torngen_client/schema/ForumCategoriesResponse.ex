@@ -28,7 +28,8 @@ defmodule Torngen.Client.Schema.ForumCategoriesResponse do
   def parse(%{} = data) do
     %__MODULE__{
       categories:
-        Map.get(data, "categories")
+        data
+        |> Map.get("categories")
         |> Torngen.Client.Schema.parse(
           {:array,
            {:object,
@@ -40,8 +41,6 @@ defmodule Torngen.Client.Schema.ForumCategoriesResponse do
             }}}
         )
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

@@ -8,10 +8,7 @@ defmodule Torngen.Client.Path.Faction.CrimeId.Crime do
   - crimeId: Crime id
   - timestamp: Timestamp to bypass cache
   - comment: Comment for your tool/service/bot/website to be visible in the logs.
-  - key: API key (Minimal).<br>It's not required to use this parameter when passing the API key via the Authorization header.
-
-  ## Tags
-  - Faction
+  - key: API key (Minimal)
   """
 
   import Torngen.Client.Path, only: [defparameter: 3]
@@ -49,7 +46,7 @@ defmodule Torngen.Client.Path.Faction.CrimeId.Crime do
 
   @impl true
   defparameter :key, value do
-    # API key (Minimal).<br>It's not required to use this parameter when passing the API key via the Authorization header.
+    # API key (Minimal). It's not required to use this parameter when passing the API key via the Authorization header.
     {:query, :key, value}
   end
 

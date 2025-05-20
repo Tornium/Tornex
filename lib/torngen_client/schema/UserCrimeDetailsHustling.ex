@@ -27,14 +27,13 @@ defmodule Torngen.Client.Schema.UserCrimeDetailsHustling do
   def parse(%{} = data) do
     %__MODULE__{
       total_audience_gathered:
-        Map.get(data, "total_audience_gathered") |> Torngen.Client.Schema.parse({:static, :integer}),
-      shill_money_collected: Map.get(data, "shill_money_collected") |> Torngen.Client.Schema.parse({:static, :integer}),
+        data |> Map.get("total_audience_gathered") |> Torngen.Client.Schema.parse({:static, :integer}),
+      shill_money_collected:
+        data |> Map.get("shill_money_collected") |> Torngen.Client.Schema.parse({:static, :integer}),
       pickpocket_money_collected:
-        Map.get(data, "pickpocket_money_collected") |> Torngen.Client.Schema.parse({:static, :integer}),
-      biggest_money_won: Map.get(data, "biggest_money_won") |> Torngen.Client.Schema.parse({:static, :integer})
+        data |> Map.get("pickpocket_money_collected") |> Torngen.Client.Schema.parse({:static, :integer}),
+      biggest_money_won: data |> Map.get("biggest_money_won") |> Torngen.Client.Schema.parse({:static, :integer})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

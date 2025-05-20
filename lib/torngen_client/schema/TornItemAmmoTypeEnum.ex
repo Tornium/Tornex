@@ -1,7 +1,9 @@
 defmodule Torngen.Client.Schema.TornItemAmmoTypeEnum do
   @moduledoc """
-  An enumerated type describing `#/components/schemas/TornItemAmmoTypeEnum` of type string.
+  An enumerated type describing `TornItemAmmoTypeEnum` of type string.
   """
+
+  require Logger
 
   @behaviour Torngen.Client.Schema
 
@@ -20,7 +22,7 @@ defmodule Torngen.Client.Schema.TornItemAmmoTypeEnum do
     if validate?(data) do
       data
     else
-      IO.inspect(data, label: "Invalid enum value of TornItemAmmoTypeEnum")
+      Logger.warning("Invalid enum value #{inspect(data)} of TornItemAmmoTypeEnum")
       nil
     end
   end

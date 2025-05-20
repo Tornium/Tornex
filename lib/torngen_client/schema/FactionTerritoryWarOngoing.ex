@@ -30,17 +30,17 @@ defmodule Torngen.Client.Schema.FactionTerritoryWarOngoing do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      territory: Map.get(data, "territory") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionTerritoryEnum),
-      target: Map.get(data, "target") |> Torngen.Client.Schema.parse({:static, :integer}),
-      start: Map.get(data, "start") |> Torngen.Client.Schema.parse({:static, :integer}),
-      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.TerritoryWarId),
+      territory:
+        data |> Map.get("territory") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionTerritoryEnum),
+      target: data |> Map.get("target") |> Torngen.Client.Schema.parse({:static, :integer}),
+      start: data |> Map.get("start") |> Torngen.Client.Schema.parse({:static, :integer}),
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.TerritoryWarId),
       factions:
-        Map.get(data, "factions")
+        data
+        |> Map.get("factions")
         |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.FactionTerritoryWarOngoingFaction}),
-      end: Map.get(data, "end") |> Torngen.Client.Schema.parse({:static, :integer})
+      end: data |> Map.get("end") |> Torngen.Client.Schema.parse({:static, :integer})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

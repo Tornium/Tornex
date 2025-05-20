@@ -30,15 +30,13 @@ defmodule Torngen.Client.Schema.FactionTerritoryWarReportMembers do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      username: Map.get(data, "username") |> Torngen.Client.Schema.parse({:static, :string}),
-      score: Map.get(data, "score") |> Torngen.Client.Schema.parse({:static, :integer}),
-      level: Map.get(data, "level") |> Torngen.Client.Schema.parse({:static, :integer}),
-      joins: Map.get(data, "joins") |> Torngen.Client.Schema.parse({:static, :integer}),
-      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId),
-      clears: Map.get(data, "clears") |> Torngen.Client.Schema.parse({:static, :integer})
+      username: data |> Map.get("username") |> Torngen.Client.Schema.parse({:static, :string}),
+      score: data |> Map.get("score") |> Torngen.Client.Schema.parse({:static, :integer}),
+      level: data |> Map.get("level") |> Torngen.Client.Schema.parse({:static, :integer}),
+      joins: data |> Map.get("joins") |> Torngen.Client.Schema.parse({:static, :integer}),
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId),
+      clears: data |> Map.get("clears") |> Torngen.Client.Schema.parse({:static, :integer})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

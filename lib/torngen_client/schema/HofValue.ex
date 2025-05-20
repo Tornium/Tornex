@@ -22,11 +22,9 @@ defmodule Torngen.Client.Schema.HofValue do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      value: Map.get(data, "value") |> Torngen.Client.Schema.parse({:static, :integer}),
-      rank: Map.get(data, "rank") |> Torngen.Client.Schema.parse({:static, :integer})
+      value: data |> Map.get("value") |> Torngen.Client.Schema.parse({:static, :integer}),
+      rank: data |> Map.get("rank") |> Torngen.Client.Schema.parse({:static, :integer})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

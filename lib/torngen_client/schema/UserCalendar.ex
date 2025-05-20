@@ -20,10 +20,8 @@ defmodule Torngen.Client.Schema.UserCalendar do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      start_time: Map.get(data, "start_time") |> Torngen.Client.Schema.parse({:static, :string})
+      start_time: data |> Map.get("start_time") |> Torngen.Client.Schema.parse({:static, :string})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

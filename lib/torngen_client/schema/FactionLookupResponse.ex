@@ -21,10 +21,10 @@ defmodule Torngen.Client.Schema.FactionLookupResponse do
   def parse(%{} = data) do
     %__MODULE__{
       selections:
-        Map.get(data, "selections") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.FactionSelectionName})
+        data
+        |> Map.get("selections")
+        |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.FactionSelectionName})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

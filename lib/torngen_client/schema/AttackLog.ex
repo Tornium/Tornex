@@ -36,16 +36,18 @@ defmodule Torngen.Client.Schema.AttackLog do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      timestamp: Map.get(data, "timestamp") |> Torngen.Client.Schema.parse({:static, :integer}),
-      text: Map.get(data, "text") |> Torngen.Client.Schema.parse({:static, :string}),
-      icon: Map.get(data, "icon") |> Torngen.Client.Schema.parse({:static, :string}),
+      timestamp: data |> Map.get("timestamp") |> Torngen.Client.Schema.parse({:static, :integer}),
+      text: data |> Map.get("text") |> Torngen.Client.Schema.parse({:static, :string}),
+      icon: data |> Map.get("icon") |> Torngen.Client.Schema.parse({:static, :string}),
       defender:
-        Map.get(data, "defender")
+        data
+        |> Map.get("defender")
         |> Torngen.Client.Schema.parse(
           {:one_of, [static: :null, object: %{"id" => Torngen.Client.Schema.UserId, "name" => {:static, :string}}]}
         ),
       attacker:
-        Map.get(data, "attacker")
+        data
+        |> Map.get("attacker")
         |> Torngen.Client.Schema.parse(
           {:one_of,
            [
@@ -59,10 +61,8 @@ defmodule Torngen.Client.Schema.AttackLog do
              }
            ]}
         ),
-      action: Map.get(data, "action") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.AttackActionEnum)
+      action: data |> Map.get("action") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.AttackActionEnum)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

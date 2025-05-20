@@ -1,7 +1,9 @@
 defmodule Torngen.Client.Schema.FactionPositionAbilityEnum do
   @moduledoc """
-  An enumerated type describing `#/components/schemas/FactionPositionAbilityEnum` of type string.
+  An enumerated type describing `FactionPositionAbilityEnum` of type string.
   """
+
+  require Logger
 
   @behaviour Torngen.Client.Schema
 
@@ -43,7 +45,7 @@ defmodule Torngen.Client.Schema.FactionPositionAbilityEnum do
     if validate?(data) do
       data
     else
-      IO.inspect(data, label: "Invalid enum value of FactionPositionAbilityEnum")
+      Logger.warning("Invalid enum value #{inspect(data)} of FactionPositionAbilityEnum")
       nil
     end
   end

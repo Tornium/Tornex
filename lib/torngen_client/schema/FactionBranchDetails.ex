@@ -27,13 +27,13 @@ defmodule Torngen.Client.Schema.FactionBranchDetails do
   def parse(%{} = data) do
     %__MODULE__{
       upgrades:
-        Map.get(data, "upgrades") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.FactionUpgradeDetails}),
-      order: Map.get(data, "order") |> Torngen.Client.Schema.parse({:static, :integer}),
-      name: Map.get(data, "name") |> Torngen.Client.Schema.parse({:static, :string}),
-      multiplier: Map.get(data, "multiplier") |> Torngen.Client.Schema.parse({:static, :integer})
+        data
+        |> Map.get("upgrades")
+        |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.FactionUpgradeDetails}),
+      order: data |> Map.get("order") |> Torngen.Client.Schema.parse({:static, :integer}),
+      name: data |> Map.get("name") |> Torngen.Client.Schema.parse({:static, :string}),
+      multiplier: data |> Map.get("multiplier") |> Torngen.Client.Schema.parse({:static, :integer})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

@@ -21,11 +21,10 @@ defmodule Torngen.Client.Schema.FactionTerritoryWarReportResponse do
   def parse(%{} = data) do
     %__MODULE__{
       territorywarreport:
-        Map.get(data, "territorywarreport")
+        data
+        |> Map.get("territorywarreport")
         |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.FactionTerritoryWarReport})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

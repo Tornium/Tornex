@@ -26,15 +26,14 @@ defmodule Torngen.Client.Schema.FactionRaidWar do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      war_id: Map.get(data, "war_id") |> Torngen.Client.Schema.parse({:static, :integer}),
-      start: Map.get(data, "start") |> Torngen.Client.Schema.parse({:static, :integer}),
+      war_id: data |> Map.get("war_id") |> Torngen.Client.Schema.parse({:static, :integer}),
+      start: data |> Map.get("start") |> Torngen.Client.Schema.parse({:static, :integer}),
       factions:
-        Map.get(data, "factions")
+        data
+        |> Map.get("factions")
         |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.FactionRaidWarParticipant}),
-      end: Map.get(data, "end") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :integer]})
+      end: data |> Map.get("end") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :integer]})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

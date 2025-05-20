@@ -21,13 +21,12 @@ defmodule Torngen.Client.Schema.PersonalStatsCrimes do
   def parse(%{} = data) do
     %__MODULE__{
       crimes:
-        Map.get(data, "crimes")
+        data
+        |> Map.get("crimes")
         |> Torngen.Client.Schema.parse(
           {:one_of, [Torngen.Client.Schema.PersonalStatsCrimesV2, Torngen.Client.Schema.PersonalStatsCrimesV1]}
         )
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

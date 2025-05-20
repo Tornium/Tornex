@@ -20,10 +20,8 @@ defmodule Torngen.Client.Schema.UserCrimeDetailsShoplifting do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      average_notoriety: Map.get(data, "average_notoriety") |> Torngen.Client.Schema.parse({:static, :integer})
+      average_notoriety: data |> Map.get("average_notoriety") |> Torngen.Client.Schema.parse({:static, :integer})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

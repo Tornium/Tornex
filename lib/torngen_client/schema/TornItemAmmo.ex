@@ -27,13 +27,11 @@ defmodule Torngen.Client.Schema.TornItemAmmo do
   def parse(%{} = data) do
     %__MODULE__{
       types:
-        Map.get(data, "types") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.TornItemAmmoTypeEnum}),
-      price: Map.get(data, "price") |> Torngen.Client.Schema.parse({:static, :integer}),
-      name: Map.get(data, "name") |> Torngen.Client.Schema.parse({:static, :string}),
-      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.AmmoId)
+        data |> Map.get("types") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.TornItemAmmoTypeEnum}),
+      price: data |> Map.get("price") |> Torngen.Client.Schema.parse({:static, :integer}),
+      name: data |> Map.get("name") |> Torngen.Client.Schema.parse({:static, :string}),
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.AmmoId)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

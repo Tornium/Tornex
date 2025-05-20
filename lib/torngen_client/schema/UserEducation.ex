@@ -23,12 +23,11 @@ defmodule Torngen.Client.Schema.UserEducation do
   def parse(%{} = data) do
     %__MODULE__{
       current:
-        Map.get(data, "current")
+        data
+        |> Map.get("current")
         |> Torngen.Client.Schema.parse({:one_of, [{:static, :null}, Torngen.Client.Schema.UserCurrentEducation]}),
-      complete: Map.get(data, "complete") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.EducationId})
+      complete: data |> Map.get("complete") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.EducationId})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

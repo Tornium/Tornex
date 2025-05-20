@@ -20,10 +20,8 @@ defmodule Torngen.Client.Schema.FactionHofResponse do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      hof: Map.get(data, "hof") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionHofStats)
+      hof: data |> Map.get("hof") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionHofStats)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

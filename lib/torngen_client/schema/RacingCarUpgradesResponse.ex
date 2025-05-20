@@ -21,10 +21,8 @@ defmodule Torngen.Client.Schema.RacingCarUpgradesResponse do
   def parse(%{} = data) do
     %__MODULE__{
       carupgrades:
-        Map.get(data, "carupgrades") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.RaceCarUpgrade})
+        data |> Map.get("carupgrades") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.RaceCarUpgrade})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

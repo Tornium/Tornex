@@ -24,17 +24,16 @@ defmodule Torngen.Client.Schema.FactionUpgrades do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      war: Map.get(data, "war") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.FactionBranchDetails}),
+      war: data |> Map.get("war") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.FactionBranchDetails}),
       peace:
-        Map.get(data, "peace") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.FactionBranchDetails}),
+        data |> Map.get("peace") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.FactionBranchDetails}),
       core:
-        Map.get(data, "core")
+        data
+        |> Map.get("core")
         |> Torngen.Client.Schema.parse(
           {:object, %{"upgrades" => {:array, Torngen.Client.Schema.FactionUpgradeDetails}}}
         )
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

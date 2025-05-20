@@ -22,11 +22,9 @@ defmodule Torngen.Client.Schema.RequestMetadataWithLinksAndTotal do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      total: Map.get(data, "total") |> Torngen.Client.Schema.parse({:static, :integer}),
-      links: Map.get(data, "links") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RequestLinks)
+      total: data |> Map.get("total") |> Torngen.Client.Schema.parse({:static, :integer}),
+      links: data |> Map.get("links") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RequestLinks)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

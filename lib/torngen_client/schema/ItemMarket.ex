@@ -26,16 +26,15 @@ defmodule Torngen.Client.Schema.ItemMarket do
   def parse(%{} = data) do
     %__MODULE__{
       listings:
-        Map.get(data, "listings")
+        data
+        |> Map.get("listings")
         |> Torngen.Client.Schema.parse(
           {:array,
            {:one_of,
             [Torngen.Client.Schema.ItemMarketListingStackable, Torngen.Client.Schema.ItemMarketListingNonstackable]}}
         ),
-      item: Map.get(data, "item") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ItemMarketItem)
+      item: data |> Map.get("item") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ItemMarketItem)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

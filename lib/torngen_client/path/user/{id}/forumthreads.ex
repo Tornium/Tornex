@@ -12,10 +12,7 @@ defmodule Torngen.Client.Path.User.Id.Forumthreads do
   - to: Timestamp that sets the upper limit for the data returned
   - timestamp: Timestamp to bypass cache
   - comment: Comment for your tool/service/bot/website to be visible in the logs.
-  - key: API key (Public).<br>It's not required to use this parameter when passing the API key via the Authorization header.
-
-  ## Tags
-  - User
+  - key: API key (Public)
   """
 
   import Torngen.Client.Path, only: [defparameter: 3]
@@ -77,7 +74,7 @@ defmodule Torngen.Client.Path.User.Id.Forumthreads do
 
   @impl true
   defparameter :key, value do
-    # API key (Public).<br>It's not required to use this parameter when passing the API key via the Authorization header.
+    # API key (Public). It's not required to use this parameter when passing the API key via the Authorization header.
     {:query, :key, value}
   end
 

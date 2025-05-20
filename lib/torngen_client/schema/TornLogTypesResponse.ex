@@ -20,10 +20,8 @@ defmodule Torngen.Client.Schema.TornLogTypesResponse do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      logtypes: Map.get(data, "logtypes") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.TornLog})
+      logtypes: data |> Map.get("logtypes") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.TornLog})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

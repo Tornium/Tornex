@@ -1,7 +1,9 @@
 defmodule Torngen.Client.Schema.KeySelectionName do
   @moduledoc """
-  An enumerated type describing `#/components/schemas/KeySelectionName` of type string.
+  An enumerated type describing `KeySelectionName` of type string.
   """
+
+  require Logger
 
   @behaviour Torngen.Client.Schema
 
@@ -20,7 +22,7 @@ defmodule Torngen.Client.Schema.KeySelectionName do
     if validate?(data) do
       data
     else
-      IO.inspect(data, label: "Invalid enum value of KeySelectionName")
+      Logger.warning("Invalid enum value #{inspect(data)} of KeySelectionName")
       nil
     end
   end

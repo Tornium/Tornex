@@ -42,7 +42,8 @@ defmodule Torngen.Client.Schema.PersonalStatsNetworthExtended do
   def parse(%{} = data) do
     %__MODULE__{
       networth:
-        Map.get(data, "networth")
+        data
+        |> Map.get("networth")
         |> Torngen.Client.Schema.parse(
           {:object,
            %{
@@ -69,8 +70,6 @@ defmodule Torngen.Client.Schema.PersonalStatsNetworthExtended do
            }}
         )
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

@@ -24,7 +24,8 @@ defmodule Torngen.Client.Schema.TornCalendarResponse do
   def parse(%{} = data) do
     %__MODULE__{
       calendar:
-        Map.get(data, "calendar")
+        data
+        |> Map.get("calendar")
         |> Torngen.Client.Schema.parse(
           {:object,
            %{
@@ -33,8 +34,6 @@ defmodule Torngen.Client.Schema.TornCalendarResponse do
            }}
         )
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

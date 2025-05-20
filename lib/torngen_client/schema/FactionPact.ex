@@ -24,12 +24,10 @@ defmodule Torngen.Client.Schema.FactionPact do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      until: Map.get(data, "until") |> Torngen.Client.Schema.parse({:static, :string}),
-      faction_name: Map.get(data, "faction_name") |> Torngen.Client.Schema.parse({:static, :string}),
-      faction_id: Map.get(data, "faction_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionId)
+      until: data |> Map.get("until") |> Torngen.Client.Schema.parse({:static, :string}),
+      faction_name: data |> Map.get("faction_name") |> Torngen.Client.Schema.parse({:static, :string}),
+      faction_id: data |> Map.get("faction_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionId)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

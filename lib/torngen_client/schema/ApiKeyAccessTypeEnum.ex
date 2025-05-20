@@ -1,7 +1,9 @@
 defmodule Torngen.Client.Schema.ApiKeyAccessTypeEnum do
   @moduledoc """
-  An enumerated type describing `#/components/schemas/ApiKeyAccessTypeEnum` of type string.
+  An enumerated type describing `ApiKeyAccessTypeEnum` of type string.
   """
+
+  require Logger
 
   @behaviour Torngen.Client.Schema
 
@@ -20,7 +22,7 @@ defmodule Torngen.Client.Schema.ApiKeyAccessTypeEnum do
     if validate?(data) do
       data
     else
-      IO.inspect(data, label: "Invalid enum value of ApiKeyAccessTypeEnum")
+      Logger.warning("Invalid enum value #{inspect(data)} of ApiKeyAccessTypeEnum")
       nil
     end
   end

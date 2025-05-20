@@ -39,7 +39,8 @@ defmodule Torngen.Client.Schema.UserCrimeDetailsScamming do
   def parse(%{} = data) do
     %__MODULE__{
       zones:
-        Map.get(data, "zones")
+        data
+        |> Map.get("zones")
         |> Torngen.Client.Schema.parse(
           {:object,
            %{
@@ -55,22 +56,23 @@ defmodule Torngen.Client.Schema.UserCrimeDetailsScamming do
            }}
         ),
       payouts:
-        Map.get(data, "payouts")
+        data
+        |> Map.get("payouts")
         |> Torngen.Client.Schema.parse(
           {:object, %{"high" => {:static, :integer}, "low" => {:static, :integer}, "medium" => {:static, :integer}}}
         ),
-      most_responses: Map.get(data, "most_responses") |> Torngen.Client.Schema.parse({:static, :integer}),
+      most_responses: data |> Map.get("most_responses") |> Torngen.Client.Schema.parse({:static, :integer}),
       emails:
-        Map.get(data, "emails")
+        data
+        |> Map.get("emails")
         |> Torngen.Client.Schema.parse({:object, %{"phisher" => {:static, :integer}, "scraper" => {:static, :integer}}}),
       concerns:
-        Map.get(data, "concerns")
+        data
+        |> Map.get("concerns")
         |> Torngen.Client.Schema.parse(
           {:object, %{"attempts" => {:static, :integer}, "resolved" => {:static, :integer}}}
         )
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

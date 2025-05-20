@@ -1,7 +1,9 @@
 defmodule Torngen.Client.Schema.ForumFeedTypeEnum do
   @moduledoc """
-  An enumerated type describing `#/components/schemas/ForumFeedTypeEnum` of type integer.
+  An enumerated type describing `ForumFeedTypeEnum` of type integer.
   """
+
+  require Logger
 
   @behaviour Torngen.Client.Schema
 
@@ -20,7 +22,7 @@ defmodule Torngen.Client.Schema.ForumFeedTypeEnum do
     if validate?(data) do
       data
     else
-      IO.inspect(data, label: "Invalid enum value of ForumFeedTypeEnum")
+      Logger.warning("Invalid enum value #{inspect(data)} of ForumFeedTypeEnum")
       nil
     end
   end

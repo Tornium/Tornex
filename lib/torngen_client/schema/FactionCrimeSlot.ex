@@ -28,11 +28,13 @@ defmodule Torngen.Client.Schema.FactionCrimeSlot do
   def parse(%{} = data) do
     %__MODULE__{
       user:
-        Map.get(data, "user")
+        data
+        |> Map.get("user")
         |> Torngen.Client.Schema.parse({:one_of, [{:static, :null}, Torngen.Client.Schema.FactionCrimeUser]}),
-      position: Map.get(data, "position") |> Torngen.Client.Schema.parse({:static, :string}),
+      position: data |> Map.get("position") |> Torngen.Client.Schema.parse({:static, :string}),
       item_requirement:
-        Map.get(data, "item_requirement")
+        data
+        |> Map.get("item_requirement")
         |> Torngen.Client.Schema.parse(
           {:one_of,
            [
@@ -44,10 +46,8 @@ defmodule Torngen.Client.Schema.FactionCrimeSlot do
              }
            ]}
         ),
-      checkpoint_pass_rate: Map.get(data, "checkpoint_pass_rate") |> Torngen.Client.Schema.parse({:static, :integer})
+      checkpoint_pass_rate: data |> Map.get("checkpoint_pass_rate") |> Torngen.Client.Schema.parse({:static, :integer})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

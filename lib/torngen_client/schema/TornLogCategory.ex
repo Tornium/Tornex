@@ -22,11 +22,9 @@ defmodule Torngen.Client.Schema.TornLogCategory do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      title: Map.get(data, "title") |> Torngen.Client.Schema.parse({:static, :string}),
-      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.LogCategoryId)
+      title: data |> Map.get("title") |> Torngen.Client.Schema.parse({:static, :string}),
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.LogCategoryId)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

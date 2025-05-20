@@ -30,7 +30,8 @@ defmodule Torngen.Client.Schema.FactionBalance do
   def parse(%{} = data) do
     %__MODULE__{
       members:
-        Map.get(data, "members")
+        data
+        |> Map.get("members")
         |> Torngen.Client.Schema.parse(
           {:array,
            {:object,
@@ -42,13 +43,12 @@ defmodule Torngen.Client.Schema.FactionBalance do
             }}}
         ),
       faction:
-        Map.get(data, "faction")
+        data
+        |> Map.get("faction")
         |> Torngen.Client.Schema.parse(
           {:object, %{"money" => {:static, :integer}, "points" => {:static, :integer}, "scope" => {:static, :integer}}}
         )
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

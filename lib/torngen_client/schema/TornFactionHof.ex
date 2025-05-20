@@ -30,15 +30,13 @@ defmodule Torngen.Client.Schema.TornFactionHof do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      values: Map.get(data, "values") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionHofValues),
-      rank: Map.get(data, "rank") |> Torngen.Client.Schema.parse({:static, :string}),
-      position: Map.get(data, "position") |> Torngen.Client.Schema.parse({:static, :integer}),
-      name: Map.get(data, "name") |> Torngen.Client.Schema.parse({:static, :string}),
-      members: Map.get(data, "members") |> Torngen.Client.Schema.parse({:static, :integer}),
-      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionId)
+      values: data |> Map.get("values") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionHofValues),
+      rank: data |> Map.get("rank") |> Torngen.Client.Schema.parse({:static, :string}),
+      position: data |> Map.get("position") |> Torngen.Client.Schema.parse({:static, :integer}),
+      name: data |> Map.get("name") |> Torngen.Client.Schema.parse({:static, :string}),
+      members: data |> Map.get("members") |> Torngen.Client.Schema.parse({:static, :integer}),
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionId)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

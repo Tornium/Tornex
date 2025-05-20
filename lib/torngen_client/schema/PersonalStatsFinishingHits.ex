@@ -34,7 +34,8 @@ defmodule Torngen.Client.Schema.PersonalStatsFinishingHits do
   def parse(%{} = data) do
     %__MODULE__{
       finishing_hits:
-        Map.get(data, "finishing_hits")
+        data
+        |> Map.get("finishing_hits")
         |> Torngen.Client.Schema.parse(
           {:object,
            %{
@@ -53,8 +54,6 @@ defmodule Torngen.Client.Schema.PersonalStatsFinishingHits do
            }}
         )
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

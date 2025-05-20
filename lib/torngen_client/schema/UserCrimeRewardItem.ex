@@ -22,11 +22,9 @@ defmodule Torngen.Client.Schema.UserCrimeRewardItem do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      id: Map.get(data, "id") |> Torngen.Client.Schema.parse({:static, :integer}),
-      amount: Map.get(data, "amount") |> Torngen.Client.Schema.parse({:static, :integer})
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse({:static, :integer}),
+      amount: data |> Map.get("amount") |> Torngen.Client.Schema.parse({:static, :integer})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

@@ -30,16 +30,14 @@ defmodule Torngen.Client.Schema.UserJobRanks do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      medical: Map.get(data, "medical") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.JobPositionMedicalEnum),
-      law: Map.get(data, "law") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.JobPositionLawEnum),
-      grocer: Map.get(data, "grocer") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.JobPositionGrocerEnum),
+      medical: data |> Map.get("medical") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.JobPositionMedicalEnum),
+      law: data |> Map.get("law") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.JobPositionLawEnum),
+      grocer: data |> Map.get("grocer") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.JobPositionGrocerEnum),
       education:
-        Map.get(data, "education") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.JobPositionEducationEnum),
-      casino: Map.get(data, "casino") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.JobPositionCasinoEnum),
-      army: Map.get(data, "army") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.JobPositionArmyEnum)
+        data |> Map.get("education") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.JobPositionEducationEnum),
+      casino: data |> Map.get("casino") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.JobPositionCasinoEnum),
+      army: data |> Map.get("army") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.JobPositionArmyEnum)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

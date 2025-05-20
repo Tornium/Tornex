@@ -22,11 +22,9 @@ defmodule Torngen.Client.Schema.ForumPollVote do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      votes: Map.get(data, "votes") |> Torngen.Client.Schema.parse({:static, :integer}),
-      answer: Map.get(data, "answer") |> Torngen.Client.Schema.parse({:static, :string})
+      votes: data |> Map.get("votes") |> Torngen.Client.Schema.parse({:static, :integer}),
+      answer: data |> Map.get("answer") |> Torngen.Client.Schema.parse({:static, :string})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

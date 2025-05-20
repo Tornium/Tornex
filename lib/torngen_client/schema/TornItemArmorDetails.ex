@@ -23,11 +23,11 @@ defmodule Torngen.Client.Schema.TornItemArmorDetails do
   def parse(%{} = data) do
     %__MODULE__{
       coverage:
-        Map.get(data, "coverage") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.TornItemArmorCoverage}),
-      base_stats: Map.get(data, "base_stats") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.TornItemBaseStats)
+        data
+        |> Map.get("coverage")
+        |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.TornItemArmorCoverage}),
+      base_stats: data |> Map.get("base_stats") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.TornItemBaseStats)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

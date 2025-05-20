@@ -35,13 +35,14 @@ defmodule Torngen.Client.Schema.TornItemWeaponDetails do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      stealth_level: Map.get(data, "stealth_level") |> Torngen.Client.Schema.parse({:static, :number}),
-      mods: Map.get(data, "mods") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.ItemModId}),
+      stealth_level: data |> Map.get("stealth_level") |> Torngen.Client.Schema.parse({:static, :number}),
+      mods: data |> Map.get("mods") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.ItemModId}),
       category:
-        Map.get(data, "category") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.TornItemWeaponCategoryEnum),
-      base_stats: Map.get(data, "base_stats") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.TornItemBaseStats),
+        data |> Map.get("category") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.TornItemWeaponCategoryEnum),
+      base_stats: data |> Map.get("base_stats") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.TornItemBaseStats),
       ammo:
-        Map.get(data, "ammo")
+        data
+        |> Map.get("ammo")
         |> Torngen.Client.Schema.parse(
           {:one_of,
            [
@@ -55,8 +56,6 @@ defmodule Torngen.Client.Schema.TornItemWeaponDetails do
            ]}
         )
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

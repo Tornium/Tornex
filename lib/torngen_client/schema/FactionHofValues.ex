@@ -24,13 +24,11 @@ defmodule Torngen.Client.Schema.FactionHofValues do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      respect: Map.get(data, "respect") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :integer]}),
+      respect: data |> Map.get("respect") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :integer]}),
       chain_duration:
-        Map.get(data, "chain_duration") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :integer]}),
-      chain: Map.get(data, "chain") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :integer]})
+        data |> Map.get("chain_duration") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :integer]}),
+      chain: data |> Map.get("chain") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :integer]})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

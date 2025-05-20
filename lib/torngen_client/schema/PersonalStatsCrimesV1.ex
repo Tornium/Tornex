@@ -52,20 +52,18 @@ defmodule Torngen.Client.Schema.PersonalStatsCrimesV1 do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      version: Map.get(data, "version") |> Torngen.Client.Schema.parse({:static, :string}),
-      total: Map.get(data, "total") |> Torngen.Client.Schema.parse({:static, :integer}),
-      theft: Map.get(data, "theft") |> Torngen.Client.Schema.parse({:static, :integer}),
-      sell_illegal_goods: Map.get(data, "sell_illegal_goods") |> Torngen.Client.Schema.parse({:static, :integer}),
-      other: Map.get(data, "other") |> Torngen.Client.Schema.parse({:static, :integer}),
-      organized_crimes: Map.get(data, "organized_crimes") |> Torngen.Client.Schema.parse({:static, :integer}),
-      murder: Map.get(data, "murder") |> Torngen.Client.Schema.parse({:static, :integer}),
-      fraud: Map.get(data, "fraud") |> Torngen.Client.Schema.parse({:static, :integer}),
-      drug_deals: Map.get(data, "drug_deals") |> Torngen.Client.Schema.parse({:static, :integer}),
-      computer: Map.get(data, "computer") |> Torngen.Client.Schema.parse({:static, :integer}),
-      auto_theft: Map.get(data, "auto_theft") |> Torngen.Client.Schema.parse({:static, :integer})
+      version: data |> Map.get("version") |> Torngen.Client.Schema.parse({:static, :string}),
+      total: data |> Map.get("total") |> Torngen.Client.Schema.parse({:static, :integer}),
+      theft: data |> Map.get("theft") |> Torngen.Client.Schema.parse({:static, :integer}),
+      sell_illegal_goods: data |> Map.get("sell_illegal_goods") |> Torngen.Client.Schema.parse({:static, :integer}),
+      other: data |> Map.get("other") |> Torngen.Client.Schema.parse({:static, :integer}),
+      organized_crimes: data |> Map.get("organized_crimes") |> Torngen.Client.Schema.parse({:static, :integer}),
+      murder: data |> Map.get("murder") |> Torngen.Client.Schema.parse({:static, :integer}),
+      fraud: data |> Map.get("fraud") |> Torngen.Client.Schema.parse({:static, :integer}),
+      drug_deals: data |> Map.get("drug_deals") |> Torngen.Client.Schema.parse({:static, :integer}),
+      computer: data |> Map.get("computer") |> Torngen.Client.Schema.parse({:static, :integer}),
+      auto_theft: data |> Map.get("auto_theft") |> Torngen.Client.Schema.parse({:static, :integer})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

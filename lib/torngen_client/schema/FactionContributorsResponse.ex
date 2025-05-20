@@ -21,10 +21,10 @@ defmodule Torngen.Client.Schema.FactionContributorsResponse do
   def parse(%{} = data) do
     %__MODULE__{
       contributors:
-        Map.get(data, "contributors") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.FactionContributor})
+        data
+        |> Map.get("contributors")
+        |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.FactionContributor})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

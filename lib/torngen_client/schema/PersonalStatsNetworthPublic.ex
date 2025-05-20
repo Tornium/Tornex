@@ -20,10 +20,8 @@ defmodule Torngen.Client.Schema.PersonalStatsNetworthPublic do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      networth: Map.get(data, "networth") |> Torngen.Client.Schema.parse({:object, %{"total" => {:static, :integer}}})
+      networth: data |> Map.get("networth") |> Torngen.Client.Schema.parse({:object, %{"total" => {:static, :integer}}})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

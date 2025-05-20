@@ -24,12 +24,10 @@ defmodule Torngen.Client.Schema.FactionChainReportAttackerRespect do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      total: Map.get(data, "total") |> Torngen.Client.Schema.parse({:static, :number}),
-      best: Map.get(data, "best") |> Torngen.Client.Schema.parse({:static, :number}),
-      average: Map.get(data, "average") |> Torngen.Client.Schema.parse({:static, :number})
+      total: data |> Map.get("total") |> Torngen.Client.Schema.parse({:static, :number}),
+      best: data |> Map.get("best") |> Torngen.Client.Schema.parse({:static, :number}),
+      average: data |> Map.get("average") |> Torngen.Client.Schema.parse({:static, :number})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

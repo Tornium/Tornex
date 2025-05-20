@@ -26,15 +26,14 @@ defmodule Torngen.Client.Schema.FactionCrimeUser do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      progress: Map.get(data, "progress") |> Torngen.Client.Schema.parse({:static, :number}),
+      progress: data |> Map.get("progress") |> Torngen.Client.Schema.parse({:static, :number}),
       outcome:
-        Map.get(data, "outcome")
+        data
+        |> Map.get("outcome")
         |> Torngen.Client.Schema.parse({:one_of, [{:static, :null}, Torngen.Client.Schema.FactionCrimeUserOutcome]}),
-      joined_at: Map.get(data, "joined_at") |> Torngen.Client.Schema.parse({:static, :integer}),
-      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId)
+      joined_at: data |> Map.get("joined_at") |> Torngen.Client.Schema.parse({:static, :integer}),
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

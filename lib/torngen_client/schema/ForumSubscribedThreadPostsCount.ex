@@ -22,11 +22,9 @@ defmodule Torngen.Client.Schema.ForumSubscribedThreadPostsCount do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      total: Map.get(data, "total") |> Torngen.Client.Schema.parse({:static, :integer}),
-      new: Map.get(data, "new") |> Torngen.Client.Schema.parse({:static, :integer})
+      total: data |> Map.get("total") |> Torngen.Client.Schema.parse({:static, :integer}),
+      new: data |> Map.get("new") |> Torngen.Client.Schema.parse({:static, :integer})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

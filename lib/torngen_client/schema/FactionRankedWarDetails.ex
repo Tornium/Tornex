@@ -33,13 +33,15 @@ defmodule Torngen.Client.Schema.FactionRankedWarDetails do
   def parse(%{} = data) do
     %__MODULE__{
       winner:
-        Map.get(data, "winner")
+        data
+        |> Map.get("winner")
         |> Torngen.Client.Schema.parse({:one_of, [{:static, :null}, Torngen.Client.Schema.FactionId]}),
-      target: Map.get(data, "target") |> Torngen.Client.Schema.parse({:static, :integer}),
-      start: Map.get(data, "start") |> Torngen.Client.Schema.parse({:static, :integer}),
-      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RankedWarId),
+      target: data |> Map.get("target") |> Torngen.Client.Schema.parse({:static, :integer}),
+      start: data |> Map.get("start") |> Torngen.Client.Schema.parse({:static, :integer}),
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RankedWarId),
       factions:
-        Map.get(data, "factions")
+        data
+        |> Map.get("factions")
         |> Torngen.Client.Schema.parse(
           {:array,
            {:object,
@@ -50,10 +52,8 @@ defmodule Torngen.Client.Schema.FactionRankedWarDetails do
               "score" => {:static, :integer}
             }}}
         ),
-      end: Map.get(data, "end") |> Torngen.Client.Schema.parse({:static, :integer})
+      end: data |> Map.get("end") |> Torngen.Client.Schema.parse({:static, :integer})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

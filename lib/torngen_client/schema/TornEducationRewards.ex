@@ -29,7 +29,8 @@ defmodule Torngen.Client.Schema.TornEducationRewards do
   def parse(%{} = data) do
     %__MODULE__{
       working_stats:
-        Map.get(data, "working_stats")
+        data
+        |> Map.get("working_stats")
         |> Torngen.Client.Schema.parse(
           {:object,
            %{
@@ -38,11 +39,9 @@ defmodule Torngen.Client.Schema.TornEducationRewards do
              "manual_labor" => {:one_of, [static: :null, static: :integer]}
            }}
         ),
-      honor: Map.get(data, "honor") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :string]}),
-      effect: Map.get(data, "effect") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :string]})
+      honor: data |> Map.get("honor") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :string]}),
+      effect: data |> Map.get("effect") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :string]})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

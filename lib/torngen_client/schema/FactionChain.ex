@@ -28,14 +28,12 @@ defmodule Torngen.Client.Schema.FactionChain do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      start: Map.get(data, "start") |> Torngen.Client.Schema.parse({:static, :integer}),
-      respect: Map.get(data, "respect") |> Torngen.Client.Schema.parse({:static, :number}),
-      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ChainId),
-      end: Map.get(data, "end") |> Torngen.Client.Schema.parse({:static, :integer}),
-      chain: Map.get(data, "chain") |> Torngen.Client.Schema.parse({:static, :integer})
+      start: data |> Map.get("start") |> Torngen.Client.Schema.parse({:static, :integer}),
+      respect: data |> Map.get("respect") |> Torngen.Client.Schema.parse({:static, :number}),
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ChainId),
+      end: data |> Map.get("end") |> Torngen.Client.Schema.parse({:static, :integer}),
+      chain: data |> Map.get("chain") |> Torngen.Client.Schema.parse({:static, :integer})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

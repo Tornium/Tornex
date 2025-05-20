@@ -22,12 +22,10 @@ defmodule Torngen.Client.Schema.FactionNewsResponse do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      news: Map.get(data, "news") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.FactionNews}),
+      news: data |> Map.get("news") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.FactionNews}),
       _metadata:
-        Map.get(data, "_metadata") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RequestMetadataWithLinks)
+        data |> Map.get("_metadata") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RequestMetadataWithLinks)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

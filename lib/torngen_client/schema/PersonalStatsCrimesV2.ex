@@ -48,9 +48,10 @@ defmodule Torngen.Client.Schema.PersonalStatsCrimesV2 do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      version: Map.get(data, "version") |> Torngen.Client.Schema.parse({:static, :string}),
+      version: data |> Map.get("version") |> Torngen.Client.Schema.parse({:static, :string}),
       skills:
-        Map.get(data, "skills")
+        data
+        |> Map.get("skills")
         |> Torngen.Client.Schema.parse(
           {:object,
            %{
@@ -69,7 +70,8 @@ defmodule Torngen.Client.Schema.PersonalStatsCrimesV2 do
            }}
         ),
       offenses:
-        Map.get(data, "offenses")
+        data
+        |> Map.get("offenses")
         |> Torngen.Client.Schema.parse(
           {:object,
            %{
@@ -86,8 +88,6 @@ defmodule Torngen.Client.Schema.PersonalStatsCrimesV2 do
            }}
         )
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

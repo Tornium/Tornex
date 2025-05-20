@@ -20,10 +20,8 @@ defmodule Torngen.Client.Schema.FactionOngoingChainResponse do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      chain: Map.get(data, "chain") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionOngoingChain)
+      chain: data |> Map.get("chain") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionOngoingChain)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

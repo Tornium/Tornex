@@ -22,13 +22,12 @@ defmodule Torngen.Client.Schema.AttackPlayerSimplified do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId),
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId),
       faction_id:
-        Map.get(data, "faction_id")
+        data
+        |> Map.get("faction_id")
         |> Torngen.Client.Schema.parse({:one_of, [{:static, :null}, Torngen.Client.Schema.FactionId]})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

@@ -21,10 +21,8 @@ defmodule Torngen.Client.Schema.ForumLookupResponse do
   def parse(%{} = data) do
     %__MODULE__{
       selections:
-        Map.get(data, "selections") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.ForumSelectionName})
+        data |> Map.get("selections") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.ForumSelectionName})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

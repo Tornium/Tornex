@@ -1,7 +1,9 @@
 defmodule Torngen.Client.Schema.JobPositionGrocerEnum do
   @moduledoc """
-  An enumerated type describing `#/components/schemas/JobPositionGrocerEnum` of type string.
+  An enumerated type describing `JobPositionGrocerEnum` of type string.
   """
+
+  require Logger
 
   @behaviour Torngen.Client.Schema
 
@@ -20,7 +22,7 @@ defmodule Torngen.Client.Schema.JobPositionGrocerEnum do
     if validate?(data) do
       data
     else
-      IO.inspect(data, label: "Invalid enum value of JobPositionGrocerEnum")
+      Logger.warning("Invalid enum value #{inspect(data)} of JobPositionGrocerEnum")
       nil
     end
   end

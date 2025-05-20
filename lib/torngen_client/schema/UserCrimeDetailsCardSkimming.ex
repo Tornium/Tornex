@@ -34,7 +34,8 @@ defmodule Torngen.Client.Schema.UserCrimeDetailsCardSkimming do
   def parse(%{} = data) do
     %__MODULE__{
       skimmers:
-        Map.get(data, "skimmers")
+        data
+        |> Map.get("skimmers")
         |> Torngen.Client.Schema.parse(
           {:object,
            %{
@@ -45,7 +46,8 @@ defmodule Torngen.Client.Schema.UserCrimeDetailsCardSkimming do
            }}
         ),
       card_details:
-        Map.get(data, "card_details")
+        data
+        |> Map.get("card_details")
         |> Torngen.Client.Schema.parse(
           {:object,
            %{
@@ -57,8 +59,6 @@ defmodule Torngen.Client.Schema.UserCrimeDetailsCardSkimming do
            }}
         )
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

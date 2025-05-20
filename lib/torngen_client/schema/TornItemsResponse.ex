@@ -20,10 +20,8 @@ defmodule Torngen.Client.Schema.TornItemsResponse do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      items: Map.get(data, "items") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.TornItem})
+      items: data |> Map.get("items") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.TornItem})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

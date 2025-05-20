@@ -33,23 +33,25 @@ defmodule Torngen.Client.Schema.UserItemMarkeListingItemDetails do
   def parse(%{} = data) do
     %__MODULE__{
       uid:
-        Map.get(data, "uid")
+        data
+        |> Map.get("uid")
         |> Torngen.Client.Schema.parse({:one_of, [{:static, :null}, Torngen.Client.Schema.ItemUid]}),
-      type: Map.get(data, "type") |> Torngen.Client.Schema.parse({:static, :string}),
+      type: data |> Map.get("type") |> Torngen.Client.Schema.parse({:static, :string}),
       stats:
-        Map.get(data, "stats")
+        data
+        |> Map.get("stats")
         |> Torngen.Client.Schema.parse({:one_of, [{:static, :null}, Torngen.Client.Schema.ItemMarketListingItemStats]}),
       rarity:
-        Map.get(data, "rarity")
+        data
+        |> Map.get("rarity")
         |> Torngen.Client.Schema.parse({:one_of, [{:static, :null}, {:enum, :string, ["yellow", "orange", "red"]}]}),
-      name: Map.get(data, "name") |> Torngen.Client.Schema.parse({:static, :string}),
-      id: Map.get(data, "id") |> Torngen.Client.Schema.parse({:static, :integer}),
+      name: data |> Map.get("name") |> Torngen.Client.Schema.parse({:static, :string}),
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse({:static, :integer}),
       bonuses:
-        Map.get(data, "bonuses")
+        data
+        |> Map.get("bonuses")
         |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.ItemMarketListingItemBonus})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

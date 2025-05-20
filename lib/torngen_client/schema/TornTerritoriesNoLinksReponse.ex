@@ -21,10 +21,8 @@ defmodule Torngen.Client.Schema.TornTerritoriesNoLinksReponse do
   def parse(%{} = data) do
     %__MODULE__{
       territory:
-        Map.get(data, "territory") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.TornTerritory})
+        data |> Map.get("territory") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.TornTerritory})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

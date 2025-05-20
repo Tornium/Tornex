@@ -23,12 +23,10 @@ defmodule Torngen.Client.Schema.TornTerritoriesResponse do
   def parse(%{} = data) do
     %__MODULE__{
       territory:
-        Map.get(data, "territory") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.TornTerritory}),
+        data |> Map.get("territory") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.TornTerritory}),
       _metadata:
-        Map.get(data, "_metadata") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RequestMetadataWithLinks)
+        data |> Map.get("_metadata") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RequestMetadataWithLinks)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

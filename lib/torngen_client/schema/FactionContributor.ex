@@ -26,13 +26,11 @@ defmodule Torngen.Client.Schema.FactionContributor do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      value: Map.get(data, "value") |> Torngen.Client.Schema.parse({:static, :integer}),
-      username: Map.get(data, "username") |> Torngen.Client.Schema.parse({:static, :string}),
-      in_faction: Map.get(data, "in_faction") |> Torngen.Client.Schema.parse({:static, :boolean}),
-      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId)
+      value: data |> Map.get("value") |> Torngen.Client.Schema.parse({:static, :integer}),
+      username: data |> Map.get("username") |> Torngen.Client.Schema.parse({:static, :string}),
+      in_faction: data |> Map.get("in_faction") |> Torngen.Client.Schema.parse({:static, :boolean}),
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

@@ -39,7 +39,8 @@ defmodule Torngen.Client.Schema.TornFactionTreeBranch do
   def parse(%{} = data) do
     %__MODULE__{
       upgrades:
-        Map.get(data, "upgrades")
+        data
+        |> Map.get("upgrades")
         |> Torngen.Client.Schema.parse(
           {:array,
            {:object,
@@ -60,11 +61,9 @@ defmodule Torngen.Client.Schema.TornFactionTreeBranch do
               "name" => {:static, :string}
             }}}
         ),
-      name: Map.get(data, "name") |> Torngen.Client.Schema.parse({:static, :string}),
-      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionBranchId)
+      name: data |> Map.get("name") |> Torngen.Client.Schema.parse({:static, :string}),
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionBranchId)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

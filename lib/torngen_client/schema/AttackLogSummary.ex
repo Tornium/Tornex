@@ -28,15 +28,15 @@ defmodule Torngen.Client.Schema.AttackLogSummary do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      name: Map.get(data, "name") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :string]}),
-      misses: Map.get(data, "misses") |> Torngen.Client.Schema.parse({:static, :integer}),
+      name: data |> Map.get("name") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :string]}),
+      misses: data |> Map.get("misses") |> Torngen.Client.Schema.parse({:static, :integer}),
       id:
-        Map.get(data, "id") |> Torngen.Client.Schema.parse({:one_of, [{:static, :null}, Torngen.Client.Schema.UserId]}),
-      hits: Map.get(data, "hits") |> Torngen.Client.Schema.parse({:static, :integer}),
-      damage: Map.get(data, "damage") |> Torngen.Client.Schema.parse({:static, :integer})
+        data
+        |> Map.get("id")
+        |> Torngen.Client.Schema.parse({:one_of, [{:static, :null}, Torngen.Client.Schema.UserId]}),
+      hits: data |> Map.get("hits") |> Torngen.Client.Schema.parse({:static, :integer}),
+      damage: data |> Map.get("damage") |> Torngen.Client.Schema.parse({:static, :integer})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

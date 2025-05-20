@@ -21,14 +21,13 @@ defmodule Torngen.Client.Schema.RacingRaceDetailsResponse do
   def parse(%{} = data) do
     %__MODULE__{
       race:
-        Map.get(data, "race")
+        data
+        |> Map.get("race")
         |> Torngen.Client.Schema.parse(
           {:all_of,
            [Torngen.Client.Schema.Race, {:object, %{"results" => {:array, Torngen.Client.Schema.RacerDetails}}}]}
         )
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

@@ -22,11 +22,9 @@ defmodule Torngen.Client.Schema.UserCurrentEducation do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      until: Map.get(data, "until") |> Torngen.Client.Schema.parse({:static, :integer}),
-      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.EducationId)
+      until: data |> Map.get("until") |> Torngen.Client.Schema.parse({:static, :integer}),
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.EducationId)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

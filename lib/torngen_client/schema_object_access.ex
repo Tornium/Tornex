@@ -11,7 +11,7 @@ defmodule Torngen.Client.SchemaObjectAccess do
         deprecated_keys = Keyword.get(unquote(opts), :deprecated, [])
 
         if Enum.member?(deprecated_keys, key) do
-          Logger.notice("Object key `#{key}` of `#{unquote(__MODULE__) |> inspect()}` is deprecated")
+          Logger.notice("Object key `#{key}` of `#{__MODULE__ |> inspect()}` is deprecated")
         end
 
         case Map.fetch(Map.from_struct(struct), key) do

@@ -23,12 +23,10 @@ defmodule Torngen.Client.Schema.RevivesFullResponse do
   def parse(%{} = data) do
     %__MODULE__{
       revives:
-        Map.get(data, "revives") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.ReviveSimplified}),
+        data |> Map.get("revives") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.ReviveSimplified}),
       _metadata:
-        Map.get(data, "_metadata") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RequestMetadataWithLinks)
+        data |> Map.get("_metadata") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RequestMetadataWithLinks)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

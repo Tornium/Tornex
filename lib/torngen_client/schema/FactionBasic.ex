@@ -61,23 +61,21 @@ defmodule Torngen.Client.Schema.FactionBasic do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      tag_image: Map.get(data, "tag_image") |> Torngen.Client.Schema.parse({:static, :string}),
-      tag: Map.get(data, "tag") |> Torngen.Client.Schema.parse({:static, :string}),
-      respect: Map.get(data, "respect") |> Torngen.Client.Schema.parse({:static, :integer}),
-      rank: Map.get(data, "rank") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionRank),
-      name: Map.get(data, "name") |> Torngen.Client.Schema.parse({:static, :string}),
-      members: Map.get(data, "members") |> Torngen.Client.Schema.parse({:static, :integer}),
-      leader_id: Map.get(data, "leader_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId),
+      tag_image: data |> Map.get("tag_image") |> Torngen.Client.Schema.parse({:static, :string}),
+      tag: data |> Map.get("tag") |> Torngen.Client.Schema.parse({:static, :string}),
+      respect: data |> Map.get("respect") |> Torngen.Client.Schema.parse({:static, :integer}),
+      rank: data |> Map.get("rank") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionRank),
+      name: data |> Map.get("name") |> Torngen.Client.Schema.parse({:static, :string}),
+      members: data |> Map.get("members") |> Torngen.Client.Schema.parse({:static, :integer}),
+      leader_id: data |> Map.get("leader_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId),
       is_enlisted:
-        Map.get(data, "is_enlisted") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :boolean]}),
-      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionId),
-      days_old: Map.get(data, "days_old") |> Torngen.Client.Schema.parse({:static, :integer}),
-      co_leader_id: Map.get(data, "co_leader_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId),
-      capacity: Map.get(data, "capacity") |> Torngen.Client.Schema.parse({:static, :integer}),
-      best_chain: Map.get(data, "best_chain") |> Torngen.Client.Schema.parse({:static, :integer})
+        data |> Map.get("is_enlisted") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :boolean]}),
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionId),
+      days_old: data |> Map.get("days_old") |> Torngen.Client.Schema.parse({:static, :integer}),
+      co_leader_id: data |> Map.get("co_leader_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId),
+      capacity: data |> Map.get("capacity") |> Torngen.Client.Schema.parse({:static, :integer}),
+      best_chain: data |> Map.get("best_chain") |> Torngen.Client.Schema.parse({:static, :integer})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

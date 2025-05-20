@@ -21,10 +21,8 @@ defmodule Torngen.Client.Schema.TornFactionTreeResponse do
   def parse(%{} = data) do
     %__MODULE__{
       factionTree:
-        Map.get(data, "factionTree") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.TornFactionTree})
+        data |> Map.get("factionTree") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.TornFactionTree})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

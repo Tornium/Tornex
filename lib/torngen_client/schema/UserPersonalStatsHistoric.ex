@@ -21,11 +21,10 @@ defmodule Torngen.Client.Schema.UserPersonalStatsHistoric do
   def parse(%{} = data) do
     %__MODULE__{
       personalstats:
-        Map.get(data, "personalstats")
+        data
+        |> Map.get("personalstats")
         |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.PersonalStatsHistoricStat})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

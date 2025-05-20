@@ -24,12 +24,10 @@ defmodule Torngen.Client.Schema.FactionHofStats do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      respect: Map.get(data, "respect") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.HofValue),
-      rank: Map.get(data, "rank") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.HofValueString),
-      chain: Map.get(data, "chain") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.HofValue)
+      respect: data |> Map.get("respect") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.HofValue),
+      rank: data |> Map.get("rank") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.HofValueString),
+      chain: data |> Map.get("chain") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.HofValue)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

@@ -58,25 +58,24 @@ defmodule Torngen.Client.Schema.ForumThreadBase do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      views: Map.get(data, "views") |> Torngen.Client.Schema.parse({:static, :integer}),
-      title: Map.get(data, "title") |> Torngen.Client.Schema.parse({:static, :string}),
-      rating: Map.get(data, "rating") |> Torngen.Client.Schema.parse({:static, :integer}),
-      posts: Map.get(data, "posts") |> Torngen.Client.Schema.parse({:static, :integer}),
+      views: data |> Map.get("views") |> Torngen.Client.Schema.parse({:static, :integer}),
+      title: data |> Map.get("title") |> Torngen.Client.Schema.parse({:static, :string}),
+      rating: data |> Map.get("rating") |> Torngen.Client.Schema.parse({:static, :integer}),
+      posts: data |> Map.get("posts") |> Torngen.Client.Schema.parse({:static, :integer}),
       last_poster:
-        Map.get(data, "last_poster")
+        data
+        |> Map.get("last_poster")
         |> Torngen.Client.Schema.parse({:one_of, [{:static, :null}, Torngen.Client.Schema.ForumThreadAuthor]}),
       last_post_time:
-        Map.get(data, "last_post_time") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :integer]}),
-      is_sticky: Map.get(data, "is_sticky") |> Torngen.Client.Schema.parse({:static, :boolean}),
-      is_locked: Map.get(data, "is_locked") |> Torngen.Client.Schema.parse({:static, :boolean}),
-      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ForumThreadId),
-      has_poll: Map.get(data, "has_poll") |> Torngen.Client.Schema.parse({:static, :boolean}),
-      forum_id: Map.get(data, "forum_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ForumId),
-      first_post_time: Map.get(data, "first_post_time") |> Torngen.Client.Schema.parse({:static, :integer}),
-      author: Map.get(data, "author") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ForumThreadAuthor)
+        data |> Map.get("last_post_time") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :integer]}),
+      is_sticky: data |> Map.get("is_sticky") |> Torngen.Client.Schema.parse({:static, :boolean}),
+      is_locked: data |> Map.get("is_locked") |> Torngen.Client.Schema.parse({:static, :boolean}),
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ForumThreadId),
+      has_poll: data |> Map.get("has_poll") |> Torngen.Client.Schema.parse({:static, :boolean}),
+      forum_id: data |> Map.get("forum_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ForumId),
+      first_post_time: data |> Map.get("first_post_time") |> Torngen.Client.Schema.parse({:static, :integer}),
+      author: data |> Map.get("author") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ForumThreadAuthor)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

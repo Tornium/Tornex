@@ -1,7 +1,9 @@
 defmodule Torngen.Client.Schema.RaceClassEnum do
   @moduledoc """
-  An enumerated type describing `#/components/schemas/RaceClassEnum` of type string.
+  An enumerated type describing `RaceClassEnum` of type string.
   """
+
+  require Logger
 
   @behaviour Torngen.Client.Schema
 
@@ -20,7 +22,7 @@ defmodule Torngen.Client.Schema.RaceClassEnum do
     if validate?(data) do
       data
     else
-      IO.inspect(data, label: "Invalid enum value of RaceClassEnum")
+      Logger.warning("Invalid enum value #{inspect(data)} of RaceClassEnum")
       nil
     end
   end

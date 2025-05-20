@@ -7,10 +7,7 @@ defmodule Torngen.Client.Path.Racing.Lookup do
   ## Parmeters
   - timestamp: Timestamp to bypass cache
   - comment: Comment for your tool/service/bot/website to be visible in the logs.
-  - key: API key (Public).<br>It's not required to use this parameter when passing the API key via the Authorization header.
-
-  ## Tags
-  - Racing
+  - key: API key (Public)
   """
 
   import Torngen.Client.Path, only: [defparameter: 3]
@@ -42,7 +39,7 @@ defmodule Torngen.Client.Path.Racing.Lookup do
 
   @impl true
   defparameter :key, value do
-    # API key (Public).<br>It's not required to use this parameter when passing the API key via the Authorization header.
+    # API key (Public). It's not required to use this parameter when passing the API key via the Authorization header.
     {:query, :key, value}
   end
 

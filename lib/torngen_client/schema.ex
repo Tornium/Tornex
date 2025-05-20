@@ -1,4 +1,6 @@
 defmodule Torngen.Client.Schema do
+  require Logger
+
   @callback parse(map() | list()) :: any()
   # TODO: Add documentation
 
@@ -11,6 +13,12 @@ defmodule Torngen.Client.Schema do
     # Other types will be modules that will have to be parsed in-line
 
     Kernel.apply(type, :parse, [value])
+  end
+
+  def parse(value, {:object, pair_types}) do
+    pair_types
+    |> Enum.map(fn {key, type} -> {key, parse(Map.get(value, key), type)} end)
+    |> Map.new()
   end
 
   def parse(value, {:array, type}) do
@@ -28,12 +36,15 @@ defmodule Torngen.Client.Schema do
   end
 
   def parse(value, {:static, type}) do
-    # TODO: Validate type of value
-    value
+    if validate?(value, {:static, type}) do
+      value
+    else
+      nil
+    end
   end
 
-  def parse(value, type) do
-    IO.inspect(type, label: "Unhandled type")
+  def parse(_value, type) do
+    Logger.warning("Unhandled type `#{inspect(type)}`")
     nil
   end
 
@@ -51,9 +62,9 @@ defmodule Torngen.Client.Schema do
   end
 
   def validate?(value, {:static, :string}) when is_binary(value), do: true
-  def validate?(value, {:string, :number}) when is_integer(value) or is_float(value), do: true
+  def validate?(value, {:static, :number}) when is_integer(value) or is_float(value), do: true
   def validate?(value, {:static, :integer}) when is_integer(value), do: true
-  def validate?(value, {:string, :boolean}) when is_boolean(value), do: true
+  def validate?(value, {:static, :boolean}) when is_boolean(value), do: true
   def validate?(value, {:static, :null}) when is_nil(value), do: true
 
   def validate?(_value, _type), do: false

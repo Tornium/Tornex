@@ -68,7 +68,8 @@ defmodule Torngen.Client.Schema.TornItem do
   def parse(%{} = data) do
     %__MODULE__{
       value:
-        Map.get(data, "value")
+        data
+        |> Map.get("value")
         |> Torngen.Client.Schema.parse(
           {:object,
            %{
@@ -79,30 +80,30 @@ defmodule Torngen.Client.Schema.TornItem do
                {:one_of, [static: :null, object: %{"country" => {:static, :string}, "name" => {:static, :string}}]}
            }}
         ),
-      type: Map.get(data, "type") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.TornItemTypeEnum),
+      type: data |> Map.get("type") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.TornItemTypeEnum),
       sub_type:
-        Map.get(data, "sub_type")
+        data
+        |> Map.get("sub_type")
         |> Torngen.Client.Schema.parse({:one_of, [{:static, :null}, Torngen.Client.Schema.TornItemWeaponTypeEnum]}),
       requirement:
-        Map.get(data, "requirement") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :string]}),
-      name: Map.get(data, "name") |> Torngen.Client.Schema.parse({:static, :string}),
-      is_tradable: Map.get(data, "is_tradable") |> Torngen.Client.Schema.parse({:static, :boolean}),
-      is_masked: Map.get(data, "is_masked") |> Torngen.Client.Schema.parse({:static, :boolean}),
-      is_found_in_city: Map.get(data, "is_found_in_city") |> Torngen.Client.Schema.parse({:static, :boolean}),
-      image: Map.get(data, "image") |> Torngen.Client.Schema.parse({:static, :string}),
-      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ItemId),
-      effect: Map.get(data, "effect") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :string]}),
+        data |> Map.get("requirement") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :string]}),
+      name: data |> Map.get("name") |> Torngen.Client.Schema.parse({:static, :string}),
+      is_tradable: data |> Map.get("is_tradable") |> Torngen.Client.Schema.parse({:static, :boolean}),
+      is_masked: data |> Map.get("is_masked") |> Torngen.Client.Schema.parse({:static, :boolean}),
+      is_found_in_city: data |> Map.get("is_found_in_city") |> Torngen.Client.Schema.parse({:static, :boolean}),
+      image: data |> Map.get("image") |> Torngen.Client.Schema.parse({:static, :string}),
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ItemId),
+      effect: data |> Map.get("effect") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :string]}),
       details:
-        Map.get(data, "details")
+        data
+        |> Map.get("details")
         |> Torngen.Client.Schema.parse(
           {:one_of,
            [{:static, :null}, Torngen.Client.Schema.TornItemArmorDetails, Torngen.Client.Schema.TornItemWeaponDetails]}
         ),
-      description: Map.get(data, "description") |> Torngen.Client.Schema.parse({:static, :string}),
-      circulation: Map.get(data, "circulation") |> Torngen.Client.Schema.parse({:static, :integer})
+      description: data |> Map.get("description") |> Torngen.Client.Schema.parse({:static, :string}),
+      circulation: data |> Map.get("circulation") |> Torngen.Client.Schema.parse({:static, :integer})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

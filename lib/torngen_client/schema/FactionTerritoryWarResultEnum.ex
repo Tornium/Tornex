@@ -1,7 +1,9 @@
 defmodule Torngen.Client.Schema.FactionTerritoryWarResultEnum do
   @moduledoc """
-  An enumerated type describing `#/components/schemas/FactionTerritoryWarResultEnum` of type string.
+  An enumerated type describing `FactionTerritoryWarResultEnum` of type string.
   """
+
+  require Logger
 
   @behaviour Torngen.Client.Schema
 
@@ -27,7 +29,7 @@ defmodule Torngen.Client.Schema.FactionTerritoryWarResultEnum do
     if validate?(data) do
       data
     else
-      IO.inspect(data, label: "Invalid enum value of FactionTerritoryWarResultEnum")
+      Logger.warning("Invalid enum value #{inspect(data)} of FactionTerritoryWarResultEnum")
       nil
     end
   end

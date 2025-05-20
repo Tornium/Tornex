@@ -22,11 +22,9 @@ defmodule Torngen.Client.Schema.FactionUpgradesResponse do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      upgrades: Map.get(data, "upgrades") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionUpgrades),
-      state: Map.get(data, "state") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionBranchStateEnum)
+      upgrades: data |> Map.get("upgrades") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionUpgrades),
+      state: data |> Map.get("state") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionBranchStateEnum)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

@@ -28,15 +28,13 @@ defmodule Torngen.Client.Schema.UserCrimeAttempts do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      total: Map.get(data, "total") |> Torngen.Client.Schema.parse({:static, :integer}),
-      success: Map.get(data, "success") |> Torngen.Client.Schema.parse({:static, :integer}),
+      total: data |> Map.get("total") |> Torngen.Client.Schema.parse({:static, :integer}),
+      success: data |> Map.get("success") |> Torngen.Client.Schema.parse({:static, :integer}),
       subcrimes:
-        Map.get(data, "subcrimes") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.UserSubcrime}),
-      fail: Map.get(data, "fail") |> Torngen.Client.Schema.parse({:static, :integer}),
-      critical_fail: Map.get(data, "critical_fail") |> Torngen.Client.Schema.parse({:static, :integer})
+        data |> Map.get("subcrimes") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.UserSubcrime}),
+      fail: data |> Map.get("fail") |> Torngen.Client.Schema.parse({:static, :integer}),
+      critical_fail: data |> Map.get("critical_fail") |> Torngen.Client.Schema.parse({:static, :integer})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

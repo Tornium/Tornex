@@ -21,11 +21,10 @@ defmodule Torngen.Client.Schema.UserForumSubscribedThreadsResponse do
   def parse(%{} = data) do
     %__MODULE__{
       forumSubscribedThreads:
-        Map.get(data, "forumSubscribedThreads")
+        data
+        |> Map.get("forumSubscribedThreads")
         |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.ForumSubscribedThread})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

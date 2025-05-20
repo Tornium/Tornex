@@ -50,7 +50,8 @@ defmodule Torngen.Client.Schema.FactionRankedWarReportResponse do
   def parse(%{} = data) do
     %__MODULE__{
       rankedwarreport:
-        Map.get(data, "rankedwarreport")
+        data
+        |> Map.get("rankedwarreport")
         |> Torngen.Client.Schema.parse(
           {:object,
            %{
@@ -96,8 +97,6 @@ defmodule Torngen.Client.Schema.FactionRankedWarReportResponse do
            }}
         )
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

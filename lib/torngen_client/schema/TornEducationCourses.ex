@@ -32,17 +32,17 @@ defmodule Torngen.Client.Schema.TornEducationCourses do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      rewards: Map.get(data, "rewards") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.TornEducationRewards),
+      rewards: data |> Map.get("rewards") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.TornEducationRewards),
       prerequisites:
-        Map.get(data, "prerequisites") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.TornEducationPrerequisites),
-      name: Map.get(data, "name") |> Torngen.Client.Schema.parse({:static, :string}),
-      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.EducationId),
-      duration: Map.get(data, "duration") |> Torngen.Client.Schema.parse({:static, :integer}),
-      description: Map.get(data, "description") |> Torngen.Client.Schema.parse({:static, :string}),
-      code: Map.get(data, "code") |> Torngen.Client.Schema.parse({:static, :string})
+        data
+        |> Map.get("prerequisites")
+        |> Torngen.Client.Schema.parse(Torngen.Client.Schema.TornEducationPrerequisites),
+      name: data |> Map.get("name") |> Torngen.Client.Schema.parse({:static, :string}),
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.EducationId),
+      duration: data |> Map.get("duration") |> Torngen.Client.Schema.parse({:static, :integer}),
+      description: data |> Map.get("description") |> Torngen.Client.Schema.parse({:static, :string}),
+      code: data |> Map.get("code") |> Torngen.Client.Schema.parse({:static, :string})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

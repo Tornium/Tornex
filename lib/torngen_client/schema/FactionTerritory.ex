@@ -36,21 +36,20 @@ defmodule Torngen.Client.Schema.FactionTerritory do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      slots: Map.get(data, "slots") |> Torngen.Client.Schema.parse({:static, :integer}),
-      size: Map.get(data, "size") |> Torngen.Client.Schema.parse({:static, :integer}),
-      sector: Map.get(data, "sector") |> Torngen.Client.Schema.parse({:static, :integer}),
-      respect: Map.get(data, "respect") |> Torngen.Client.Schema.parse({:static, :integer}),
+      slots: data |> Map.get("slots") |> Torngen.Client.Schema.parse({:static, :integer}),
+      size: data |> Map.get("size") |> Torngen.Client.Schema.parse({:static, :integer}),
+      sector: data |> Map.get("sector") |> Torngen.Client.Schema.parse({:static, :integer}),
+      respect: data |> Map.get("respect") |> Torngen.Client.Schema.parse({:static, :integer}),
       racket:
-        Map.get(data, "racket")
+        data
+        |> Map.get("racket")
         |> Torngen.Client.Schema.parse({:one_of, [{:static, :null}, Torngen.Client.Schema.TornRacket]}),
-      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionTerritoryEnum),
-      density: Map.get(data, "density") |> Torngen.Client.Schema.parse({:static, :integer}),
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionTerritoryEnum),
+      density: data |> Map.get("density") |> Torngen.Client.Schema.parse({:static, :integer}),
       coordinates:
-        Map.get(data, "coordinates") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.TornTerritoryCoordinates),
-      acquired_at: Map.get(data, "acquired_at") |> Torngen.Client.Schema.parse({:static, :integer})
+        data |> Map.get("coordinates") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.TornTerritoryCoordinates),
+      acquired_at: data |> Map.get("acquired_at") |> Torngen.Client.Schema.parse({:static, :integer})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

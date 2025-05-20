@@ -22,12 +22,10 @@ defmodule Torngen.Client.Schema.MarketItemMarketResponse do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      itemmarket: Map.get(data, "itemmarket") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ItemMarket),
+      itemmarket: data |> Map.get("itemmarket") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ItemMarket),
       _metadata:
-        Map.get(data, "_metadata") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RequestMetadataWithLinks)
+        data |> Map.get("_metadata") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RequestMetadataWithLinks)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

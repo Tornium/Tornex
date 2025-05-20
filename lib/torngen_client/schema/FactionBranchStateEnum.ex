@@ -1,7 +1,9 @@
 defmodule Torngen.Client.Schema.FactionBranchStateEnum do
   @moduledoc """
-  An enumerated type describing `#/components/schemas/FactionBranchStateEnum` of type string.
+  An enumerated type describing `FactionBranchStateEnum` of type string.
   """
+
+  require Logger
 
   @behaviour Torngen.Client.Schema
 
@@ -20,7 +22,7 @@ defmodule Torngen.Client.Schema.FactionBranchStateEnum do
     if validate?(data) do
       data
     else
-      IO.inspect(data, label: "Invalid enum value of FactionBranchStateEnum")
+      Logger.warning("Invalid enum value #{inspect(data)} of FactionBranchStateEnum")
       nil
     end
   end

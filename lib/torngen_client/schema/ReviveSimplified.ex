@@ -37,9 +37,10 @@ defmodule Torngen.Client.Schema.ReviveSimplified do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      timestamp: Map.get(data, "timestamp") |> Torngen.Client.Schema.parse({:static, :integer}),
+      timestamp: data |> Map.get("timestamp") |> Torngen.Client.Schema.parse({:static, :integer}),
       target:
-        Map.get(data, "target")
+        data
+        |> Map.get("target")
         |> Torngen.Client.Schema.parse(
           {:object,
            %{
@@ -51,9 +52,10 @@ defmodule Torngen.Client.Schema.ReviveSimplified do
              "online_status" => {:static, :string}
            }}
         ),
-      success_chance: Map.get(data, "success_chance") |> Torngen.Client.Schema.parse({:static, :number}),
+      success_chance: data |> Map.get("success_chance") |> Torngen.Client.Schema.parse({:static, :number}),
       reviver:
-        Map.get(data, "reviver")
+        data
+        |> Map.get("reviver")
         |> Torngen.Client.Schema.parse(
           {:object,
            %{
@@ -61,11 +63,9 @@ defmodule Torngen.Client.Schema.ReviveSimplified do
              "id" => Torngen.Client.Schema.UserId
            }}
         ),
-      result: Map.get(data, "result") |> Torngen.Client.Schema.parse({:static, :string}),
-      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ReviveId)
+      result: data |> Map.get("result") |> Torngen.Client.Schema.parse({:static, :string}),
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ReviveId)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

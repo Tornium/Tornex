@@ -6,13 +6,10 @@ defmodule Torngen.Client.Path.Torn.Items do
 
   ## Parmeters
   - cat: Item category type
-  - sort: Sort rows from newest to oldest<br>Default ordering is ascending
+  - sort: Sort rows from newest to oldest Default ordering is ascending
   - timestamp: Timestamp to bypass cache
   - comment: Comment for your tool/service/bot/website to be visible in the logs.
-  - key: API key (Public).<br>It's not required to use this parameter when passing the API key via the Authorization header.
-
-  ## Tags
-  - Torn
+  - key: API key (Public)
   """
 
   import Torngen.Client.Path, only: [defparameter: 3]
@@ -38,7 +35,7 @@ defmodule Torngen.Client.Path.Torn.Items do
 
   @impl true
   defparameter :sort, value do
-    # Sort rows from newest to oldest<br>Default ordering is ascending
+    # Sort rows from newest to oldest Default ordering is ascending
     {:query, :sort, value}
   end
 
@@ -56,7 +53,7 @@ defmodule Torngen.Client.Path.Torn.Items do
 
   @impl true
   defparameter :key, value do
-    # API key (Public).<br>It's not required to use this parameter when passing the API key via the Authorization header.
+    # API key (Public). It's not required to use this parameter when passing the API key via the Authorization header.
     {:query, :key, value}
   end
 

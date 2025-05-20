@@ -30,15 +30,13 @@ defmodule Torngen.Client.Schema.TornRacket do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      reward: Map.get(data, "reward") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.TornRacketReward),
-      name: Map.get(data, "name") |> Torngen.Client.Schema.parse({:static, :string}),
-      level: Map.get(data, "level") |> Torngen.Client.Schema.parse({:static, :integer}),
-      description: Map.get(data, "description") |> Torngen.Client.Schema.parse({:static, :string}),
-      created_at: Map.get(data, "created_at") |> Torngen.Client.Schema.parse({:static, :integer}),
-      changed_at: Map.get(data, "changed_at") |> Torngen.Client.Schema.parse({:static, :integer})
+      reward: data |> Map.get("reward") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.TornRacketReward),
+      name: data |> Map.get("name") |> Torngen.Client.Schema.parse({:static, :string}),
+      level: data |> Map.get("level") |> Torngen.Client.Schema.parse({:static, :integer}),
+      description: data |> Map.get("description") |> Torngen.Client.Schema.parse({:static, :string}),
+      created_at: data |> Map.get("created_at") |> Torngen.Client.Schema.parse({:static, :integer}),
+      changed_at: data |> Map.get("changed_at") |> Torngen.Client.Schema.parse({:static, :integer})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

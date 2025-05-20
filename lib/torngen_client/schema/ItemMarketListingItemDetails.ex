@@ -26,17 +26,17 @@ defmodule Torngen.Client.Schema.ItemMarketListingItemDetails do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      uid: Map.get(data, "uid") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ItemUid),
-      stats: Map.get(data, "stats") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ItemMarketListingItemStats),
+      uid: data |> Map.get("uid") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ItemUid),
+      stats: data |> Map.get("stats") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ItemMarketListingItemStats),
       rarity:
-        Map.get(data, "rarity")
+        data
+        |> Map.get("rarity")
         |> Torngen.Client.Schema.parse({:one_of, [{:static, :null}, {:enum, :string, ["yellow", "orange", "red"]}]}),
       bonuses:
-        Map.get(data, "bonuses")
+        data
+        |> Map.get("bonuses")
         |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.ItemMarketListingItemBonus})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

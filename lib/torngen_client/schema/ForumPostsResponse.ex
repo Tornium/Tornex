@@ -22,12 +22,10 @@ defmodule Torngen.Client.Schema.ForumPostsResponse do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      posts: Map.get(data, "posts") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.ForumPost}),
+      posts: data |> Map.get("posts") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.ForumPost}),
       _metadata:
-        Map.get(data, "_metadata") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RequestMetadataWithLinks)
+        data |> Map.get("_metadata") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RequestMetadataWithLinks)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

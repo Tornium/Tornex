@@ -20,10 +20,8 @@ defmodule Torngen.Client.Schema.UserBountiesResponse do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      bounties: Map.get(data, "bounties") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.Bounty})
+      bounties: data |> Map.get("bounties") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.Bounty})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

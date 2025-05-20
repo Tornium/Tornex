@@ -33,9 +33,10 @@ defmodule Torngen.Client.Schema.FactionApplication do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      valid_until: Map.get(data, "valid_until") |> Torngen.Client.Schema.parse({:static, :integer}),
+      valid_until: data |> Map.get("valid_until") |> Torngen.Client.Schema.parse({:static, :integer}),
       user:
-        Map.get(data, "user")
+        data
+        |> Map.get("user")
         |> Torngen.Client.Schema.parse(
           {:object,
            %{
@@ -53,12 +54,10 @@ defmodule Torngen.Client.Schema.FactionApplication do
            }}
         ),
       status:
-        Map.get(data, "status") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionApplicationStatusEnum),
-      message: Map.get(data, "message") |> Torngen.Client.Schema.parse({:static, :string}),
-      id: Map.get(data, "id") |> Torngen.Client.Schema.parse({:static, :integer})
+        data |> Map.get("status") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionApplicationStatusEnum),
+      message: data |> Map.get("message") |> Torngen.Client.Schema.parse({:static, :string}),
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse({:static, :integer})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

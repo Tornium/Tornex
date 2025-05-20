@@ -28,14 +28,12 @@ defmodule Torngen.Client.Schema.RaceRecord do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      lap_time: Map.get(data, "lap_time") |> Torngen.Client.Schema.parse({:static, :number}),
-      driver_name: Map.get(data, "driver_name") |> Torngen.Client.Schema.parse({:static, :string}),
-      driver_id: Map.get(data, "driver_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId),
-      car_item_name: Map.get(data, "car_item_name") |> Torngen.Client.Schema.parse({:static, :string}),
-      car_item_id: Map.get(data, "car_item_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ItemId)
+      lap_time: data |> Map.get("lap_time") |> Torngen.Client.Schema.parse({:static, :number}),
+      driver_name: data |> Map.get("driver_name") |> Torngen.Client.Schema.parse({:static, :string}),
+      driver_id: data |> Map.get("driver_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId),
+      car_item_name: data |> Map.get("car_item_name") |> Torngen.Client.Schema.parse({:static, :string}),
+      car_item_id: data |> Map.get("car_item_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ItemId)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

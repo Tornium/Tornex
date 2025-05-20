@@ -24,13 +24,13 @@ defmodule Torngen.Client.Schema.ItemMarketListingNonstackable do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      price: Map.get(data, "price") |> Torngen.Client.Schema.parse({:static, :integer}),
+      price: data |> Map.get("price") |> Torngen.Client.Schema.parse({:static, :integer}),
       item_details:
-        Map.get(data, "item_details") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ItemMarketListingItemDetails),
-      amount: Map.get(data, "amount") |> Torngen.Client.Schema.parse({:static, :integer})
+        data
+        |> Map.get("item_details")
+        |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ItemMarketListingItemDetails),
+      amount: data |> Map.get("amount") |> Torngen.Client.Schema.parse({:static, :integer})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

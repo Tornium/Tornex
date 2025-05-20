@@ -30,17 +30,16 @@ defmodule Torngen.Client.Schema.UserList do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      status: Map.get(data, "status") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserStatus),
-      name: Map.get(data, "name") |> Torngen.Client.Schema.parse({:static, :string}),
-      level: Map.get(data, "level") |> Torngen.Client.Schema.parse({:static, :integer}),
-      last_action: Map.get(data, "last_action") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserLastAction),
-      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId),
+      status: data |> Map.get("status") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserStatus),
+      name: data |> Map.get("name") |> Torngen.Client.Schema.parse({:static, :string}),
+      level: data |> Map.get("level") |> Torngen.Client.Schema.parse({:static, :integer}),
+      last_action: data |> Map.get("last_action") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserLastAction),
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId),
       faction_id:
-        Map.get(data, "faction_id")
+        data
+        |> Map.get("faction_id")
         |> Torngen.Client.Schema.parse({:one_of, [{:static, :null}, Torngen.Client.Schema.FactionId]})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

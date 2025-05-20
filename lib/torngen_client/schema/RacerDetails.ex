@@ -50,21 +50,21 @@ defmodule Torngen.Client.Schema.RacerDetails do
   def parse(%{} = data) do
     %__MODULE__{
       time_ended:
-        Map.get(data, "time_ended") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :integer]}),
-      race_time: Map.get(data, "race_time") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :number]}),
-      position: Map.get(data, "position") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :integer]}),
+        data |> Map.get("time_ended") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :integer]}),
+      race_time:
+        data |> Map.get("race_time") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :number]}),
+      position:
+        data |> Map.get("position") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :integer]}),
       has_crashed:
-        Map.get(data, "has_crashed") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :boolean]}),
-      driver_id: Map.get(data, "driver_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId),
-      car_item_name: Map.get(data, "car_item_name") |> Torngen.Client.Schema.parse({:static, :string}),
-      car_item_id: Map.get(data, "car_item_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ItemId),
-      car_id: Map.get(data, "car_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RaceCarId),
-      car_class: Map.get(data, "car_class") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RaceClassEnum),
+        data |> Map.get("has_crashed") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :boolean]}),
+      driver_id: data |> Map.get("driver_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId),
+      car_item_name: data |> Map.get("car_item_name") |> Torngen.Client.Schema.parse({:static, :string}),
+      car_item_id: data |> Map.get("car_item_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ItemId),
+      car_id: data |> Map.get("car_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RaceCarId),
+      car_class: data |> Map.get("car_class") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RaceClassEnum),
       best_lap_time:
-        Map.get(data, "best_lap_time") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :number]})
+        data |> Map.get("best_lap_time") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :number]})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

@@ -32,18 +32,17 @@ defmodule Torngen.Client.Schema.FactionTerritoryWarReportFaction do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      score: Map.get(data, "score") |> Torngen.Client.Schema.parse({:static, :integer}),
-      name: Map.get(data, "name") |> Torngen.Client.Schema.parse({:static, :string}),
+      score: data |> Map.get("score") |> Torngen.Client.Schema.parse({:static, :integer}),
+      name: data |> Map.get("name") |> Torngen.Client.Schema.parse({:static, :string}),
       members:
-        Map.get(data, "members")
+        data
+        |> Map.get("members")
         |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.FactionTerritoryWarReportMembers}),
-      joins: Map.get(data, "joins") |> Torngen.Client.Schema.parse({:static, :integer}),
-      is_aggressor: Map.get(data, "is_aggressor") |> Torngen.Client.Schema.parse({:static, :boolean}),
-      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionId),
-      clears: Map.get(data, "clears") |> Torngen.Client.Schema.parse({:static, :integer})
+      joins: data |> Map.get("joins") |> Torngen.Client.Schema.parse({:static, :integer}),
+      is_aggressor: data |> Map.get("is_aggressor") |> Torngen.Client.Schema.parse({:static, :boolean}),
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionId),
+      clears: data |> Map.get("clears") |> Torngen.Client.Schema.parse({:static, :integer})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

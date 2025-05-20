@@ -20,10 +20,8 @@ defmodule Torngen.Client.Schema.ForumThreadResponse do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      thread: Map.get(data, "thread") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ForumThreadExtended)
+      thread: data |> Map.get("thread") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ForumThreadExtended)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

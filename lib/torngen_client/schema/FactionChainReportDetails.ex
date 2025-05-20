@@ -64,24 +64,22 @@ defmodule Torngen.Client.Schema.FactionChainReportDetails do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      war: Map.get(data, "war") |> Torngen.Client.Schema.parse({:static, :integer}),
-      targets: Map.get(data, "targets") |> Torngen.Client.Schema.parse({:static, :integer}),
-      retaliations: Map.get(data, "retaliations") |> Torngen.Client.Schema.parse({:static, :integer}),
-      respect: Map.get(data, "respect") |> Torngen.Client.Schema.parse({:static, :number}),
-      overseas: Map.get(data, "overseas") |> Torngen.Client.Schema.parse({:static, :integer}),
-      mug: Map.get(data, "mug") |> Torngen.Client.Schema.parse({:static, :integer}),
-      members: Map.get(data, "members") |> Torngen.Client.Schema.parse({:static, :integer}),
-      losses: Map.get(data, "losses") |> Torngen.Client.Schema.parse({:static, :integer}),
-      leave: Map.get(data, "leave") |> Torngen.Client.Schema.parse({:static, :integer}),
-      hospitalize: Map.get(data, "hospitalize") |> Torngen.Client.Schema.parse({:static, :integer}),
-      escapes: Map.get(data, "escapes") |> Torngen.Client.Schema.parse({:static, :integer}),
-      draws: Map.get(data, "draws") |> Torngen.Client.Schema.parse({:static, :integer}),
-      chain: Map.get(data, "chain") |> Torngen.Client.Schema.parse({:static, :integer}),
-      best: Map.get(data, "best") |> Torngen.Client.Schema.parse({:static, :number}),
-      assists: Map.get(data, "assists") |> Torngen.Client.Schema.parse({:static, :integer})
+      war: data |> Map.get("war") |> Torngen.Client.Schema.parse({:static, :integer}),
+      targets: data |> Map.get("targets") |> Torngen.Client.Schema.parse({:static, :integer}),
+      retaliations: data |> Map.get("retaliations") |> Torngen.Client.Schema.parse({:static, :integer}),
+      respect: data |> Map.get("respect") |> Torngen.Client.Schema.parse({:static, :number}),
+      overseas: data |> Map.get("overseas") |> Torngen.Client.Schema.parse({:static, :integer}),
+      mug: data |> Map.get("mug") |> Torngen.Client.Schema.parse({:static, :integer}),
+      members: data |> Map.get("members") |> Torngen.Client.Schema.parse({:static, :integer}),
+      losses: data |> Map.get("losses") |> Torngen.Client.Schema.parse({:static, :integer}),
+      leave: data |> Map.get("leave") |> Torngen.Client.Schema.parse({:static, :integer}),
+      hospitalize: data |> Map.get("hospitalize") |> Torngen.Client.Schema.parse({:static, :integer}),
+      escapes: data |> Map.get("escapes") |> Torngen.Client.Schema.parse({:static, :integer}),
+      draws: data |> Map.get("draws") |> Torngen.Client.Schema.parse({:static, :integer}),
+      chain: data |> Map.get("chain") |> Torngen.Client.Schema.parse({:static, :integer}),
+      best: data |> Map.get("best") |> Torngen.Client.Schema.parse({:static, :number}),
+      assists: data |> Map.get("assists") |> Torngen.Client.Schema.parse({:static, :integer})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

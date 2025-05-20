@@ -1,7 +1,9 @@
 defmodule Torngen.Client.Schema.PersonalStatsStatName do
   @moduledoc """
-  An enumerated type describing `#/components/schemas/PersonalStatsStatName` of type string.
+  An enumerated type describing `PersonalStatsStatName` of type string.
   """
+
+  require Logger
 
   @behaviour Torngen.Client.Schema
 
@@ -237,7 +239,7 @@ defmodule Torngen.Client.Schema.PersonalStatsStatName do
     if validate?(data) do
       data
     else
-      IO.inspect(data, label: "Invalid enum value of PersonalStatsStatName")
+      Logger.warning("Invalid enum value #{inspect(data)} of PersonalStatsStatName")
       nil
     end
   end

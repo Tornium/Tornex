@@ -20,10 +20,8 @@ defmodule Torngen.Client.Schema.FactionBalanceResponse do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      balance: Map.get(data, "balance") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionBalance)
+      balance: data |> Map.get("balance") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionBalance)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

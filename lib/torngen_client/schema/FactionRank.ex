@@ -28,14 +28,12 @@ defmodule Torngen.Client.Schema.FactionRank do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      wins: Map.get(data, "wins") |> Torngen.Client.Schema.parse({:static, :integer}),
-      position: Map.get(data, "position") |> Torngen.Client.Schema.parse({:static, :integer}),
-      name: Map.get(data, "name") |> Torngen.Client.Schema.parse({:static, :string}),
-      level: Map.get(data, "level") |> Torngen.Client.Schema.parse({:static, :integer}),
-      division: Map.get(data, "division") |> Torngen.Client.Schema.parse({:static, :integer})
+      wins: data |> Map.get("wins") |> Torngen.Client.Schema.parse({:static, :integer}),
+      position: data |> Map.get("position") |> Torngen.Client.Schema.parse({:static, :integer}),
+      name: data |> Map.get("name") |> Torngen.Client.Schema.parse({:static, :string}),
+      level: data |> Map.get("level") |> Torngen.Client.Schema.parse({:static, :integer}),
+      division: data |> Map.get("division") |> Torngen.Client.Schema.parse({:static, :integer})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

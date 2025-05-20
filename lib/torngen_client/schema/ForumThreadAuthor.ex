@@ -24,12 +24,10 @@ defmodule Torngen.Client.Schema.ForumThreadAuthor do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      username: Map.get(data, "username") |> Torngen.Client.Schema.parse({:static, :string}),
-      karma: Map.get(data, "karma") |> Torngen.Client.Schema.parse({:static, :integer}),
-      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId)
+      username: data |> Map.get("username") |> Torngen.Client.Schema.parse({:static, :string}),
+      karma: data |> Map.get("karma") |> Torngen.Client.Schema.parse({:static, :integer}),
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

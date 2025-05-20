@@ -22,11 +22,9 @@ defmodule Torngen.Client.Schema.ItemMarketListingStackable do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      price: Map.get(data, "price") |> Torngen.Client.Schema.parse({:static, :integer}),
-      amount: Map.get(data, "amount") |> Torngen.Client.Schema.parse({:static, :integer})
+      price: data |> Map.get("price") |> Torngen.Client.Schema.parse({:static, :integer}),
+      amount: data |> Map.get("amount") |> Torngen.Client.Schema.parse({:static, :integer})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

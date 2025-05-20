@@ -41,13 +41,14 @@ defmodule Torngen.Client.Schema.UserCrime do
   def parse(%{} = data) do
     %__MODULE__{
       uniques:
-        Map.get(data, "uniques") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.UserCrimeUniques}),
-      skill: Map.get(data, "skill") |> Torngen.Client.Schema.parse({:static, :integer}),
-      rewards: Map.get(data, "rewards") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserCrimeRewards),
-      progression_bonus: Map.get(data, "progression_bonus") |> Torngen.Client.Schema.parse({:static, :integer}),
-      nerve_spent: Map.get(data, "nerve_spent") |> Torngen.Client.Schema.parse({:static, :integer}),
+        data |> Map.get("uniques") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.UserCrimeUniques}),
+      skill: data |> Map.get("skill") |> Torngen.Client.Schema.parse({:static, :integer}),
+      rewards: data |> Map.get("rewards") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserCrimeRewards),
+      progression_bonus: data |> Map.get("progression_bonus") |> Torngen.Client.Schema.parse({:static, :integer}),
+      nerve_spent: data |> Map.get("nerve_spent") |> Torngen.Client.Schema.parse({:static, :integer}),
       miscellaneous:
-        Map.get(data, "miscellaneous")
+        data
+        |> Map.get("miscellaneous")
         |> Torngen.Client.Schema.parse(
           {:one_of,
            [
@@ -61,10 +62,8 @@ defmodule Torngen.Client.Schema.UserCrime do
              Torngen.Client.Schema.UserCrimeDetailsBootlegging
            ]}
         ),
-      attempts: Map.get(data, "attempts") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserCrimeAttempts)
+      attempts: data |> Map.get("attempts") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserCrimeAttempts)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

@@ -25,14 +25,13 @@ defmodule Torngen.Client.Schema.FactionTerritoryOwnership do
   def parse(%{} = data) do
     %__MODULE__{
       owned_by:
-        Map.get(data, "owned_by")
+        data
+        |> Map.get("owned_by")
         |> Torngen.Client.Schema.parse({:one_of, [{:static, :null}, Torngen.Client.Schema.FactionId]}),
-      id: Map.get(data, "id") |> Torngen.Client.Schema.parse({:static, :string}),
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse({:static, :string}),
       acquired_at:
-        Map.get(data, "acquired_at") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :integer]})
+        data |> Map.get("acquired_at") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :integer]})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

@@ -20,10 +20,8 @@ defmodule Torngen.Client.Schema.RequestMetadata do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      links: Map.get(data, "links") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RequestLinks)
+      links: data |> Map.get("links") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RequestLinks)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

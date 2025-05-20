@@ -26,7 +26,8 @@ defmodule Torngen.Client.Schema.AttackLogResponse do
   def parse(%{} = data) do
     %__MODULE__{
       attacklog:
-        Map.get(data, "attacklog")
+        data
+        |> Map.get("attacklog")
         |> Torngen.Client.Schema.parse(
           {:object,
            %{
@@ -35,10 +36,8 @@ defmodule Torngen.Client.Schema.AttackLogResponse do
            }}
         ),
       _metadata:
-        Map.get(data, "_metadata") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RequestMetadataWithLinks)
+        data |> Map.get("_metadata") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RequestMetadataWithLinks)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

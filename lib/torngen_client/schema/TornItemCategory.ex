@@ -1,7 +1,9 @@
 defmodule Torngen.Client.Schema.TornItemCategory do
   @moduledoc """
-  An enumerated type describing `#/components/schemas/TornItemCategory` of type string.
+  An enumerated type describing `TornItemCategory` of type string.
   """
+
+  require Logger
 
   @behaviour Torngen.Client.Schema
 
@@ -50,7 +52,7 @@ defmodule Torngen.Client.Schema.TornItemCategory do
     if validate?(data) do
       data
     else
-      IO.inspect(data, label: "Invalid enum value of TornItemCategory")
+      Logger.warning("Invalid enum value #{inspect(data)} of TornItemCategory")
       nil
     end
   end

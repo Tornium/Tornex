@@ -20,10 +20,8 @@ defmodule Torngen.Client.Schema.RacingTracksResponse do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      tracks: Map.get(data, "tracks") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.RaceTrack})
+      tracks: data |> Map.get("tracks") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.RaceTrack})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

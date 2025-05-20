@@ -26,13 +26,11 @@ defmodule Torngen.Client.Schema.FactionChainReportBonus do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      respect: Map.get(data, "respect") |> Torngen.Client.Schema.parse({:static, :integer}),
-      defender_id: Map.get(data, "defender_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId),
-      chain: Map.get(data, "chain") |> Torngen.Client.Schema.parse({:static, :integer}),
-      attacker_id: Map.get(data, "attacker_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId)
+      respect: data |> Map.get("respect") |> Torngen.Client.Schema.parse({:static, :integer}),
+      defender_id: data |> Map.get("defender_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId),
+      chain: data |> Map.get("chain") |> Torngen.Client.Schema.parse({:static, :integer}),
+      attacker_id: data |> Map.get("attacker_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

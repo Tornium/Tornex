@@ -37,7 +37,8 @@ defmodule Torngen.Client.Schema.UserCrimeDetailsBootlegging do
   def parse(%{} = data) do
     %__MODULE__{
       online_store:
-        Map.get(data, "online_store")
+        data
+        |> Map.get("online_store")
         |> Torngen.Client.Schema.parse(
           {:object,
            %{
@@ -47,9 +48,10 @@ defmodule Torngen.Client.Schema.UserCrimeDetailsBootlegging do
              "visits" => {:static, :integer}
            }}
         ),
-      dvds_copied: Map.get(data, "dvds_copied") |> Torngen.Client.Schema.parse({:static, :integer}),
+      dvds_copied: data |> Map.get("dvds_copied") |> Torngen.Client.Schema.parse({:static, :integer}),
       dvd_sales:
-        Map.get(data, "dvd_sales")
+        data
+        |> Map.get("dvd_sales")
         |> Torngen.Client.Schema.parse(
           {:object,
            %{
@@ -67,8 +69,6 @@ defmodule Torngen.Client.Schema.UserCrimeDetailsBootlegging do
            }}
         )
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

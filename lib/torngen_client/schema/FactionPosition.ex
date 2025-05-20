@@ -24,14 +24,13 @@ defmodule Torngen.Client.Schema.FactionPosition do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      name: Map.get(data, "name") |> Torngen.Client.Schema.parse({:static, :string}),
-      is_default: Map.get(data, "is_default") |> Torngen.Client.Schema.parse({:static, :boolean}),
+      name: data |> Map.get("name") |> Torngen.Client.Schema.parse({:static, :string}),
+      is_default: data |> Map.get("is_default") |> Torngen.Client.Schema.parse({:static, :boolean}),
       abilities:
-        Map.get(data, "abilities")
+        data
+        |> Map.get("abilities")
         |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.FactionPositionAbilityEnum})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

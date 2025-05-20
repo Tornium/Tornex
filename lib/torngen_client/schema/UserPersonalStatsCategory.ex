@@ -37,7 +37,8 @@ defmodule Torngen.Client.Schema.UserPersonalStatsCategory do
   def parse(%{} = data) do
     %__MODULE__{
       personalstats:
-        Map.get(data, "personalstats")
+        data
+        |> Map.get("personalstats")
         |> Torngen.Client.Schema.parse(
           {:one_of,
            [
@@ -60,8 +61,6 @@ defmodule Torngen.Client.Schema.UserPersonalStatsCategory do
            ]}
         )
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

@@ -41,7 +41,8 @@ defmodule Torngen.Client.Schema.KeyInfoResponse do
   def parse(%{} = data) do
     %__MODULE__{
       info:
-        Map.get(data, "info")
+        data
+        |> Map.get("info")
         |> Torngen.Client.Schema.parse(
           {:object,
            %{
@@ -71,8 +72,6 @@ defmodule Torngen.Client.Schema.KeyInfoResponse do
            }}
         )
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

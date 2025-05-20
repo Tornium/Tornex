@@ -26,13 +26,11 @@ defmodule Torngen.Client.Schema.TornCalendarActivity do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      title: Map.get(data, "title") |> Torngen.Client.Schema.parse({:static, :string}),
-      start: Map.get(data, "start") |> Torngen.Client.Schema.parse({:static, :integer}),
-      end: Map.get(data, "end") |> Torngen.Client.Schema.parse({:static, :integer}),
-      description: Map.get(data, "description") |> Torngen.Client.Schema.parse({:static, :string})
+      title: data |> Map.get("title") |> Torngen.Client.Schema.parse({:static, :string}),
+      start: data |> Map.get("start") |> Torngen.Client.Schema.parse({:static, :integer}),
+      end: data |> Map.get("end") |> Torngen.Client.Schema.parse({:static, :integer}),
+      description: data |> Map.get("description") |> Torngen.Client.Schema.parse({:static, :string})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

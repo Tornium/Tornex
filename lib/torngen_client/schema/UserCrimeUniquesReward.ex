@@ -25,15 +25,16 @@ defmodule Torngen.Client.Schema.UserCrimeUniquesReward do
   def parse(%{} = data) do
     %__MODULE__{
       money:
-        Map.get(data, "money")
+        data
+        |> Map.get("money")
         |> Torngen.Client.Schema.parse({:one_of, [{:static, :null}, Torngen.Client.Schema.UserCrimeUniquesRewardMoney]}),
-      items: Map.get(data, "items") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.UserCrimeRewardItem}),
+      items:
+        data |> Map.get("items") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.UserCrimeRewardItem}),
       ammo:
-        Map.get(data, "ammo")
+        data
+        |> Map.get("ammo")
         |> Torngen.Client.Schema.parse({:one_of, [{:static, :null}, Torngen.Client.Schema.UserCrimeUniquesRewardAmmo]})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

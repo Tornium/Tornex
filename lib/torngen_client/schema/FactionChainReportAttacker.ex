@@ -25,13 +25,15 @@ defmodule Torngen.Client.Schema.FactionChainReportAttacker do
   def parse(%{} = data) do
     %__MODULE__{
       respect:
-        Map.get(data, "respect") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionChainReportAttackerRespect),
-      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId),
+        data
+        |> Map.get("respect")
+        |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionChainReportAttackerRespect),
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId),
       attacks:
-        Map.get(data, "attacks") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionChainReportAttackerAttacks)
+        data
+        |> Map.get("attacks")
+        |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionChainReportAttackerAttacks)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

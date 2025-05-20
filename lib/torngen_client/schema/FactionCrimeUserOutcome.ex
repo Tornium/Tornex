@@ -1,7 +1,9 @@
 defmodule Torngen.Client.Schema.FactionCrimeUserOutcome do
   @moduledoc """
-  An enumerated type describing `#/components/schemas/FactionCrimeUserOutcome` of type string.
+  An enumerated type describing `FactionCrimeUserOutcome` of type string.
   """
+
+  require Logger
 
   @behaviour Torngen.Client.Schema
 
@@ -20,7 +22,7 @@ defmodule Torngen.Client.Schema.FactionCrimeUserOutcome do
     if validate?(data) do
       data
     else
-      IO.inspect(data, label: "Invalid enum value of FactionCrimeUserOutcome")
+      Logger.warning("Invalid enum value #{inspect(data)} of FactionCrimeUserOutcome")
       nil
     end
   end

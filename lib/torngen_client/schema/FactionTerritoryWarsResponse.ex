@@ -23,7 +23,8 @@ defmodule Torngen.Client.Schema.FactionTerritoryWarsResponse do
   def parse(%{} = data) do
     %__MODULE__{
       territorywars:
-        Map.get(data, "territorywars")
+        data
+        |> Map.get("territorywars")
         |> Torngen.Client.Schema.parse(
           {:one_of,
            [
@@ -32,8 +33,6 @@ defmodule Torngen.Client.Schema.FactionTerritoryWarsResponse do
            ]}
         )
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

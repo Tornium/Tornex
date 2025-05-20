@@ -34,17 +34,15 @@ defmodule Torngen.Client.Schema.ForumFeed do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      user: Map.get(data, "user") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ForumThreadAuthor),
-      type: Map.get(data, "type") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ForumFeedTypeEnum),
-      title: Map.get(data, "title") |> Torngen.Client.Schema.parse({:static, :string}),
-      timestamp: Map.get(data, "timestamp") |> Torngen.Client.Schema.parse({:static, :integer}),
-      thread_id: Map.get(data, "thread_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ForumThreadId),
-      text: Map.get(data, "text") |> Torngen.Client.Schema.parse({:static, :string}),
-      post_id: Map.get(data, "post_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ForumPostId),
-      is_seen: Map.get(data, "is_seen") |> Torngen.Client.Schema.parse({:static, :boolean})
+      user: data |> Map.get("user") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ForumThreadAuthor),
+      type: data |> Map.get("type") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ForumFeedTypeEnum),
+      title: data |> Map.get("title") |> Torngen.Client.Schema.parse({:static, :string}),
+      timestamp: data |> Map.get("timestamp") |> Torngen.Client.Schema.parse({:static, :integer}),
+      thread_id: data |> Map.get("thread_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ForumThreadId),
+      text: data |> Map.get("text") |> Torngen.Client.Schema.parse({:static, :string}),
+      post_id: data |> Map.get("post_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.ForumPostId),
+      is_seen: data |> Map.get("is_seen") |> Torngen.Client.Schema.parse({:static, :boolean})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

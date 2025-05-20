@@ -36,20 +36,20 @@ defmodule Torngen.Client.Schema.AttackSimplified do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      started: Map.get(data, "started") |> Torngen.Client.Schema.parse({:static, :integer}),
-      result: Map.get(data, "result") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionAttackResult),
-      respect_loss: Map.get(data, "respect_loss") |> Torngen.Client.Schema.parse({:static, :number}),
-      respect_gain: Map.get(data, "respect_gain") |> Torngen.Client.Schema.parse({:static, :number}),
-      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.AttackId),
-      ended: Map.get(data, "ended") |> Torngen.Client.Schema.parse({:static, :integer}),
-      defender: Map.get(data, "defender") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.AttackPlayerSimplified),
-      code: Map.get(data, "code") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.AttackCode),
+      started: data |> Map.get("started") |> Torngen.Client.Schema.parse({:static, :integer}),
+      result: data |> Map.get("result") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionAttackResult),
+      respect_loss: data |> Map.get("respect_loss") |> Torngen.Client.Schema.parse({:static, :number}),
+      respect_gain: data |> Map.get("respect_gain") |> Torngen.Client.Schema.parse({:static, :number}),
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.AttackId),
+      ended: data |> Map.get("ended") |> Torngen.Client.Schema.parse({:static, :integer}),
+      defender:
+        data |> Map.get("defender") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.AttackPlayerSimplified),
+      code: data |> Map.get("code") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.AttackCode),
       attacker:
-        Map.get(data, "attacker")
+        data
+        |> Map.get("attacker")
         |> Torngen.Client.Schema.parse({:one_of, [{:static, :null}, Torngen.Client.Schema.AttackPlayerSimplified]})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

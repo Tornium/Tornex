@@ -43,11 +43,12 @@ defmodule Torngen.Client.Schema.Race do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      track_id: Map.get(data, "track_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RaceTrackId),
-      title: Map.get(data, "title") |> Torngen.Client.Schema.parse({:static, :string}),
-      status: Map.get(data, "status") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RaceStatusEnum),
+      track_id: data |> Map.get("track_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RaceTrackId),
+      title: data |> Map.get("title") |> Torngen.Client.Schema.parse({:static, :string}),
+      status: data |> Map.get("status") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RaceStatusEnum),
       schedule:
-        Map.get(data, "schedule")
+        data
+        |> Map.get("schedule")
         |> Torngen.Client.Schema.parse(
           {:object,
            %{
@@ -58,7 +59,8 @@ defmodule Torngen.Client.Schema.Race do
            }}
         ),
       requirements:
-        Map.get(data, "requirements")
+        data
+        |> Map.get("requirements")
         |> Torngen.Client.Schema.parse(
           {:object,
            %{
@@ -71,17 +73,16 @@ defmodule Torngen.Client.Schema.Race do
            }}
         ),
       participants:
-        Map.get(data, "participants")
+        data
+        |> Map.get("participants")
         |> Torngen.Client.Schema.parse(
           {:object,
            %{"current" => {:static, :integer}, "maximum" => {:static, :integer}, "minimum" => {:static, :integer}}}
         ),
-      laps: Map.get(data, "laps") |> Torngen.Client.Schema.parse({:static, :integer}),
-      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RaceId),
-      creator_id: Map.get(data, "creator_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId)
+      laps: data |> Map.get("laps") |> Torngen.Client.Schema.parse({:static, :integer}),
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.RaceId),
+      creator_id: data |> Map.get("creator_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId)
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

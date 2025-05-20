@@ -28,7 +28,8 @@ defmodule Torngen.Client.Schema.PersonalStatsOther do
   def parse(%{} = data) do
     %__MODULE__{
       other:
-        Map.get(data, "other")
+        data
+        |> Map.get("other")
         |> Torngen.Client.Schema.parse(
           {:object,
            %{
@@ -48,8 +49,6 @@ defmodule Torngen.Client.Schema.PersonalStatsOther do
            }}
         )
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

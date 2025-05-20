@@ -30,15 +30,13 @@ defmodule Torngen.Client.Schema.FactionUpgradeDetails do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      unlocked_at: Map.get(data, "unlocked_at") |> Torngen.Client.Schema.parse({:static, :integer}),
-      name: Map.get(data, "name") |> Torngen.Client.Schema.parse({:static, :string}),
-      level: Map.get(data, "level") |> Torngen.Client.Schema.parse({:static, :integer}),
-      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionBranchId),
-      cost: Map.get(data, "cost") |> Torngen.Client.Schema.parse({:static, :integer}),
-      ability: Map.get(data, "ability") |> Torngen.Client.Schema.parse({:static, :string})
+      unlocked_at: data |> Map.get("unlocked_at") |> Torngen.Client.Schema.parse({:static, :integer}),
+      name: data |> Map.get("name") |> Torngen.Client.Schema.parse({:static, :string}),
+      level: data |> Map.get("level") |> Torngen.Client.Schema.parse({:static, :integer}),
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionBranchId),
+      cost: data |> Map.get("cost") |> Torngen.Client.Schema.parse({:static, :integer}),
+      ability: data |> Map.get("ability") |> Torngen.Client.Schema.parse({:static, :string})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

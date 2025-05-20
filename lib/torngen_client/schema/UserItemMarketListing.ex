@@ -32,16 +32,15 @@ defmodule Torngen.Client.Schema.UserItemMarketListing do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      price: Map.get(data, "price") |> Torngen.Client.Schema.parse({:static, :integer}),
-      item: Map.get(data, "item") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserItemMarkeListingItemDetails),
-      is_anonymous: Map.get(data, "is_anonymous") |> Torngen.Client.Schema.parse({:static, :boolean}),
-      id: Map.get(data, "id") |> Torngen.Client.Schema.parse({:static, :integer}),
-      average_price: Map.get(data, "average_price") |> Torngen.Client.Schema.parse({:static, :integer}),
-      available: Map.get(data, "available") |> Torngen.Client.Schema.parse({:static, :integer}),
-      amount: Map.get(data, "amount") |> Torngen.Client.Schema.parse({:static, :integer})
+      price: data |> Map.get("price") |> Torngen.Client.Schema.parse({:static, :integer}),
+      item:
+        data |> Map.get("item") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserItemMarkeListingItemDetails),
+      is_anonymous: data |> Map.get("is_anonymous") |> Torngen.Client.Schema.parse({:static, :boolean}),
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse({:static, :integer}),
+      average_price: data |> Map.get("average_price") |> Torngen.Client.Schema.parse({:static, :integer}),
+      available: data |> Map.get("available") |> Torngen.Client.Schema.parse({:static, :integer}),
+      amount: data |> Map.get("amount") |> Torngen.Client.Schema.parse({:static, :integer})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

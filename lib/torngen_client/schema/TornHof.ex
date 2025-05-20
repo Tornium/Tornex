@@ -55,21 +55,19 @@ defmodule Torngen.Client.Schema.TornHof do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      value: Map.get(data, "value") |> Torngen.Client.Schema.parse(:any),
-      username: Map.get(data, "username") |> Torngen.Client.Schema.parse({:static, :string}),
-      signed_up: Map.get(data, "signed_up") |> Torngen.Client.Schema.parse({:static, :integer}),
-      rank_number: Map.get(data, "rank_number") |> Torngen.Client.Schema.parse({:static, :integer}),
-      rank_name: Map.get(data, "rank_name") |> Torngen.Client.Schema.parse({:static, :string}),
-      rank: Map.get(data, "rank") |> Torngen.Client.Schema.parse({:static, :string}),
-      position: Map.get(data, "position") |> Torngen.Client.Schema.parse({:static, :integer}),
-      level: Map.get(data, "level") |> Torngen.Client.Schema.parse({:static, :integer}),
-      last_action: Map.get(data, "last_action") |> Torngen.Client.Schema.parse({:static, :integer}),
-      id: Map.get(data, "id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId),
-      faction_id: Map.get(data, "faction_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionId),
-      age_in_days: Map.get(data, "age_in_days") |> Torngen.Client.Schema.parse({:static, :integer})
+      value: data |> Map.get("value") |> Torngen.Client.Schema.parse(:any),
+      username: data |> Map.get("username") |> Torngen.Client.Schema.parse({:static, :string}),
+      signed_up: data |> Map.get("signed_up") |> Torngen.Client.Schema.parse({:static, :integer}),
+      rank_number: data |> Map.get("rank_number") |> Torngen.Client.Schema.parse({:static, :integer}),
+      rank_name: data |> Map.get("rank_name") |> Torngen.Client.Schema.parse({:static, :string}),
+      rank: data |> Map.get("rank") |> Torngen.Client.Schema.parse({:static, :string}),
+      position: data |> Map.get("position") |> Torngen.Client.Schema.parse({:static, :integer}),
+      level: data |> Map.get("level") |> Torngen.Client.Schema.parse({:static, :integer}),
+      last_action: data |> Map.get("last_action") |> Torngen.Client.Schema.parse({:static, :integer}),
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId),
+      faction_id: data |> Map.get("faction_id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.FactionId),
+      age_in_days: data |> Map.get("age_in_days") |> Torngen.Client.Schema.parse({:static, :integer})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

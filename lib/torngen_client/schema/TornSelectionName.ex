@@ -1,7 +1,9 @@
 defmodule Torngen.Client.Schema.TornSelectionName do
   @moduledoc """
-  An enumerated type describing `#/components/schemas/TornSelectionName` of type string.
+  An enumerated type describing `TornSelectionName` of type string.
   """
+
+  require Logger
 
   @behaviour Torngen.Client.Schema
 
@@ -67,7 +69,7 @@ defmodule Torngen.Client.Schema.TornSelectionName do
     if validate?(data) do
       data
     else
-      IO.inspect(data, label: "Invalid enum value of TornSelectionName")
+      Logger.warning("Invalid enum value #{inspect(data)} of TornSelectionName")
       nil
     end
   end

@@ -24,13 +24,13 @@ defmodule Torngen.Client.Schema.TornRacketReward do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      type: Map.get(data, "type") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.TornRacketType),
-      quantity: Map.get(data, "quantity") |> Torngen.Client.Schema.parse({:static, :integer}),
+      type: data |> Map.get("type") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.TornRacketType),
+      quantity: data |> Map.get("quantity") |> Torngen.Client.Schema.parse({:static, :integer}),
       id:
-        Map.get(data, "id") |> Torngen.Client.Schema.parse({:one_of, [{:static, :null}, Torngen.Client.Schema.ItemId]})
+        data
+        |> Map.get("id")
+        |> Torngen.Client.Schema.parse({:one_of, [{:static, :null}, Torngen.Client.Schema.ItemId]})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

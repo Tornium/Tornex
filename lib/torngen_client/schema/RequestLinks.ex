@@ -22,11 +22,9 @@ defmodule Torngen.Client.Schema.RequestLinks do
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      prev: Map.get(data, "prev") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :string]}),
-      next: Map.get(data, "next") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :string]})
+      prev: data |> Map.get("prev") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :string]}),
+      next: data |> Map.get("next") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :string]})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true

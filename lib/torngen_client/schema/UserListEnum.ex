@@ -1,7 +1,9 @@
 defmodule Torngen.Client.Schema.UserListEnum do
   @moduledoc """
-  An enumerated type describing `#/components/schemas/UserListEnum` of type string.
+  An enumerated type describing `UserListEnum` of type string.
   """
+
+  require Logger
 
   @behaviour Torngen.Client.Schema
 
@@ -20,7 +22,7 @@ defmodule Torngen.Client.Schema.UserListEnum do
     if validate?(data) do
       data
     else
-      IO.inspect(data, label: "Invalid enum value of UserListEnum")
+      Logger.warning("Invalid enum value #{inspect(data)} of UserListEnum")
       nil
     end
   end

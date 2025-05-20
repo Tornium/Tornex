@@ -21,10 +21,10 @@ defmodule Torngen.Client.Schema.UserEnlistedCarsResponse do
   def parse(%{} = data) do
     %__MODULE__{
       enlistedcars:
-        Map.get(data, "enlistedcars") |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.UserRaceCarDetails})
+        data
+        |> Map.get("enlistedcars")
+        |> Torngen.Client.Schema.parse({:array, Torngen.Client.Schema.UserRaceCarDetails})
     }
-
-    # TODO: Handle default values in schema parser and codegen
   end
 
   @impl true
