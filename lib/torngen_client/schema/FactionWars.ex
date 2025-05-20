@@ -36,23 +36,23 @@ defmodule Torngen.Client.Schema.FactionWars do
   end
 
   @impl true
-  def validate(%{} = data) do
+  def validate?(%{} = data) do
     @keys
     |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
-    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
-    |> Enum.any?()
+    |> Enum.map(fn {key, value} -> validate_key?(key, value) end)
+    |> Enum.all?()
   end
 
-  defp validate_key(:territory, value) do
-    Torngen.Client.Schema.validate(value, {:array, Torngen.Client.Schema.FactionTerritoryWar})
+  defp validate_key?(:territory, value) do
+    Torngen.Client.Schema.validate?(value, {:array, Torngen.Client.Schema.FactionTerritoryWar})
   end
 
-  defp validate_key(:ranked, value) do
-    Torngen.Client.Schema.validate(value, {:one_of, [{:static, :null}, Torngen.Client.Schema.FactionRankedWar]})
+  defp validate_key?(:ranked, value) do
+    Torngen.Client.Schema.validate?(value, {:one_of, [{:static, :null}, Torngen.Client.Schema.FactionRankedWar]})
   end
 
-  defp validate_key(:raids, value) do
-    Torngen.Client.Schema.validate(value, {:array, Torngen.Client.Schema.FactionRaidWar})
+  defp validate_key?(:raids, value) do
+    Torngen.Client.Schema.validate?(value, {:array, Torngen.Client.Schema.FactionRaidWar})
   end
 
   @spec keys() :: list(atom())

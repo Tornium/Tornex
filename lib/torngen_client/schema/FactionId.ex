@@ -11,5 +11,5 @@ defmodule Torngen.Client.Schema.FactionId do
   # TODO: Validate type of value
 
   @impl true
-  def validate(value), do: Torngen.Client.Schema.validate(value, {:static, :integer})
+  def validate?(value), do: Torngen.Client.Schema.validate?(value, {:static, :integer})
 end

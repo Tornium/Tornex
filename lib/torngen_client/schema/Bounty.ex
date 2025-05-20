@@ -68,51 +68,51 @@ defmodule Torngen.Client.Schema.Bounty do
   end
 
   @impl true
-  def validate(%{} = data) do
+  def validate?(%{} = data) do
     @keys
     |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
-    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
-    |> Enum.any?()
+    |> Enum.map(fn {key, value} -> validate_key?(key, value) end)
+    |> Enum.all?()
   end
 
-  defp validate_key(:valid_until, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:valid_until, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:target_name, value) do
-    Torngen.Client.Schema.validate(value, {:static, :string})
+  defp validate_key?(:target_name, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :string})
   end
 
-  defp validate_key(:target_level, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:target_level, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:target_id, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.UserId)
+  defp validate_key?(:target_id, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.UserId)
   end
 
-  defp validate_key(:reward, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:reward, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:reason, value) do
-    Torngen.Client.Schema.validate(value, {:one_of, [static: :null, static: :string]})
+  defp validate_key?(:reason, value) do
+    Torngen.Client.Schema.validate?(value, {:one_of, [static: :null, static: :string]})
   end
 
-  defp validate_key(:quantity, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:quantity, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:lister_name, value) do
-    Torngen.Client.Schema.validate(value, {:one_of, [static: :null, static: :string]})
+  defp validate_key?(:lister_name, value) do
+    Torngen.Client.Schema.validate?(value, {:one_of, [static: :null, static: :string]})
   end
 
-  defp validate_key(:lister_id, value) do
-    Torngen.Client.Schema.validate(value, {:one_of, [{:static, :null}, Torngen.Client.Schema.UserId]})
+  defp validate_key?(:lister_id, value) do
+    Torngen.Client.Schema.validate?(value, {:one_of, [{:static, :null}, Torngen.Client.Schema.UserId]})
   end
 
-  defp validate_key(:is_anonymous, value) do
-    Torngen.Client.Schema.validate(value, {:static, :boolean})
+  defp validate_key?(:is_anonymous, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :boolean})
   end
 
   @spec keys() :: list(atom())

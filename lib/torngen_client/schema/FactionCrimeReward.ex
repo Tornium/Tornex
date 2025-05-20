@@ -42,31 +42,34 @@ defmodule Torngen.Client.Schema.FactionCrimeReward do
   end
 
   @impl true
-  def validate(%{} = data) do
+  def validate?(%{} = data) do
     @keys
     |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
-    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
-    |> Enum.any?()
+    |> Enum.map(fn {key, value} -> validate_key?(key, value) end)
+    |> Enum.all?()
   end
 
-  defp validate_key(:scope, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:scope, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:respect, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:respect, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:payout, value) do
-    Torngen.Client.Schema.validate(value, {:one_of, [{:static, :null}, Torngen.Client.Schema.FactionCrimeRewardPayout]})
+  defp validate_key?(:payout, value) do
+    Torngen.Client.Schema.validate?(
+      value,
+      {:one_of, [{:static, :null}, Torngen.Client.Schema.FactionCrimeRewardPayout]}
+    )
   end
 
-  defp validate_key(:money, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:money, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:items, value) do
-    Torngen.Client.Schema.validate(value, {:array, Torngen.Client.Schema.FactionCrimeRewardItem})
+  defp validate_key?(:items, value) do
+    Torngen.Client.Schema.validate?(value, {:array, Torngen.Client.Schema.FactionCrimeRewardItem})
   end
 
   @spec keys() :: list(atom())

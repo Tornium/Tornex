@@ -19,11 +19,12 @@ defmodule Torngen.Client.Schema.FactionTerritoryWarResultEnum do
   @spec values() :: [t()]
   def values, do: @values
 
-  @spec valid?(term()) :: boolean()
-  def valid?(value), do: value in @values
+  @impl true
+  def validate?(value), do: Enum.member?(@values, value)
 
+  @impl true
   def parse(data) do
-    if Enum.member?(@values, data) do
+    if validate?(data) do
       data
     else
       IO.inspect(data, label: "Invalid enum value of FactionTerritoryWarResultEnum")

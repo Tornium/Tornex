@@ -38,27 +38,27 @@ defmodule Torngen.Client.Schema.UserCrimeDetailsHustling do
   end
 
   @impl true
-  def validate(%{} = data) do
+  def validate?(%{} = data) do
     @keys
     |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
-    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
-    |> Enum.any?()
+    |> Enum.map(fn {key, value} -> validate_key?(key, value) end)
+    |> Enum.all?()
   end
 
-  defp validate_key(:total_audience_gathered, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:total_audience_gathered, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:shill_money_collected, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:shill_money_collected, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:pickpocket_money_collected, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:pickpocket_money_collected, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:biggest_money_won, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:biggest_money_won, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
   @spec keys() :: list(atom())

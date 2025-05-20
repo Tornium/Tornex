@@ -68,35 +68,35 @@ defmodule Torngen.Client.Schema.UserCrime do
   end
 
   @impl true
-  def validate(%{} = data) do
+  def validate?(%{} = data) do
     @keys
     |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
-    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
-    |> Enum.any?()
+    |> Enum.map(fn {key, value} -> validate_key?(key, value) end)
+    |> Enum.all?()
   end
 
-  defp validate_key(:uniques, value) do
-    Torngen.Client.Schema.validate(value, {:array, Torngen.Client.Schema.UserCrimeUniques})
+  defp validate_key?(:uniques, value) do
+    Torngen.Client.Schema.validate?(value, {:array, Torngen.Client.Schema.UserCrimeUniques})
   end
 
-  defp validate_key(:skill, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:skill, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:rewards, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.UserCrimeRewards)
+  defp validate_key?(:rewards, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.UserCrimeRewards)
   end
 
-  defp validate_key(:progression_bonus, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:progression_bonus, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:nerve_spent, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:nerve_spent, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:miscellaneous, value) do
-    Torngen.Client.Schema.validate(
+  defp validate_key?(:miscellaneous, value) do
+    Torngen.Client.Schema.validate?(
       value,
       {:one_of,
        [
@@ -112,8 +112,8 @@ defmodule Torngen.Client.Schema.UserCrime do
     )
   end
 
-  defp validate_key(:attempts, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.UserCrimeAttempts)
+  defp validate_key?(:attempts, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.UserCrimeAttempts)
   end
 
   @spec keys() :: list(atom())

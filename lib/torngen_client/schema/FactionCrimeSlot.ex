@@ -51,23 +51,23 @@ defmodule Torngen.Client.Schema.FactionCrimeSlot do
   end
 
   @impl true
-  def validate(%{} = data) do
+  def validate?(%{} = data) do
     @keys
     |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
-    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
-    |> Enum.any?()
+    |> Enum.map(fn {key, value} -> validate_key?(key, value) end)
+    |> Enum.all?()
   end
 
-  defp validate_key(:user, value) do
-    Torngen.Client.Schema.validate(value, {:one_of, [{:static, :null}, Torngen.Client.Schema.FactionCrimeUser]})
+  defp validate_key?(:user, value) do
+    Torngen.Client.Schema.validate?(value, {:one_of, [{:static, :null}, Torngen.Client.Schema.FactionCrimeUser]})
   end
 
-  defp validate_key(:position, value) do
-    Torngen.Client.Schema.validate(value, {:static, :string})
+  defp validate_key?(:position, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :string})
   end
 
-  defp validate_key(:item_requirement, value) do
-    Torngen.Client.Schema.validate(
+  defp validate_key?(:item_requirement, value) do
+    Torngen.Client.Schema.validate?(
       value,
       {:one_of,
        [
@@ -81,8 +81,8 @@ defmodule Torngen.Client.Schema.FactionCrimeSlot do
     )
   end
 
-  defp validate_key(:checkpoint_pass_rate, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:checkpoint_pass_rate, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
   @spec keys() :: list(atom())

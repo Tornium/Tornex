@@ -40,31 +40,31 @@ defmodule Torngen.Client.Schema.ForumSubscribedThread do
   end
 
   @impl true
-  def validate(%{} = data) do
+  def validate?(%{} = data) do
     @keys
     |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
-    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
-    |> Enum.any?()
+    |> Enum.map(fn {key, value} -> validate_key?(key, value) end)
+    |> Enum.all?()
   end
 
-  defp validate_key(:title, value) do
-    Torngen.Client.Schema.validate(value, {:static, :string})
+  defp validate_key?(:title, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :string})
   end
 
-  defp validate_key(:posts, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.ForumSubscribedThreadPostsCount)
+  defp validate_key?(:posts, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.ForumSubscribedThreadPostsCount)
   end
 
-  defp validate_key(:id, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.ForumThreadId)
+  defp validate_key?(:id, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.ForumThreadId)
   end
 
-  defp validate_key(:forum_id, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.ForumId)
+  defp validate_key?(:forum_id, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.ForumId)
   end
 
-  defp validate_key(:author, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.ForumThreadAuthor)
+  defp validate_key?(:author, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.ForumThreadAuthor)
   end
 
   @spec keys() :: list(atom())

@@ -33,23 +33,23 @@ defmodule Torngen.Client.Schema.UserCrimeRewards do
   end
 
   @impl true
-  def validate(%{} = data) do
+  def validate?(%{} = data) do
     @keys
     |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
-    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
-    |> Enum.any?()
+    |> Enum.map(fn {key, value} -> validate_key?(key, value) end)
+    |> Enum.all?()
   end
 
-  defp validate_key(:money, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:money, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:items, value) do
-    Torngen.Client.Schema.validate(value, {:array, Torngen.Client.Schema.UserCrimeRewardItem})
+  defp validate_key?(:items, value) do
+    Torngen.Client.Schema.validate?(value, {:array, Torngen.Client.Schema.UserCrimeRewardItem})
   end
 
-  defp validate_key(:ammo, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.UserCrimeRewardAmmo)
+  defp validate_key?(:ammo, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.UserCrimeRewardAmmo)
   end
 
   @spec keys() :: list(atom())

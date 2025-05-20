@@ -69,55 +69,55 @@ defmodule Torngen.Client.Schema.PersonalStatsCrimesV1 do
   end
 
   @impl true
-  def validate(%{} = data) do
+  def validate?(%{} = data) do
     @keys
     |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
-    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
-    |> Enum.any?()
+    |> Enum.map(fn {key, value} -> validate_key?(key, value) end)
+    |> Enum.all?()
   end
 
-  defp validate_key(:version, value) do
-    Torngen.Client.Schema.validate(value, {:static, :string})
+  defp validate_key?(:version, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :string})
   end
 
-  defp validate_key(:total, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:total, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:theft, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:theft, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:sell_illegal_goods, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:sell_illegal_goods, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:other, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:other, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:organized_crimes, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:organized_crimes, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:murder, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:murder, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:fraud, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:fraud, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:drug_deals, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:drug_deals, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:computer, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:computer, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:auto_theft, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:auto_theft, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
   @spec keys() :: list(atom())

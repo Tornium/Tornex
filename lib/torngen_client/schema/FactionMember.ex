@@ -74,59 +74,59 @@ defmodule Torngen.Client.Schema.FactionMember do
   end
 
   @impl true
-  def validate(%{} = data) do
+  def validate?(%{} = data) do
     @keys
     |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
-    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
-    |> Enum.any?()
+    |> Enum.map(fn {key, value} -> validate_key?(key, value) end)
+    |> Enum.all?()
   end
 
-  defp validate_key(:status, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.UserStatus)
+  defp validate_key?(:status, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.UserStatus)
   end
 
-  defp validate_key(:revive_setting, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.ReviveSetting)
+  defp validate_key?(:revive_setting, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.ReviveSetting)
   end
 
-  defp validate_key(:position, value) do
-    Torngen.Client.Schema.validate(value, {:static, :string})
+  defp validate_key?(:position, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :string})
   end
 
-  defp validate_key(:name, value) do
-    Torngen.Client.Schema.validate(value, {:static, :string})
+  defp validate_key?(:name, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :string})
   end
 
-  defp validate_key(:level, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:level, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:last_action, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.UserLastAction)
+  defp validate_key?(:last_action, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.UserLastAction)
   end
 
-  defp validate_key(:is_revivable, value) do
-    Torngen.Client.Schema.validate(value, {:static, :boolean})
+  defp validate_key?(:is_revivable, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :boolean})
   end
 
-  defp validate_key(:is_on_wall, value) do
-    Torngen.Client.Schema.validate(value, {:static, :boolean})
+  defp validate_key?(:is_on_wall, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :boolean})
   end
 
-  defp validate_key(:is_in_oc, value) do
-    Torngen.Client.Schema.validate(value, {:static, :boolean})
+  defp validate_key?(:is_in_oc, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :boolean})
   end
 
-  defp validate_key(:id, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.UserId)
+  defp validate_key?(:id, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.UserId)
   end
 
-  defp validate_key(:has_early_discharge, value) do
-    Torngen.Client.Schema.validate(value, {:static, :boolean})
+  defp validate_key?(:has_early_discharge, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :boolean})
   end
 
-  defp validate_key(:days_in_faction, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:days_in_faction, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
   @spec keys() :: list(atom())

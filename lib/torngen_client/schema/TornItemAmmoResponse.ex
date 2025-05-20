@@ -27,15 +27,15 @@ defmodule Torngen.Client.Schema.TornItemAmmoResponse do
   end
 
   @impl true
-  def validate(%{} = data) do
+  def validate?(%{} = data) do
     @keys
     |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
-    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
-    |> Enum.any?()
+    |> Enum.map(fn {key, value} -> validate_key?(key, value) end)
+    |> Enum.all?()
   end
 
-  defp validate_key(:itemammo, value) do
-    Torngen.Client.Schema.validate(value, {:array, Torngen.Client.Schema.TornItemAmmo})
+  defp validate_key?(:itemammo, value) do
+    Torngen.Client.Schema.validate?(value, {:array, Torngen.Client.Schema.TornItemAmmo})
   end
 
   @spec keys() :: list(atom())

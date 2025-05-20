@@ -87,71 +87,71 @@ defmodule Torngen.Client.Schema.UserHofStats do
   end
 
   @impl true
-  def validate(%{} = data) do
+  def validate?(%{} = data) do
     @keys
     |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
-    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
-    |> Enum.any?()
+    |> Enum.map(fn {key, value} -> validate_key?(key, value) end)
+    |> Enum.all?()
   end
 
-  defp validate_key(:working_stats, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.HofValue)
+  defp validate_key?(:working_stats, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.HofValue)
   end
 
-  defp validate_key(:travel_time, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.HofValue)
+  defp validate_key?(:travel_time, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.HofValue)
   end
 
-  defp validate_key(:revives, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.HofValue)
+  defp validate_key?(:revives, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.HofValue)
   end
 
-  defp validate_key(:rank, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.HofValue)
+  defp validate_key?(:rank, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.HofValue)
   end
 
-  defp validate_key(:racing_wins, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.HofValue)
+  defp validate_key?(:racing_wins, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.HofValue)
   end
 
-  defp validate_key(:racing_skill, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.HofValue)
+  defp validate_key?(:racing_skill, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.HofValue)
   end
 
-  defp validate_key(:racing_points, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.HofValue)
+  defp validate_key?(:racing_points, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.HofValue)
   end
 
-  defp validate_key(:offences, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.HofValue)
+  defp validate_key?(:offences, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.HofValue)
   end
 
-  defp validate_key(:networth, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.HofValue)
+  defp validate_key?(:networth, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.HofValue)
   end
 
-  defp validate_key(:level, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.HofValue)
+  defp validate_key?(:level, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.HofValue)
   end
 
-  defp validate_key(:defends, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.HofValue)
+  defp validate_key?(:defends, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.HofValue)
   end
 
-  defp validate_key(:busts, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.HofValue)
+  defp validate_key?(:busts, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.HofValue)
   end
 
-  defp validate_key(:battle_stats, value) do
-    Torngen.Client.Schema.validate(value, {:one_of, [{:static, :null}, Torngen.Client.Schema.HofValue]})
+  defp validate_key?(:battle_stats, value) do
+    Torngen.Client.Schema.validate?(value, {:one_of, [{:static, :null}, Torngen.Client.Schema.HofValue]})
   end
 
-  defp validate_key(:awards, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.HofValue)
+  defp validate_key?(:awards, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.HofValue)
   end
 
-  defp validate_key(:attacks, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.HofValue)
+  defp validate_key?(:attacks, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.HofValue)
   end
 
   @spec keys() :: list(atom())

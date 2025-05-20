@@ -40,27 +40,27 @@ defmodule Torngen.Client.Schema.ItemMarketListingItemDetails do
   end
 
   @impl true
-  def validate(%{} = data) do
+  def validate?(%{} = data) do
     @keys
     |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
-    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
-    |> Enum.any?()
+    |> Enum.map(fn {key, value} -> validate_key?(key, value) end)
+    |> Enum.all?()
   end
 
-  defp validate_key(:uid, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.ItemUid)
+  defp validate_key?(:uid, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.ItemUid)
   end
 
-  defp validate_key(:stats, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.ItemMarketListingItemStats)
+  defp validate_key?(:stats, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.ItemMarketListingItemStats)
   end
 
-  defp validate_key(:rarity, value) do
-    Torngen.Client.Schema.validate(value, {:one_of, [{:static, :null}, {:enum, :string, ["yellow", "orange", "red"]}]})
+  defp validate_key?(:rarity, value) do
+    Torngen.Client.Schema.validate?(value, {:one_of, [{:static, :null}, {:enum, :string, ["yellow", "orange", "red"]}]})
   end
 
-  defp validate_key(:bonuses, value) do
-    Torngen.Client.Schema.validate(value, {:array, Torngen.Client.Schema.ItemMarketListingItemBonus})
+  defp validate_key?(:bonuses, value) do
+    Torngen.Client.Schema.validate?(value, {:array, Torngen.Client.Schema.ItemMarketListingItemBonus})
   end
 
   @spec keys() :: list(atom())

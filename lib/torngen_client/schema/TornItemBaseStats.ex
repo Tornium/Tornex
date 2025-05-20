@@ -33,23 +33,23 @@ defmodule Torngen.Client.Schema.TornItemBaseStats do
   end
 
   @impl true
-  def validate(%{} = data) do
+  def validate?(%{} = data) do
     @keys
     |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
-    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
-    |> Enum.any?()
+    |> Enum.map(fn {key, value} -> validate_key?(key, value) end)
+    |> Enum.all?()
   end
 
-  defp validate_key(:damage, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:damage, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:armor, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:armor, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:accuracy, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:accuracy, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
   @spec keys() :: list(atom())

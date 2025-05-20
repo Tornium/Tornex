@@ -74,15 +74,15 @@ defmodule Torngen.Client.Schema.UserCrimeDetailsScamming do
   end
 
   @impl true
-  def validate(%{} = data) do
+  def validate?(%{} = data) do
     @keys
     |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
-    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
-    |> Enum.any?()
+    |> Enum.map(fn {key, value} -> validate_key?(key, value) end)
+    |> Enum.all?()
   end
 
-  defp validate_key(:zones, value) do
-    Torngen.Client.Schema.validate(
+  defp validate_key?(:zones, value) do
+    Torngen.Client.Schema.validate?(
       value,
       {:object,
        %{
@@ -99,26 +99,26 @@ defmodule Torngen.Client.Schema.UserCrimeDetailsScamming do
     )
   end
 
-  defp validate_key(:payouts, value) do
-    Torngen.Client.Schema.validate(
+  defp validate_key?(:payouts, value) do
+    Torngen.Client.Schema.validate?(
       value,
       {:object, %{"high" => {:static, :integer}, "low" => {:static, :integer}, "medium" => {:static, :integer}}}
     )
   end
 
-  defp validate_key(:most_responses, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:most_responses, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:emails, value) do
-    Torngen.Client.Schema.validate(
+  defp validate_key?(:emails, value) do
+    Torngen.Client.Schema.validate?(
       value,
       {:object, %{"phisher" => {:static, :integer}, "scraper" => {:static, :integer}}}
     )
   end
 
-  defp validate_key(:concerns, value) do
-    Torngen.Client.Schema.validate(
+  defp validate_key?(:concerns, value) do
+    Torngen.Client.Schema.validate?(
       value,
       {:object, %{"attempts" => {:static, :integer}, "resolved" => {:static, :integer}}}
     )

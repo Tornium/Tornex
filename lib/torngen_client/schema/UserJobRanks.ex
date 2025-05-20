@@ -43,35 +43,35 @@ defmodule Torngen.Client.Schema.UserJobRanks do
   end
 
   @impl true
-  def validate(%{} = data) do
+  def validate?(%{} = data) do
     @keys
     |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
-    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
-    |> Enum.any?()
+    |> Enum.map(fn {key, value} -> validate_key?(key, value) end)
+    |> Enum.all?()
   end
 
-  defp validate_key(:medical, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.JobPositionMedicalEnum)
+  defp validate_key?(:medical, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.JobPositionMedicalEnum)
   end
 
-  defp validate_key(:law, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.JobPositionLawEnum)
+  defp validate_key?(:law, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.JobPositionLawEnum)
   end
 
-  defp validate_key(:grocer, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.JobPositionGrocerEnum)
+  defp validate_key?(:grocer, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.JobPositionGrocerEnum)
   end
 
-  defp validate_key(:education, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.JobPositionEducationEnum)
+  defp validate_key?(:education, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.JobPositionEducationEnum)
   end
 
-  defp validate_key(:casino, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.JobPositionCasinoEnum)
+  defp validate_key?(:casino, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.JobPositionCasinoEnum)
   end
 
-  defp validate_key(:army, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.JobPositionArmyEnum)
+  defp validate_key?(:army, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.JobPositionArmyEnum)
   end
 
   @spec keys() :: list(atom())

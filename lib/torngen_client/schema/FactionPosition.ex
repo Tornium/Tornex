@@ -35,23 +35,23 @@ defmodule Torngen.Client.Schema.FactionPosition do
   end
 
   @impl true
-  def validate(%{} = data) do
+  def validate?(%{} = data) do
     @keys
     |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
-    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
-    |> Enum.any?()
+    |> Enum.map(fn {key, value} -> validate_key?(key, value) end)
+    |> Enum.all?()
   end
 
-  defp validate_key(:name, value) do
-    Torngen.Client.Schema.validate(value, {:static, :string})
+  defp validate_key?(:name, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :string})
   end
 
-  defp validate_key(:is_default, value) do
-    Torngen.Client.Schema.validate(value, {:static, :boolean})
+  defp validate_key?(:is_default, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :boolean})
   end
 
-  defp validate_key(:abilities, value) do
-    Torngen.Client.Schema.validate(value, {:array, Torngen.Client.Schema.FactionPositionAbilityEnum})
+  defp validate_key?(:abilities, value) do
+    Torngen.Client.Schema.validate?(value, {:array, Torngen.Client.Schema.FactionPositionAbilityEnum})
   end
 
   @spec keys() :: list(atom())

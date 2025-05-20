@@ -54,47 +54,47 @@ defmodule Torngen.Client.Schema.FactionChainReport do
   end
 
   @impl true
-  def validate(%{} = data) do
+  def validate?(%{} = data) do
     @keys
     |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
-    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
-    |> Enum.any?()
+    |> Enum.map(fn {key, value} -> validate_key?(key, value) end)
+    |> Enum.all?()
   end
 
-  defp validate_key(:start, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:start, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:non_attackers, value) do
-    Torngen.Client.Schema.validate(value, {:array, Torngen.Client.Schema.UserId})
+  defp validate_key?(:non_attackers, value) do
+    Torngen.Client.Schema.validate?(value, {:array, Torngen.Client.Schema.UserId})
   end
 
-  defp validate_key(:"non-attackers", value) do
-    Torngen.Client.Schema.validate(value, {:array, Torngen.Client.Schema.UserId})
+  defp validate_key?(:"non-attackers", value) do
+    Torngen.Client.Schema.validate?(value, {:array, Torngen.Client.Schema.UserId})
   end
 
-  defp validate_key(:id, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.ChainId)
+  defp validate_key?(:id, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.ChainId)
   end
 
-  defp validate_key(:faction_id, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.FactionId)
+  defp validate_key?(:faction_id, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.FactionId)
   end
 
-  defp validate_key(:end, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:end, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:details, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.FactionChainReportDetails)
+  defp validate_key?(:details, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.FactionChainReportDetails)
   end
 
-  defp validate_key(:bonuses, value) do
-    Torngen.Client.Schema.validate(value, {:array, Torngen.Client.Schema.FactionChainReportBonus})
+  defp validate_key?(:bonuses, value) do
+    Torngen.Client.Schema.validate?(value, {:array, Torngen.Client.Schema.FactionChainReportBonus})
   end
 
-  defp validate_key(:attackers, value) do
-    Torngen.Client.Schema.validate(value, {:array, Torngen.Client.Schema.FactionChainReportAttacker})
+  defp validate_key?(:attackers, value) do
+    Torngen.Client.Schema.validate?(value, {:array, Torngen.Client.Schema.FactionChainReportAttacker})
   end
 
   @spec keys() :: list(atom())

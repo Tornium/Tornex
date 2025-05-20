@@ -60,31 +60,31 @@ defmodule Torngen.Client.Schema.TornItemWeaponDetails do
   end
 
   @impl true
-  def validate(%{} = data) do
+  def validate?(%{} = data) do
     @keys
     |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
-    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
-    |> Enum.any?()
+    |> Enum.map(fn {key, value} -> validate_key?(key, value) end)
+    |> Enum.all?()
   end
 
-  defp validate_key(:stealth_level, value) do
-    Torngen.Client.Schema.validate(value, {:static, :number})
+  defp validate_key?(:stealth_level, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :number})
   end
 
-  defp validate_key(:mods, value) do
-    Torngen.Client.Schema.validate(value, {:array, Torngen.Client.Schema.ItemModId})
+  defp validate_key?(:mods, value) do
+    Torngen.Client.Schema.validate?(value, {:array, Torngen.Client.Schema.ItemModId})
   end
 
-  defp validate_key(:category, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.TornItemWeaponCategoryEnum)
+  defp validate_key?(:category, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.TornItemWeaponCategoryEnum)
   end
 
-  defp validate_key(:base_stats, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.TornItemBaseStats)
+  defp validate_key?(:base_stats, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.TornItemBaseStats)
   end
 
-  defp validate_key(:ammo, value) do
-    Torngen.Client.Schema.validate(
+  defp validate_key?(:ammo, value) do
+    Torngen.Client.Schema.validate?(
       value,
       {:one_of,
        [

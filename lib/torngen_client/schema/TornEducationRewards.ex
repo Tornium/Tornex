@@ -46,15 +46,15 @@ defmodule Torngen.Client.Schema.TornEducationRewards do
   end
 
   @impl true
-  def validate(%{} = data) do
+  def validate?(%{} = data) do
     @keys
     |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
-    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
-    |> Enum.any?()
+    |> Enum.map(fn {key, value} -> validate_key?(key, value) end)
+    |> Enum.all?()
   end
 
-  defp validate_key(:working_stats, value) do
-    Torngen.Client.Schema.validate(
+  defp validate_key?(:working_stats, value) do
+    Torngen.Client.Schema.validate?(
       value,
       {:object,
        %{
@@ -65,12 +65,12 @@ defmodule Torngen.Client.Schema.TornEducationRewards do
     )
   end
 
-  defp validate_key(:honor, value) do
-    Torngen.Client.Schema.validate(value, {:one_of, [static: :null, static: :string]})
+  defp validate_key?(:honor, value) do
+    Torngen.Client.Schema.validate?(value, {:one_of, [static: :null, static: :string]})
   end
 
-  defp validate_key(:effect, value) do
-    Torngen.Client.Schema.validate(value, {:one_of, [static: :null, static: :string]})
+  defp validate_key?(:effect, value) do
+    Torngen.Client.Schema.validate?(value, {:one_of, [static: :null, static: :string]})
   end
 
   @spec keys() :: list(atom())

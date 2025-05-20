@@ -73,27 +73,27 @@ defmodule Torngen.Client.Schema.RaceCarUpgrade do
   end
 
   @impl true
-  def validate(%{} = data) do
+  def validate?(%{} = data) do
     @keys
     |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
-    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
-    |> Enum.any?()
+    |> Enum.map(fn {key, value} -> validate_key?(key, value) end)
+    |> Enum.all?()
   end
 
-  defp validate_key(:subcategory, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.RaceCarUpgradeSubCategory)
+  defp validate_key?(:subcategory, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.RaceCarUpgradeSubCategory)
   end
 
-  defp validate_key(:name, value) do
-    Torngen.Client.Schema.validate(value, {:static, :string})
+  defp validate_key?(:name, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :string})
   end
 
-  defp validate_key(:id, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.RaceCarUpgradeId)
+  defp validate_key?(:id, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.RaceCarUpgradeId)
   end
 
-  defp validate_key(:effects, value) do
-    Torngen.Client.Schema.validate(
+  defp validate_key?(:effects, value) do
+    Torngen.Client.Schema.validate?(
       value,
       {:object,
        %{
@@ -108,20 +108,20 @@ defmodule Torngen.Client.Schema.RaceCarUpgrade do
     )
   end
 
-  defp validate_key(:description, value) do
-    Torngen.Client.Schema.validate(value, {:static, :string})
+  defp validate_key?(:description, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :string})
   end
 
-  defp validate_key(:cost, value) do
-    Torngen.Client.Schema.validate(value, {:object, %{"cash" => {:static, :integer}, "points" => {:static, :integer}}})
+  defp validate_key?(:cost, value) do
+    Torngen.Client.Schema.validate?(value, {:object, %{"cash" => {:static, :integer}, "points" => {:static, :integer}}})
   end
 
-  defp validate_key(:class_required, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.RaceClassEnum)
+  defp validate_key?(:class_required, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.RaceClassEnum)
   end
 
-  defp validate_key(:category, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.RaceCarUpgradeCategory)
+  defp validate_key?(:category, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.RaceCarUpgradeCategory)
   end
 
   @spec keys() :: list(atom())

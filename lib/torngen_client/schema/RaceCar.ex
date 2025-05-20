@@ -54,51 +54,51 @@ defmodule Torngen.Client.Schema.RaceCar do
   end
 
   @impl true
-  def validate(%{} = data) do
+  def validate?(%{} = data) do
     @keys
     |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
-    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
-    |> Enum.any?()
+    |> Enum.map(fn {key, value} -> validate_key?(key, value) end)
+    |> Enum.all?()
   end
 
-  defp validate_key(:top_speed, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:top_speed, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:tarmac, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:tarmac, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:safety, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:safety, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:handling, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:handling, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:dirt, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:dirt, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:class, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.RaceClassEnum)
+  defp validate_key?(:class, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.RaceClassEnum)
   end
 
-  defp validate_key(:car_item_name, value) do
-    Torngen.Client.Schema.validate(value, {:static, :string})
+  defp validate_key?(:car_item_name, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :string})
   end
 
-  defp validate_key(:car_item_id, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.ItemId)
+  defp validate_key?(:car_item_id, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.ItemId)
   end
 
-  defp validate_key(:braking, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:braking, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:acceleration, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:acceleration, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
   @spec keys() :: list(atom())

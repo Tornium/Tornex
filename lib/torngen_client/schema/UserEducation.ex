@@ -32,19 +32,19 @@ defmodule Torngen.Client.Schema.UserEducation do
   end
 
   @impl true
-  def validate(%{} = data) do
+  def validate?(%{} = data) do
     @keys
     |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
-    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
-    |> Enum.any?()
+    |> Enum.map(fn {key, value} -> validate_key?(key, value) end)
+    |> Enum.all?()
   end
 
-  defp validate_key(:current, value) do
-    Torngen.Client.Schema.validate(value, {:one_of, [{:static, :null}, Torngen.Client.Schema.UserCurrentEducation]})
+  defp validate_key?(:current, value) do
+    Torngen.Client.Schema.validate?(value, {:one_of, [{:static, :null}, Torngen.Client.Schema.UserCurrentEducation]})
   end
 
-  defp validate_key(:complete, value) do
-    Torngen.Client.Schema.validate(value, {:array, Torngen.Client.Schema.EducationId})
+  defp validate_key?(:complete, value) do
+    Torngen.Client.Schema.validate?(value, {:array, Torngen.Client.Schema.EducationId})
   end
 
   @spec keys() :: list(atom())

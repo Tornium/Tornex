@@ -11,5 +11,5 @@ defmodule Torngen.Client.Schema.AttackCode do
   # TODO: Validate type of value
 
   @impl true
-  def validate(value), do: Torngen.Client.Schema.validate(value, {:static, :string})
+  def validate?(value), do: Torngen.Client.Schema.validate?(value, {:static, :string})
 end

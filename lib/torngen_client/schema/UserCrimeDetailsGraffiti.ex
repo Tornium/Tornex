@@ -41,31 +41,31 @@ defmodule Torngen.Client.Schema.UserCrimeDetailsGraffiti do
   end
 
   @impl true
-  def validate(%{} = data) do
+  def validate?(%{} = data) do
     @keys
     |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
-    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
-    |> Enum.any?()
+    |> Enum.map(fn {key, value} -> validate_key?(key, value) end)
+    |> Enum.all?()
   end
 
-  defp validate_key(:most_graffiti_simultaneously, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:most_graffiti_simultaneously, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:most_graffiti_in_one_area, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:most_graffiti_in_one_area, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:graffiti_removed, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:graffiti_removed, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:cost_to_city, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:cost_to_city, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:cans_used, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:cans_used, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
   @spec keys() :: list(atom())

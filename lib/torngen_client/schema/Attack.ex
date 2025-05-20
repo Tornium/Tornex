@@ -114,31 +114,31 @@ defmodule Torngen.Client.Schema.Attack do
   end
 
   @impl true
-  def validate(%{} = data) do
+  def validate?(%{} = data) do
     @keys
     |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
-    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
-    |> Enum.any?()
+    |> Enum.map(fn {key, value} -> validate_key?(key, value) end)
+    |> Enum.all?()
   end
 
-  defp validate_key(:started, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:started, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:result, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.FactionAttackResult)
+  defp validate_key?(:result, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.FactionAttackResult)
   end
 
-  defp validate_key(:respect_loss, value) do
-    Torngen.Client.Schema.validate(value, {:static, :number})
+  defp validate_key?(:respect_loss, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :number})
   end
 
-  defp validate_key(:respect_gain, value) do
-    Torngen.Client.Schema.validate(value, {:static, :number})
+  defp validate_key?(:respect_gain, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :number})
   end
 
-  defp validate_key(:modifiers, value) do
-    Torngen.Client.Schema.validate(
+  defp validate_key?(:modifiers, value) do
+    Torngen.Client.Schema.validate?(
       value,
       {:object,
        %{
@@ -153,48 +153,48 @@ defmodule Torngen.Client.Schema.Attack do
     )
   end
 
-  defp validate_key(:is_stealthed, value) do
-    Torngen.Client.Schema.validate(value, {:static, :boolean})
+  defp validate_key?(:is_stealthed, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :boolean})
   end
 
-  defp validate_key(:is_ranked_war, value) do
-    Torngen.Client.Schema.validate(value, {:static, :boolean})
+  defp validate_key?(:is_ranked_war, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :boolean})
   end
 
-  defp validate_key(:is_raid, value) do
-    Torngen.Client.Schema.validate(value, {:static, :boolean})
+  defp validate_key?(:is_raid, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :boolean})
   end
 
-  defp validate_key(:is_interrupted, value) do
-    Torngen.Client.Schema.validate(value, {:static, :boolean})
+  defp validate_key?(:is_interrupted, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :boolean})
   end
 
-  defp validate_key(:id, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.AttackId)
+  defp validate_key?(:id, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.AttackId)
   end
 
-  defp validate_key(:finishing_hit_effects, value) do
-    Torngen.Client.Schema.validate(value, {:array, Torngen.Client.Schema.AttackingFinishingHitEffects})
+  defp validate_key?(:finishing_hit_effects, value) do
+    Torngen.Client.Schema.validate?(value, {:array, Torngen.Client.Schema.AttackingFinishingHitEffects})
   end
 
-  defp validate_key(:ended, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:ended, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:defender, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.AttackPlayer)
+  defp validate_key?(:defender, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.AttackPlayer)
   end
 
-  defp validate_key(:code, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.AttackCode)
+  defp validate_key?(:code, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.AttackCode)
   end
 
-  defp validate_key(:chain, value) do
-    Torngen.Client.Schema.validate(value, {:static, :integer})
+  defp validate_key?(:chain, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
-  defp validate_key(:attacker, value) do
-    Torngen.Client.Schema.validate(value, {:one_of, [{:static, :null}, Torngen.Client.Schema.AttackPlayer]})
+  defp validate_key?(:attacker, value) do
+    Torngen.Client.Schema.validate?(value, {:one_of, [{:static, :null}, Torngen.Client.Schema.AttackPlayer]})
   end
 
   @spec keys() :: list(atom())

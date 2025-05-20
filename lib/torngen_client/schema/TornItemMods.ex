@@ -40,31 +40,31 @@ defmodule Torngen.Client.Schema.TornItemMods do
   end
 
   @impl true
-  def validate(%{} = data) do
+  def validate?(%{} = data) do
     @keys
     |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
-    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
-    |> Enum.any?()
+    |> Enum.map(fn {key, value} -> validate_key?(key, value) end)
+    |> Enum.all?()
   end
 
-  defp validate_key(:weapons, value) do
-    Torngen.Client.Schema.validate(value, {:array, Torngen.Client.Schema.TornItemWeaponTypeEnum})
+  defp validate_key?(:weapons, value) do
+    Torngen.Client.Schema.validate?(value, {:array, Torngen.Client.Schema.TornItemWeaponTypeEnum})
   end
 
-  defp validate_key(:name, value) do
-    Torngen.Client.Schema.validate(value, {:static, :string})
+  defp validate_key?(:name, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :string})
   end
 
-  defp validate_key(:id, value) do
-    Torngen.Client.Schema.validate(value, Torngen.Client.Schema.ItemModId)
+  defp validate_key?(:id, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.ItemModId)
   end
 
-  defp validate_key(:dual_fit, value) do
-    Torngen.Client.Schema.validate(value, {:static, :boolean})
+  defp validate_key?(:dual_fit, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :boolean})
   end
 
-  defp validate_key(:description, value) do
-    Torngen.Client.Schema.validate(value, {:static, :string})
+  defp validate_key?(:description, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :string})
   end
 
   @spec keys() :: list(atom())

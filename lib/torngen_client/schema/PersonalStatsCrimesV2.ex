@@ -91,19 +91,19 @@ defmodule Torngen.Client.Schema.PersonalStatsCrimesV2 do
   end
 
   @impl true
-  def validate(%{} = data) do
+  def validate?(%{} = data) do
     @keys
     |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
-    |> Enum.map(fn {key, value} -> validate_key(key, value) end)
-    |> Enum.any?()
+    |> Enum.map(fn {key, value} -> validate_key?(key, value) end)
+    |> Enum.all?()
   end
 
-  defp validate_key(:version, value) do
-    Torngen.Client.Schema.validate(value, {:static, :string})
+  defp validate_key?(:version, value) do
+    Torngen.Client.Schema.validate?(value, {:static, :string})
   end
 
-  defp validate_key(:skills, value) do
-    Torngen.Client.Schema.validate(
+  defp validate_key?(:skills, value) do
+    Torngen.Client.Schema.validate?(
       value,
       {:object,
        %{
@@ -123,8 +123,8 @@ defmodule Torngen.Client.Schema.PersonalStatsCrimesV2 do
     )
   end
 
-  defp validate_key(:offenses, value) do
-    Torngen.Client.Schema.validate(
+  defp validate_key?(:offenses, value) do
+    Torngen.Client.Schema.validate?(
       value,
       {:object,
        %{
