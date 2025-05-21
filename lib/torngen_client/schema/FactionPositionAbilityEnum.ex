@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.FactionPositionAbilityEnum do
-  @moduledoc """
-  An enumerated type describing `FactionPositionAbilityEnum` of type string.
-  """
+  @moduledoc false
 
   require Logger
 

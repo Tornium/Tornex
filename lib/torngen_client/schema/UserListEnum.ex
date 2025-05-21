@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.UserListEnum do
-  @moduledoc """
-  An enumerated type describing `UserListEnum` of type string.
-  """
+  @moduledoc false
 
   require Logger
 

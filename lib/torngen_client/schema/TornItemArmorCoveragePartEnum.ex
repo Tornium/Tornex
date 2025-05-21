@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.TornItemArmorCoveragePartEnum do
-  @moduledoc """
-  An enumerated type describing `TornItemArmorCoveragePartEnum` of type string.
-  """
+  @moduledoc false
 
   require Logger
 

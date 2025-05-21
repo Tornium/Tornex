@@ -9,6 +9,9 @@ defmodule Torngen.Client.Path.Torn.CrimeId.Subcrimes do
   - timestamp: Timestamp to bypass cache
   - comment: Comment for your tool/service/bot/website to be visible in the logs.
   - key: API key (Public)
+
+  ## Response Module(s)
+  - TornSubcrimesResponse
   """
 
   import Torngen.Client.Path, only: [defparameter: 3]

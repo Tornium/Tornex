@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.RacingSelectionName do
-  @moduledoc """
-  An enumerated type describing `RacingSelectionName` of type string.
-  """
+  @moduledoc false
 
   require Logger
 

@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.RaceCarUpgradeSubCategory do
-  @moduledoc """
-  An enumerated type describing `RaceCarUpgradeSubCategory` of type string.
-  """
+  @moduledoc false
 
   require Logger
 

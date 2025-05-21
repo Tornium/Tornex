@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.FactionTerritoryWarResultEnum do
-  @moduledoc """
-  An enumerated type describing `FactionTerritoryWarResultEnum` of type string.
-  """
+  @moduledoc false
 
   require Logger
 

@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.UserCrimeUniquesRewardAmmoEnum do
-  @moduledoc """
-  An enumerated type describing `UserCrimeUniquesRewardAmmoEnum` of type string.
-  """
+  @moduledoc false
 
   require Logger
 

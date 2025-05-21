@@ -13,6 +13,9 @@ defmodule Torngen.Client.Path.User.Id.Forumthreads do
   - timestamp: Timestamp to bypass cache
   - comment: Comment for your tool/service/bot/website to be visible in the logs.
   - key: API key (Public)
+
+  ## Response Module(s)
+  - UserForumThreadsResponse
   """
 
   import Torngen.Client.Path, only: [defparameter: 3]

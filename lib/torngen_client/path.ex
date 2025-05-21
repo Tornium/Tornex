@@ -1,4 +1,6 @@
 defmodule Torngen.Client.Path do
+  @moduledoc false
+
   defmacro defparameter(args1, args2, do: body) do
     quote do
       @parameter_keys unquote(args1)
@@ -31,10 +33,10 @@ defmodule Torngen.Client.Path do
   @optional_callbacks parameter: 2
 
   @doc """
+  Parse the API response for the path.
   """
-  @callback parse(response :: map() | list()) :: any()
-  # TODO: Add documentation
-  # TODO: Add response type
+  @callback parse(response :: map() | list()) :: list()
+  # TODO: Narrow response type
 
   @doc false
   def path_selection(path) do
@@ -46,6 +48,8 @@ defmodule Torngen.Client.Path do
   @doc false
   @spec parse(response_modules :: [module()], response :: map() | list()) :: list()
   def parse(response_modules, response) do
+    # TODO: Narrow response type
+
     response_modules
     |> Enum.map(fn module_name ->
       Torngen.Client.Schema

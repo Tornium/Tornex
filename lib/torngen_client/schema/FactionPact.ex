@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.FactionPact do
-  @moduledoc """
-  [SHORT DESCRIPTION]
-  """
+  @moduledoc false
 
   use Torngen.Client.SchemaObjectAccess, deprecated: []
 

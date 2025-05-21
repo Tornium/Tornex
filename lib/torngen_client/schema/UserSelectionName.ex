@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.UserSelectionName do
-  @moduledoc """
-  An enumerated type describing `UserSelectionName` of type string.
-  """
+  @moduledoc false
 
   require Logger
 

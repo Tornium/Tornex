@@ -8,6 +8,9 @@ defmodule Torngen.Client.Path.User.Hof do
   - timestamp: Timestamp to bypass cache
   - comment: Comment for your tool/service/bot/website to be visible in the logs.
   - key: API key (Public)
+
+  ## Response Module(s)
+  - UserHofResponse
   """
 
   import Torngen.Client.Path, only: [defparameter: 3]

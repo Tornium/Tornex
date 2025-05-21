@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.FactionTerritoryOwnership do
-  @moduledoc """
-  [SHORT DESCRIPTION]
-  """
+  @moduledoc false
 
   use Torngen.Client.SchemaObjectAccess, deprecated: []
 

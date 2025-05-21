@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.RaceTrackId do
-  @moduledoc """
-  Literal of type integer
-  """
+  @moduledoc false
 
   @behaviour Torngen.Client.Schema
 

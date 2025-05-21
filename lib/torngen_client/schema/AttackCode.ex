@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.AttackCode do
-  @moduledoc """
-  Literal of type string
-  """
+  @moduledoc false
 
   @behaviour Torngen.Client.Schema
 

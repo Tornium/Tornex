@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.FactionSelectionName do
-  @moduledoc """
-  An enumerated type describing `FactionSelectionName` of type string.
-  """
+  @moduledoc false
 
   require Logger
 

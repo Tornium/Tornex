@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.ForumSelectionName do
-  @moduledoc """
-  An enumerated type describing `ForumSelectionName` of type string.
-  """
+  @moduledoc false
 
   require Logger
 

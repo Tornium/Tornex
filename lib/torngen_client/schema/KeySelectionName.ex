@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.KeySelectionName do
-  @moduledoc """
-  An enumerated type describing `KeySelectionName` of type string.
-  """
+  @moduledoc false
 
   require Logger
 

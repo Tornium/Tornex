@@ -17,6 +17,26 @@ defmodule Torngen.Client.Path.Torn do
   - timestamp: Timestamp to bypass cache
   - comment: Comment for your tool/service/bot/website to be visible in the logs.
   - key: API key (Public)
+
+  ## Response Module(s)
+  - TimestampResponse
+  - TornLookupResponse
+  - TornItemModsResponse
+  - TornTerritoriesNoLinksReponse
+  - TornTerritoriesResponse
+  - AttackLogResponse
+  - TornFactionTreeResponse
+  - TornItemAmmoResponse
+  - TornBountiesResponse
+  - TornEducationResponse
+  - TornLogCategoriesResponse
+  - TornItemsResponse
+  - TornLogTypesResponse
+  - TornFactionHofResponse
+  - TornHofResponse
+  - TornCalendarResponse
+  - TornCrimesResponse
+  - TornSubcrimesResponse
   """
 
   import Torngen.Client.Path, only: [defparameter: 3]

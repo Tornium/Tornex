@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.UserHofResponse do
-  @moduledoc """
-  [SHORT DESCRIPTION]
-  """
+  @moduledoc false
 
   use Torngen.Client.SchemaObjectAccess, deprecated: []
 

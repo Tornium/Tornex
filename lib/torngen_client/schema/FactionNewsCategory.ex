@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.FactionNewsCategory do
-  @moduledoc """
-  An enumerated type describing `FactionNewsCategory` of type string.
-  """
+  @moduledoc false
 
   require Logger
 

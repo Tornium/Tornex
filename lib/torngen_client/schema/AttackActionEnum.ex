@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.AttackActionEnum do
-  @moduledoc """
-  An enumerated type describing `AttackActionEnum` of type string.
-  """
+  @moduledoc false
 
   require Logger
 

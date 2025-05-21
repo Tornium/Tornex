@@ -1,7 +1,7 @@
 defmodule Tornex.MixProject do
   use Mix.Project
 
-  @version "0.1.1-dev"
+  @version "0.2.0-dev"
 
   def project do
     [
@@ -53,7 +53,8 @@ defmodule Tornex.MixProject do
   def docs do
     [
       main: "readme",
-      extras: ["README.md", "LICENSE.md"]
+      extras: ["README.md", "LICENSE.md"],
+      nest_modules_by_prefix: [Torngen.Client.Path, Torngen.Client]
     ]
   end
 end

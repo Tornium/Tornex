@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.PersonalStatsStatName do
-  @moduledoc """
-  An enumerated type describing `PersonalStatsStatName` of type string.
-  """
+  @moduledoc false
 
   require Logger
 

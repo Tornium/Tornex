@@ -41,26 +41,39 @@ end
 ## Usage
 Add the supervisor `Tornex.Scheduler.supervisor` to your application supervisor. If you are using the default telemetry handler using `Tornex.Telemetry.attach_default_handler`, make sure to start the handler before starting the supervisor.
 
+<!-- tabs-open -->
+### APIv1
 Create a `Tornex.Query` struct containing the request information:
 ```elixir
 request = %Tornex.Query{
-    resource: "v2/user",
-    resource_id: 1,
+    resource: "user",
+    resource_id: 2383326,
     key: api_key,
-    selections: ["criminalrecord", "basic"],
+    selections: ["attacks", "basic"],
     key_owner: 2383326,
     nice: 10
 }
 ```
 
 The query struct must contain the following values:
-- `resource`: The name of the resource in v1 or v2. Prepend with `v2/` if you're using APIv2.
+- `resource`: The name of the resource.
 - `resource_id`: The ID of the resource even if the request is against the key owner's user, faction, etc.
 - `key`: The API key to be used.
 - `key_owner`: Any other unique identifier (suggested to use Torn ID) of the API key owner.
 - `nice`: The priority of the request (following the Linux niceness values) where -20 is the highest priority and 19 is the lowest priority.
 
-The request can be enqueued into the key owner's queue with `Tornex.Scheduler.Bucket.enqueue/1` to be made depending on the request's priority and the state of the key owner's queue. Or the request can be performed immediately with `Tornex.API.torn_get/1` which performs no ratelimiting. Both methods are blocking though.
+### APIv2
+Create a `Tornex.SpecQuery` struct containing the request information:
+```elixir
+request =
+    Tornex.SpecQuery.new()
+    |> Tornex.SpecQuery.put_path(Torngen.Client.Path.User.Attacks)
+    |> Tornex.SpecQuery.put_path(Torngen.Client.Path.User.Basic)
+    |> Tornex.SpecQuery.put_key(api_key)
+```
+<!-- tabs-close -->
+
+Once the query struct has been constructed, the request can be enqueued into the key owner's queue with `Tornex.Scheduler.Bucket.enqueue/1` to be made depending on the request's priority and the state of the key owner's queue. Alternatively, the request can be performed immediately with `Tornex.API.torn_get/1` which performs no ratelimiting. However, both methods are blocking.
 
 ```elixir
 response = Tornex.Scheduler.Bucket.enqueue(request)
@@ -72,8 +85,8 @@ case response do
     {:error, _} ->
         IO.puts("unknown")
 
-    %{"name" => name, "criminalrecord" => %{"total" => crime_count}} ->
-        IO.puts("#{name} => #{crime_count} crimes")
+    %{"name" => name, "attacks" => attacks} ->
+        IO.puts("#{name} => #{Enum.count(attacks)} attacks")
 end
 ```
 

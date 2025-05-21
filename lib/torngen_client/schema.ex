@@ -1,11 +1,17 @@
 defmodule Torngen.Client.Schema do
+  @moduledoc false
+
   require Logger
 
+  @doc """
+  Parse an API response or response fragment into the schema.
+  """
   @callback parse(map() | list()) :: any()
-  # TODO: Add documentation
 
+  @doc """
+  Validate an API response or response fragment for a schema.
+  """
   @callback validate?(any()) :: boolean()
-  # TODO: Add documentation
 
   @spec parse(value :: any(), type :: module() | tuple()) :: any()
   def parse(value, type) when is_atom(type) do

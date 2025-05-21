@@ -30,6 +30,9 @@ defmodule Tornex.API do
         comment: "Tornium"
   """
 
+  # TODO: Document and provide examples for making API calls
+
+  require Logger
   use Tesla
 
   @type return :: list() | map()
@@ -204,7 +207,7 @@ defmodule Tornex.API do
   end
 
   defp handle_response({:error, reason}, _query) do
-    IO.inspect(reason, label: "Unknown Tornex error")
+    Logger.warning("Unknown Tornex error: #{inspect(reason)}")
 
     {:error, :unknown}
   end

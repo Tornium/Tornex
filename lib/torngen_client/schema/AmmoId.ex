@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.AmmoId do
-  @moduledoc """
-  Literal of type integer
-  """
+  @moduledoc false
 
   @behaviour Torngen.Client.Schema
 

@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.PersonalStatsCategoryEnum do
-  @moduledoc """
-  An enumerated type describing `PersonalStatsCategoryEnum` of type string.
-  """
+  @moduledoc false
 
   require Logger
 

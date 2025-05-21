@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.ReviveSetting do
-  @moduledoc """
-  An enumerated type describing `ReviveSetting` of type string.
-  """
+  @moduledoc false
 
   require Logger
 

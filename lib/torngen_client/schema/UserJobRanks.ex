@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.UserJobRanks do
-  @moduledoc """
-  [SHORT DESCRIPTION]
-  """
+  @moduledoc false
 
   use Torngen.Client.SchemaObjectAccess, deprecated: []
 

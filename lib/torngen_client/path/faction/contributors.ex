@@ -10,6 +10,9 @@ defmodule Torngen.Client.Path.Faction.Contributors do
   - timestamp: Timestamp to bypass cache
   - comment: Comment for your tool/service/bot/website to be visible in the logs.
   - key: API key (Public)
+
+  ## Response Module(s)
+  - FactionContributorsResponse
   """
 
   import Torngen.Client.Path, only: [defparameter: 3]

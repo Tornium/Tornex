@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.RaceStatusEnum do
-  @moduledoc """
-  An enumerated type describing `RaceStatusEnum` of type string.
-  """
+  @moduledoc false
 
   require Logger
 

@@ -18,6 +18,38 @@ defmodule Torngen.Client.Path.Faction do
   - timestamp: Timestamp to bypass cache
   - comment: Comment for your tool/service/bot/website to be visible in the logs.
   - key: API key (Public)
+
+  ## Response Module(s)
+  - TimestampResponse
+  - FactionLookupResponse
+  - FactionRankedWarResponse
+  - FactionRacketsReponse
+  - FactionContributorsResponse
+  - FactionTerritoryWarsResponse
+  - FactionStatsResponse
+  - FactionUpgradesResponse
+  - FactionTerritoriesReponse
+  - FactionTerritoryWarReportResponse
+  - FactionRankedWarReportResponse
+  - FactionCrimeResponse
+  - FactionCrimesResponse
+  - FactionChainReportResponse
+  - FactionChainsResponse
+  - FactionOngoingChainResponse
+  - FactionApplicationsResponse
+  - FactionAttacksFullResponse
+  - RevivesFullResponse
+  - FactionPositionsResponse
+  - FactionTerritoriesOwnershipResponse
+  - FactionBalanceResponse
+  - FactionAttacksResponse
+  - FactionTerritoryWarsHistoryResponse
+  - RevivesResponse
+  - FactionNewsResponse
+  - FactionWarsResponse
+  - FactionBasicResponse
+  - FactionMembersResponse
+  - FactionHofResponse
   """
 
   import Torngen.Client.Path, only: [defparameter: 3]

@@ -13,6 +13,9 @@ defmodule Torngen.Client.Path.Faction.Crimes do
   - timestamp: Timestamp to bypass cache
   - comment: Comment for your tool/service/bot/website to be visible in the logs.
   - key: API key (Minimal)
+
+  ## Response Module(s)
+  - FactionCrimesResponse
   """
 
   import Torngen.Client.Path, only: [defparameter: 3]

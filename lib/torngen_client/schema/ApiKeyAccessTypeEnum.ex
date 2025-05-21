@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.ApiKeyAccessTypeEnum do
-  @moduledoc """
-  An enumerated type describing `ApiKeyAccessTypeEnum` of type string.
-  """
+  @moduledoc false
 
   require Logger
 

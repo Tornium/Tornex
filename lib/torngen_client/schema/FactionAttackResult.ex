@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.FactionAttackResult do
-  @moduledoc """
-  An enumerated type describing `FactionAttackResult` of type string.
-  """
+  @moduledoc false
 
   require Logger
 

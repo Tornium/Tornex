@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.RacingRacesResponse do
-  @moduledoc """
-  [SHORT DESCRIPTION]
-  """
+  @moduledoc false
 
   use Torngen.Client.SchemaObjectAccess, deprecated: []
 

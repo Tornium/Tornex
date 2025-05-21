@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.JobPositionArmyEnum do
-  @moduledoc """
-  An enumerated type describing `JobPositionArmyEnum` of type string.
-  """
+  @moduledoc false
 
   require Logger
 

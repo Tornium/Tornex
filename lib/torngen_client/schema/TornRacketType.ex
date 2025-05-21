@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.TornRacketType do
-  @moduledoc """
-  An enumerated type describing `TornRacketType` of type string.
-  """
+  @moduledoc false
 
   require Logger
 

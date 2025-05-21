@@ -10,6 +10,9 @@ defmodule Torngen.Client.Path.Racing.TrackId.Records do
   - timestamp: Timestamp to bypass cache
   - comment: Comment for your tool/service/bot/website to be visible in the logs.
   - key: API key (Public)
+
+  ## Response Module(s)
+  - RacingTrackRecordsResponse
   """
 
   import Torngen.Client.Path, only: [defparameter: 3]

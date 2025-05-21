@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.AttackFinishingHitEffect do
-  @moduledoc """
-  An enumerated type describing `AttackFinishingHitEffect` of type string.
-  """
+  @moduledoc false
 
   require Logger
 

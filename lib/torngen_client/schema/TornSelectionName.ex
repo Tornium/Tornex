@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.TornSelectionName do
-  @moduledoc """
-  An enumerated type describing `TornSelectionName` of type string.
-  """
+  @moduledoc false
 
   require Logger
 

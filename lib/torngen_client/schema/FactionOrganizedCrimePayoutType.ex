@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.FactionOrganizedCrimePayoutType do
-  @moduledoc """
-  An enumerated type describing `FactionOrganizedCrimePayoutType` of type string.
-  """
+  @moduledoc false
 
   require Logger
 

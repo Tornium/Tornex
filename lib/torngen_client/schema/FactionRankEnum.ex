@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.FactionRankEnum do
-  @moduledoc """
-  An enumerated type describing `FactionRankEnum` of type string.
-  """
+  @moduledoc false
 
   require Logger
 

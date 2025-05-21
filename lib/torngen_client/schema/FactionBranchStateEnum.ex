@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.FactionBranchStateEnum do
-  @moduledoc """
-  An enumerated type describing `FactionBranchStateEnum` of type string.
-  """
+  @moduledoc false
 
   require Logger
 

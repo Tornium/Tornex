@@ -1,11 +1,9 @@
 defmodule Torngen.Client.Schema.ForumThreadUserExtended do
-  @moduledoc """
-  [SHORT DESCRIPTION]
-
-  Type: AllOf
-  """
+  @moduledoc false
 
   @behaviour Torngen.Client.Schema
 
-  @type t :: [Torngen.Client.Schema.ForumThreadBase.t() | %{:new_posts => nil | integer()}]
+  defstruct [:values]
+
+  @type t :: %__MODULE__{values: [Torngen.Client.Schema.ForumThreadBase.t() | %{:new_posts => nil | integer()}]}
 end

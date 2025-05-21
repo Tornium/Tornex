@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.ForumFeedTypeEnum do
-  @moduledoc """
-  An enumerated type describing `ForumFeedTypeEnum` of type integer.
-  """
+  @moduledoc false
 
   require Logger
 

@@ -33,7 +33,7 @@ defmodule Tornex.Test.SpecQuery do
 
   test "test_uri" do
     Tornex.SpecQuery.new()
-    # FIXME: Replace torngen-generated path with mock
+    # TODO: Replace torngen-generated path with mock
     |> Tornex.SpecQuery.put_path(Torngen.Client.Path.Faction.Basic)
     |> Tornex.SpecQuery.uri()
     |> URI.to_string()

@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.TornFactionHofCategory do
-  @moduledoc """
-  An enumerated type describing `TornFactionHofCategory` of type string.
-  """
+  @moduledoc false
 
   require Logger
 

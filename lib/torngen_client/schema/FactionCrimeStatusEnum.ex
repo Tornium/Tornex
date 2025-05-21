@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.FactionCrimeStatusEnum do
-  @moduledoc """
-  An enumerated type describing `FactionCrimeStatusEnum` of type string.
-  """
+  @moduledoc false
 
   require Logger
 

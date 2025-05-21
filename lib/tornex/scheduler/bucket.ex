@@ -43,7 +43,6 @@ defmodule Tornex.Scheduler.Bucket do
       end)
       |> Task.await_many(timeout)
   """
-  alias Torngen.Client.Path.Torn
 
   use GenServer
 

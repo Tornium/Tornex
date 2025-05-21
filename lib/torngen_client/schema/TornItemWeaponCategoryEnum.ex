@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.TornItemWeaponCategoryEnum do
-  @moduledoc """
-  An enumerated type describing `TornItemWeaponCategoryEnum` of type string.
-  """
+  @moduledoc false
 
   require Logger
 

@@ -18,6 +18,36 @@ defmodule Torngen.Client.Path.User do
   - timestamp: Timestamp to bypass cache
   - comment: Comment for your tool/service/bot/website to be visible in the logs.
   - key: API key (Public)
+
+  ## Response Module(s)
+  - TimestampResponse
+  - UserLookupResponse
+  - FactionAttacksFullResponse
+  - FactionAttacksResponse
+  - UserOrganizedCrimeResponse
+  - UserPersonalStatsHistoric
+  - UserPersonalStatsPopular
+  - UserPersonalStatsCategory
+  - UserPersonalStatsFullPublic
+  - UserPersonalStatsFull
+  - UserListResponse
+  - UserItemMarketResponse
+  - RevivesFullResponse
+  - RevivesResponse
+  - UserFactionBalanceResponse
+  - UserJobRanksResponse
+  - UserBountiesResponse
+  - UserEducationResponse
+  - UserCalendarResponse
+  - UserHofResponse
+  - UserForumFriendsResponse
+  - UserForumFeedResponse
+  - UserForumSubscribedThreadsResponse
+  - UserForumThreadsResponse
+  - UserForumPostsResponse
+  - UserEnlistedCarsResponse
+  - UserRacesResponse
+  - UserCrimesResponse
   """
 
   import Torngen.Client.Path, only: [defparameter: 3]

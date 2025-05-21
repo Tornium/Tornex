@@ -1,7 +1,5 @@
 defmodule Torngen.Client.Schema.MarketSelectionName do
-  @moduledoc """
-  An enumerated type describing `MarketSelectionName` of type string.
-  """
+  @moduledoc false
 
   require Logger
 

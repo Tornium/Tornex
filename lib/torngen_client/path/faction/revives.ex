@@ -13,6 +13,9 @@ defmodule Torngen.Client.Path.Faction.Revives do
   - timestamp: Timestamp to bypass cache
   - comment: Comment for your tool/service/bot/website to be visible in the logs.
   - key: API key (Limited)
+
+  ## Response Module(s)
+  - RevivesResponse
   """
 
   import Torngen.Client.Path, only: [defparameter: 3]
