@@ -12,7 +12,7 @@ defmodule Torngen.Client.Schema.RacingRaceDetailsResponse do
   ]
 
   @type t :: %__MODULE__{
-          race: [Torngen.Client.Schema.Race.t() | %{:results => [Torngen.Client.Schema.RacerDetails.t()]}]
+          race: [%{:results => [Torngen.Client.Schema.RacerDetails.t()]} | Torngen.Client.Schema.Race.t()]
         }
 
   @impl true
@@ -23,7 +23,7 @@ defmodule Torngen.Client.Schema.RacingRaceDetailsResponse do
         |> Map.get("race")
         |> Torngen.Client.Schema.parse(
           {:all_of,
-           [Torngen.Client.Schema.Race, {:object, %{"results" => {:array, Torngen.Client.Schema.RacerDetails}}}]}
+           [{:object, %{"results" => {:array, Torngen.Client.Schema.RacerDetails}}}, Torngen.Client.Schema.Race]}
         )
     }
   end
@@ -39,7 +39,7 @@ defmodule Torngen.Client.Schema.RacingRaceDetailsResponse do
   defp validate_key?(:race, value) do
     Torngen.Client.Schema.validate?(
       value,
-      {:all_of, [Torngen.Client.Schema.Race, {:object, %{"results" => {:array, Torngen.Client.Schema.RacerDetails}}}]}
+      {:all_of, [{:object, %{"results" => {:array, Torngen.Client.Schema.RacerDetails}}}, Torngen.Client.Schema.Race]}
     )
   end
 

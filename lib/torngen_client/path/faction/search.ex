@@ -1,31 +1,28 @@
-defmodule Torngen.Client.Path.Market do
+defmodule Torngen.Client.Path.Faction.Search do
   @moduledoc """
-  Get any Market selection.
+  Search factions by name or other criteria.
 
-  Requires public access key. <br>Choose one or more selections (comma separated).
+  Requires public access key. <br>This selection is standalone and cannot be used together with other selections.
 
   ## Parmeters
-  - selections: Selection names
-  - id: selection id
-  - bonus: Used to filter weapons with a specific bonus
-  - sort: Direction to sort rows in
+  - name: Name  to search for.
+  - filters: A filtering query parameter allowing a comma-separated list of filters
+  - limit: N/A
   - offset: N/A
   - timestamp: Timestamp to bypass cache
   - comment: Comment for your tool/service/bot/website to be visible in the logs.
   - key: API key (Public)
 
   ## Response Module(s)
-  - TimestampResponse
-  - MarketLookupResponse
-  - MarketItemMarketResponse
+  - FactionSearchResponse
   """
 
   import Torngen.Client.Path, only: [defparameter: 3]
 
   @behaviour Torngen.Client.Path
 
-  @path "market"
-  @response_modules [TimestampResponse, MarketLookupResponse, MarketItemMarketResponse]
+  @path "faction/search"
+  @response_modules [FactionSearchResponse]
 
   Module.register_attribute(__MODULE__, :parameter_keys, accumulate: true)
 
@@ -36,27 +33,21 @@ defmodule Torngen.Client.Path.Market do
   def path_selection(), do: Torngen.Client.Path.path_selection(@path)
 
   @impl true
-  defparameter :selections, value do
-    # Selection names
-    {:query, :selections, value}
+  defparameter :name, value do
+    # Name  to search for.
+    {:query, :name, value}
   end
 
   @impl true
-  defparameter :id, value do
-    # selection id
-    {:query, :id, value}
+  defparameter :filters, value do
+    # A filtering query parameter allowing a comma-separated list of filters.    * Each filter can be one of the following:  * Fixed options: 'destroyed', 'notDestroyed', 'recruiting', 'notRecruiting'  * Dynamic options: `fieldName`+`condition`+`number`, where:  * * `fieldName` is one of: `id`, `respect`, `members`  * * `condition` is one of: `Equal`, `NotEqual`, `Less`, `LessOrEqual`, `GreaterOrEqual`, `Greater`  * * `number`: any integer value  * Examples: `filters=destroyed`, `filters=notDestroyed,recruiting`, `filters=respectLessOrEqual20000,idGreater100,notRecruiting`
+    {:query, :filters, value}
   end
 
   @impl true
-  defparameter :bonus, value do
-    # Used to filter weapons with a specific bonus
-    {:query, :bonus, value}
-  end
-
-  @impl true
-  defparameter :sort, value do
-    # Direction to sort rows in
-    {:query, :sort, value}
+  defparameter :limit, value do
+    # N/A
+    {:query, :limit, value}
   end
 
   @impl true

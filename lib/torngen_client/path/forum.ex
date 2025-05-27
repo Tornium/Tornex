@@ -13,7 +13,6 @@ defmodule Torngen.Client.Path.Forum do
   - from: Timestamp that sets the lower limit for the data returned
   - to: Timestamp that sets the upper limit for the data returned
   - offset: N/A
-  - cat: Selection category
   - timestamp: Timestamp to bypass cache
   - comment: Comment for your tool/service/bot/website to be visible in the logs.
   - key: API key (Public)
@@ -95,12 +94,6 @@ defmodule Torngen.Client.Path.Forum do
   defparameter :offset, value do
     # N/A
     {:query, :offset, value}
-  end
-
-  @impl true
-  defparameter :cat, value do
-    # Selection category
-    {:query, :cat, value}
   end
 
   @impl true

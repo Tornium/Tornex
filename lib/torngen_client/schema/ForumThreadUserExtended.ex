@@ -5,5 +5,5 @@ defmodule Torngen.Client.Schema.ForumThreadUserExtended do
 
   defstruct [:values]
 
-  @type t :: %__MODULE__{values: [Torngen.Client.Schema.ForumThreadBase.t() | %{:new_posts => nil | integer()}]}
+  @type t :: %__MODULE__{values: [%{:new_posts => nil | integer()} | Torngen.Client.Schema.ForumThreadBase.t()]}
 end

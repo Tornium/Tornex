@@ -1,4 +1,4 @@
-defmodule Torngen.Client.Schema.HofValueString do
+defmodule Torngen.Client.Schema.HofValueFloat do
   @moduledoc false
 
   use Torngen.Client.SchemaObjectAccess, deprecated: []
@@ -13,15 +13,15 @@ defmodule Torngen.Client.Schema.HofValueString do
   ]
 
   @type t :: %__MODULE__{
-          value: String.t(),
-          rank: nil | integer()
+          value: integer() | float(),
+          rank: integer()
         }
 
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      value: data |> Map.get("value") |> Torngen.Client.Schema.parse({:static, :string}),
-      rank: data |> Map.get("rank") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :integer]})
+      value: data |> Map.get("value") |> Torngen.Client.Schema.parse({:static, :number}),
+      rank: data |> Map.get("rank") |> Torngen.Client.Schema.parse({:static, :integer})
     }
   end
 
@@ -34,11 +34,11 @@ defmodule Torngen.Client.Schema.HofValueString do
   end
 
   defp validate_key?(:value, value) do
-    Torngen.Client.Schema.validate?(value, {:static, :string})
+    Torngen.Client.Schema.validate?(value, {:static, :number})
   end
 
   defp validate_key?(:rank, value) do
-    Torngen.Client.Schema.validate?(value, {:one_of, [static: :null, static: :integer]})
+    Torngen.Client.Schema.validate?(value, {:static, :integer})
   end
 
   @spec keys() :: list(atom())

@@ -132,7 +132,7 @@ defmodule Torngen.Client.Path.User do
 
   @impl true
   defparameter :cat, value do
-    # Selection category
+    # Selection category. Can belong to one of the specified types.
     {:query, :cat, value}
   end
 

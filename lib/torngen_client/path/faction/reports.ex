@@ -1,31 +1,29 @@
-defmodule Torngen.Client.Path.Market do
+defmodule Torngen.Client.Path.Faction.Reports do
   @moduledoc """
-  Get any Market selection.
+  Get faction reports.
 
-  Requires public access key. <br>Choose one or more selections (comma separated).
+  Requires limited access key. <br>
+  *  The default limit is set to 25. However, the limit can be set to 100 for the 'stats' category.
 
   ## Parmeters
-  - selections: Selection names
-  - id: selection id
-  - bonus: Used to filter weapons with a specific bonus
-  - sort: Direction to sort rows in
+  - cat: Used to filter reports with a specific type.
+  - target: Get reports for a specific player by passing their player ID.
+  - limit: N/A
   - offset: N/A
   - timestamp: Timestamp to bypass cache
   - comment: Comment for your tool/service/bot/website to be visible in the logs.
-  - key: API key (Public)
+  - key: API key (Limited)
 
   ## Response Module(s)
-  - TimestampResponse
-  - MarketLookupResponse
-  - MarketItemMarketResponse
+  - ReportsResponse
   """
 
   import Torngen.Client.Path, only: [defparameter: 3]
 
   @behaviour Torngen.Client.Path
 
-  @path "market"
-  @response_modules [TimestampResponse, MarketLookupResponse, MarketItemMarketResponse]
+  @path "faction/reports"
+  @response_modules [ReportsResponse]
 
   Module.register_attribute(__MODULE__, :parameter_keys, accumulate: true)
 
@@ -36,27 +34,21 @@ defmodule Torngen.Client.Path.Market do
   def path_selection(), do: Torngen.Client.Path.path_selection(@path)
 
   @impl true
-  defparameter :selections, value do
-    # Selection names
-    {:query, :selections, value}
+  defparameter :cat, value do
+    # Used to filter reports with a specific type.
+    {:query, :cat, value}
   end
 
   @impl true
-  defparameter :id, value do
-    # selection id
-    {:query, :id, value}
+  defparameter :target, value do
+    # Get reports for a specific player by passing their player ID.
+    {:query, :target, value}
   end
 
   @impl true
-  defparameter :bonus, value do
-    # Used to filter weapons with a specific bonus
-    {:query, :bonus, value}
-  end
-
-  @impl true
-  defparameter :sort, value do
-    # Direction to sort rows in
-    {:query, :sort, value}
+  defparameter :limit, value do
+    # N/A
+    {:query, :limit, value}
   end
 
   @impl true
@@ -79,7 +71,7 @@ defmodule Torngen.Client.Path.Market do
 
   @impl true
   defparameter :key, value do
-    # API key (Public). It's not required to use this parameter when passing the API key via the Authorization header.
+    # API key (Limited). It's not required to use this parameter when passing the API key via the Authorization header.
     {:query, :key, value}
   end
 

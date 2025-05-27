@@ -15,7 +15,6 @@ defmodule Torngen.Client.Path.User.Id.Personalstats do
   - cat:
   - stat: Stat names (10 maximum)
   - timestamp: Returns stats until this timestamp (converted to nearest date).
-  - timestamp: Timestamp to bypass cache
   - comment: Comment for your tool/service/bot/website to be visible in the logs.
   - key: API key (Public)
 
@@ -69,12 +68,6 @@ defmodule Torngen.Client.Path.User.Id.Personalstats do
   @impl true
   defparameter :timestamp, value do
     # Returns stats until this timestamp (converted to nearest date).
-    {:query, :timestamp, value}
-  end
-
-  @impl true
-  defparameter :timestamp, value do
-    # Timestamp to bypass cache
     {:query, :timestamp, value}
   end
 

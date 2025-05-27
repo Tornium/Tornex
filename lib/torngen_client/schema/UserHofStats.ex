@@ -47,7 +47,7 @@ defmodule Torngen.Client.Schema.UserHofStats do
           revives: Torngen.Client.Schema.HofValue.t(),
           rank: Torngen.Client.Schema.HofValue.t(),
           racing_wins: Torngen.Client.Schema.HofValue.t(),
-          racing_skill: Torngen.Client.Schema.HofValue.t(),
+          racing_skill: Torngen.Client.Schema.HofValueFloat.t(),
           racing_points: Torngen.Client.Schema.HofValue.t(),
           offences: Torngen.Client.Schema.HofValue.t(),
           networth: Torngen.Client.Schema.HofValue.t(),
@@ -67,7 +67,7 @@ defmodule Torngen.Client.Schema.UserHofStats do
       revives: data |> Map.get("revives") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.HofValue),
       rank: data |> Map.get("rank") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.HofValue),
       racing_wins: data |> Map.get("racing_wins") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.HofValue),
-      racing_skill: data |> Map.get("racing_skill") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.HofValue),
+      racing_skill: data |> Map.get("racing_skill") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.HofValueFloat),
       racing_points: data |> Map.get("racing_points") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.HofValue),
       offences: data |> Map.get("offences") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.HofValue),
       networth: data |> Map.get("networth") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.HofValue),
@@ -112,7 +112,7 @@ defmodule Torngen.Client.Schema.UserHofStats do
   end
 
   defp validate_key?(:racing_skill, value) do
-    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.HofValue)
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.HofValueFloat)
   end
 
   defp validate_key?(:racing_points, value) do

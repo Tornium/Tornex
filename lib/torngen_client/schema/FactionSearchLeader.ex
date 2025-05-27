@@ -1,27 +1,27 @@
-defmodule Torngen.Client.Schema.HofValueString do
+defmodule Torngen.Client.Schema.FactionSearchLeader do
   @moduledoc false
 
   use Torngen.Client.SchemaObjectAccess, deprecated: []
 
   @behaviour Torngen.Client.Schema
 
-  @keys [:value, :rank]
+  @keys [:name, :id]
 
   defstruct [
-    :value,
-    :rank
+    :name,
+    :id
   ]
 
   @type t :: %__MODULE__{
-          value: String.t(),
-          rank: nil | integer()
+          name: String.t(),
+          id: Torngen.Client.Schema.UserId.t()
         }
 
   @impl true
   def parse(%{} = data) do
     %__MODULE__{
-      value: data |> Map.get("value") |> Torngen.Client.Schema.parse({:static, :string}),
-      rank: data |> Map.get("rank") |> Torngen.Client.Schema.parse({:one_of, [static: :null, static: :integer]})
+      name: data |> Map.get("name") |> Torngen.Client.Schema.parse({:static, :string}),
+      id: data |> Map.get("id") |> Torngen.Client.Schema.parse(Torngen.Client.Schema.UserId)
     }
   end
 
@@ -33,12 +33,12 @@ defmodule Torngen.Client.Schema.HofValueString do
     |> Enum.all?()
   end
 
-  defp validate_key?(:value, value) do
+  defp validate_key?(:name, value) do
     Torngen.Client.Schema.validate?(value, {:static, :string})
   end
 
-  defp validate_key?(:rank, value) do
-    Torngen.Client.Schema.validate?(value, {:one_of, [static: :null, static: :integer]})
+  defp validate_key?(:id, value) do
+    Torngen.Client.Schema.validate?(value, Torngen.Client.Schema.UserId)
   end
 
   @spec keys() :: list(atom())
