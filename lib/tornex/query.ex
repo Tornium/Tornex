@@ -69,8 +69,16 @@ defmodule Tornex.Query do
   - high priority requests (-10 < nice <= 0) => Requests where latency matters
   - user requests (nice <= -10) => Requests that should be performed immediately, typically initiated by a user action
   """
-  @spec query_priority(Tornex.Query.t()) :: :user_request | :high_priority | :generic_request
+  @spec query_priority(query :: t() | Tornex.SpecQuery.t()) :: :user_request | :high_priority | :generic_request
   def query_priority(%Tornex.Query{} = query) do
+    cond do
+      query.nice <= -10 -> :user_request
+      query.nice <= 0 -> :high_priority
+      true -> :generic_request
+    end
+  end
+
+  def query_priority(%Tornex.SpecQuery{} = query) do
     cond do
       query.nice <= -10 -> :user_request
       query.nice <= 0 -> :high_priority
