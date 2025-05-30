@@ -35,7 +35,7 @@ defmodule Tornex.Test.SpecQuery do
     Tornex.SpecQuery.new()
     # TODO: Replace torngen-generated path with mock
     |> Tornex.SpecQuery.put_path(Torngen.Client.Path.Faction.Basic)
-    |> Tornex.SpecQuery.uri()
+    |> Tornex.SpecQuery.uri!()
     |> URI.to_string()
     |> (&assert(&1 == "https://api.torn.com/v2/faction/?selections=basic")).()
 
@@ -43,7 +43,7 @@ defmodule Tornex.Test.SpecQuery do
     |> Tornex.SpecQuery.put_path(Torngen.Client.Path.Faction.Id.Basic)
     |> Tornex.SpecQuery.put_path(Torngen.Client.Path.Faction.Id.Members)
     |> Tornex.SpecQuery.put_parameter(:id, 1)
-    |> Tornex.SpecQuery.uri()
+    |> Tornex.SpecQuery.uri!()
     |> URI.to_string()
     |> (&assert(&1 == "https://api.torn.com/v2/faction/1/?selections=members,basic")).()
 
@@ -52,7 +52,7 @@ defmodule Tornex.Test.SpecQuery do
     |> Tornex.SpecQuery.put_path(Torngen.Client.Path.Faction.Id.Basic)
     |> Tornex.SpecQuery.put_parameter(:id, 89)
     |> Tornex.SpecQuery.put_parameter(:limit, 100)
-    |> Tornex.SpecQuery.uri()
+    |> Tornex.SpecQuery.uri!()
     |> URI.to_string()
     |> (&assert(&1 == "https://api.torn.com/v2/faction/89/?selections=basic,chains&limit=100")).()
   end

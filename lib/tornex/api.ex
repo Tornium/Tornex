@@ -90,7 +90,7 @@ defmodule Tornex.API do
 
   def query_to_url(%Tornex.SpecQuery{} = query) do
     query
-    |> Tornex.SpecQuery.uri()
+    |> Tornex.SpecQuery.uri!()
     |> URI.append_query("comment=" <> @comment)
     |> URI.to_string()
   end
