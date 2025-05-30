@@ -22,9 +22,13 @@ defmodule Torngen.Client.Schema do
   end
 
   def parse(value, {:object, pair_types}) do
-    pair_types
-    |> Enum.map(fn {key, type} -> {key, parse(Map.get(value, key), type)} end)
-    |> Map.new()
+    try do
+      pair_types
+      |> Enum.map(fn {key, type} -> {key, parse(Map.get(value, key), type)} end)
+      |> Map.new()
+    rescue
+      _ -> nil
+    end
   end
 
   def parse(value, {:array, type}) do
@@ -39,6 +43,12 @@ defmodule Torngen.Client.Schema do
       nil -> nil
       _ -> parse(value, valid_type)
     end
+  end
+
+  def parse(value, {:all_of, types}) do
+    types
+    |> Enum.map(fn type -> {type, parse(value, type)} end)
+    |> Map.new()
   end
 
   def parse(value, {:static, type}) do
@@ -58,7 +68,11 @@ defmodule Torngen.Client.Schema do
   def validate?(value, type) when is_atom(type) do
     # See reasoning in parse/2
 
-    Kernel.apply(type, :validate?, [value])
+    try do
+      Kernel.apply(type, :validate?, [value])
+    rescue
+      _ -> false
+    end
   end
 
   def validate?(value, {:array, type}) when is_list(value) do

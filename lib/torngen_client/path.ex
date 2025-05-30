@@ -36,7 +36,6 @@ defmodule Torngen.Client.Path do
   Parse the API response for the path.
   """
   @callback parse(response :: map() | list()) :: list()
-
   @doc false
   def path_selection(path) do
     path
@@ -49,11 +48,15 @@ defmodule Torngen.Client.Path do
   def parse(response_modules, response) do
     response_modules
     |> Enum.map(fn module_name ->
-      Torngen.Client.Schema
-      |> Module.concat(module_name)
-      |> apply(:parse, [response])
+      parsed_schema =
+        Torngen.Client.Schema
+        |> Module.concat(module_name)
+        |> apply(:parse, [response])
+
+      {module_name, parsed_schema}
     end)
-    |> Enum.reject(&is_nil/1)
+    |> Enum.reject(fn {key, value} -> is_nil(value) end)
+    |> Map.new()
   end
 
   defp do_path_selection(path_sections) when Kernel.length(path_sections) == 3 do

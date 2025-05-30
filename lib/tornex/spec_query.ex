@@ -124,9 +124,11 @@ defmodule Tornex.SpecQuery do
   @spec parse(query :: t(), response :: list() | map()) :: list(term())
   def parse(%__MODULE__{paths: paths} = _query, response)
       when (is_list(response) or is_map(response)) and Kernel.length(paths) > 0 do
+    # TODO: Document this function
+
     paths
-    |> Enum.map(fn path -> path.parse(response) end)
-    |> List.flatten()
+    |> Enum.map(fn path when is_atom(path) -> {path, path.parse(response)} end)
+    |> Map.new()
   end
 
   @spec base_path!(query :: t()) :: String.t()
@@ -210,6 +212,12 @@ defmodule Tornex.SpecQuery do
 
   defp do_insert_path_parameter(%URI{} = uri, []) do
     uri
+  end
+
+  defp do_insert_query_parameter(%URI{} = uri, [{name, value} | remaining_parameters])
+       when is_atom(name) and is_list(value) do
+    uri = URI.append_query(uri, "#{name}=#{Enum.join(value, ",")}")
+    do_insert_query_parameter(uri, remaining_parameters)
   end
 
   defp do_insert_query_parameter(%URI{} = uri, [{name, value} | remaining_parameters]) when is_atom(name) do

@@ -24,6 +24,9 @@ defmodule Torngen.Client.Schema.FactionChainReportResponse do
   end
 
   @impl true
+  def parse(_data), do: nil
+
+  @impl true
   def validate?(%{} = data) do
     @keys
     |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
