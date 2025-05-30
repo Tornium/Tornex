@@ -36,7 +36,6 @@ defmodule Torngen.Client.Path do
   Parse the API response for the path.
   """
   @callback parse(response :: map() | list()) :: list()
-  # TODO: Narrow response type
 
   @doc false
   def path_selection(path) do
@@ -48,8 +47,6 @@ defmodule Torngen.Client.Path do
   @doc false
   @spec parse(response_modules :: [module()], response :: map() | list()) :: list()
   def parse(response_modules, response) do
-    # TODO: Narrow response type
-
     response_modules
     |> Enum.map(fn module_name ->
       Torngen.Client.Schema

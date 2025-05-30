@@ -26,8 +26,8 @@ defmodule Torngen.Client.Path.User do
   - FactionAttacksResponse
   - UserOrganizedCrimeResponse
   - UserPersonalStatsHistoric
-  - UserPersonalStatsPopular
   - UserPersonalStatsCategory
+  - UserPersonalStatsPopular
   - UserPersonalStatsFullPublic
   - UserPersonalStatsFull
   - UserListResponse
@@ -62,8 +62,8 @@ defmodule Torngen.Client.Path.User do
     FactionAttacksResponse,
     UserOrganizedCrimeResponse,
     UserPersonalStatsHistoric,
-    UserPersonalStatsPopular,
     UserPersonalStatsCategory,
+    UserPersonalStatsPopular,
     UserPersonalStatsFullPublic,
     UserPersonalStatsFull,
     UserListResponse,

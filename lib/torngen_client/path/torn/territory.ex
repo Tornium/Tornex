@@ -5,6 +5,7 @@ defmodule Torngen.Client.Path.Torn.Territory do
   Requires public access key. <br>
 
   ## Parmeters
+  - ids: Specific territory id or a list of territory ids (comma separated)
   - offset: N/A
   - limit: N/A
   - timestamp: Timestamp to bypass cache
@@ -29,6 +30,12 @@ defmodule Torngen.Client.Path.Torn.Territory do
 
   @impl true
   def path_selection(), do: Torngen.Client.Path.path_selection(@path)
+
+  @impl true
+  defparameter :ids, value do
+    # Specific territory id or a list of territory ids (comma separated)
+    {:query, :ids, value}
+  end
 
   @impl true
   defparameter :offset, value do

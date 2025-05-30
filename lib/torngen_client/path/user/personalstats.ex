@@ -19,8 +19,8 @@ defmodule Torngen.Client.Path.User.Personalstats do
 
   ## Response Module(s)
   - UserPersonalStatsHistoric
-  - UserPersonalStatsPopular
   - UserPersonalStatsCategory
+  - UserPersonalStatsPopular
   - UserPersonalStatsFullPublic
   - UserPersonalStatsFull
   """
@@ -32,8 +32,8 @@ defmodule Torngen.Client.Path.User.Personalstats do
   @path "user/personalstats"
   @response_modules [
     UserPersonalStatsHistoric,
-    UserPersonalStatsPopular,
     UserPersonalStatsCategory,
+    UserPersonalStatsPopular,
     UserPersonalStatsFullPublic,
     UserPersonalStatsFull
   ]

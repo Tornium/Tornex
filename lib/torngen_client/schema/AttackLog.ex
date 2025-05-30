@@ -5,13 +5,14 @@ defmodule Torngen.Client.Schema.AttackLog do
 
   @behaviour Torngen.Client.Schema
 
-  @keys [:timestamp, :text, :icon, :defender, :attacker, :action]
+  @keys [:timestamp, :text, :icon, :defender, :attacker_item, :attacker, :action]
 
   defstruct [
     :timestamp,
     :text,
     :icon,
     :defender,
+    :attacker_item,
     :attacker,
     :action
   ]
@@ -21,6 +22,7 @@ defmodule Torngen.Client.Schema.AttackLog do
           text: String.t(),
           icon: String.t(),
           defender: nil | %{:name => String.t(), :id => Torngen.Client.Schema.UserId.t()},
+          attacker_item: %{:name => String.t(), :id => Torngen.Client.Schema.ItemId.t()},
           attacker:
             nil
             | %{
@@ -43,6 +45,10 @@ defmodule Torngen.Client.Schema.AttackLog do
         |> Torngen.Client.Schema.parse(
           {:one_of, [static: :null, object: %{"id" => Torngen.Client.Schema.UserId, "name" => {:static, :string}}]}
         ),
+      attacker_item:
+        data
+        |> Map.get("attacker_item")
+        |> Torngen.Client.Schema.parse({:object, %{"id" => Torngen.Client.Schema.ItemId, "name" => {:static, :string}}}),
       attacker:
         data
         |> Map.get("attacker")
@@ -87,6 +93,13 @@ defmodule Torngen.Client.Schema.AttackLog do
     Torngen.Client.Schema.validate?(
       value,
       {:one_of, [static: :null, object: %{"id" => Torngen.Client.Schema.UserId, "name" => {:static, :string}}]}
+    )
+  end
+
+  defp validate_key?(:attacker_item, value) do
+    Torngen.Client.Schema.validate?(
+      value,
+      {:object, %{"id" => Torngen.Client.Schema.ItemId, "name" => {:static, :string}}}
     )
   end
 
