@@ -35,7 +35,7 @@ defmodule Tornex.MixProject do
       {:plug_cowboy, "~> 2.7", optional: true},
       {:ex_doc, "~> 0.34", only: :dev, runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
-      {:torngen, path: "../torngen/", only: :dev, runtime: false}
+      {:torngen, github: "Tornium/torngen", tag: "v0.1.0", only: :dev, runtime: false}
     ]
   end
 
