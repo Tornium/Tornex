@@ -278,17 +278,4 @@ defmodule Tornex.API do
 
     {:error, :unknown}
   end
-
-  @spec append_resource_id(String.t(), Tornex.Query.t()) :: String.t()
-  defp append_resource_id(uri_string, %Tornex.Query{resource_id: nil} = _) do
-    uri_string
-  end
-
-  defp append_resource_id(uri_string, query) when is_binary(query.resource_id) do
-    uri_string <> query.resource_id
-  end
-
-  defp append_resource_id(uri_string, query) when is_integer(query.resource_id) do
-    uri_string <> Integer.to_string(query.resource_id)
-  end
 end
