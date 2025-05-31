@@ -63,6 +63,14 @@ defmodule Tornex.SpecQuery do
   Initialize an empty query against the OpenAPI specification.
 
   By default, the niceness of the request will be set to 20 and the key owner will be set to 0. The key owner of 0 is intended to be for requests where the owner of the key is not known (e.g. for determining the owner of the API key).
+
+  ## Options
+
+    * `:paths` - list of API paths
+    * `:parameters` - list of query/path parameters
+    * `:key` - API key
+    * `:key_owner` - ID of the owner of the API key (default: `0`)
+    * `:nice` - Priority of the API call between -20 and 20 (default: `20`)
   """
   @spec new(opts :: Keyword.t()) :: t()
   def new(opts \\ []) do
@@ -214,8 +222,6 @@ defmodule Tornex.SpecQuery do
 
   @doc """
   Parse the response of an API call against the query into schema structs.
-
-  ## Examples
   """
   @spec parse(query :: t(), response :: list() | map()) :: %{module() => term()}
   def parse(%__MODULE__{paths: paths} = _query, response)
