@@ -113,9 +113,13 @@ defmodule Tornex.Scheduler.Bucket do
   Enqueues a `Tornex.Query` or `Tornex.SpecQuery` to the queue of the `Tornex.Scheduler.Bucket` for the API key's user.
 
   The `pid` of the bucket belonging to the API key's user will be retrieved with `Tornex.Scheduler.Bucket.get_by_id/1`, and will be used to enqueue the query for that specific bucket.
+
+  ## Options
+
+    * `:timeout` - Timeout of the GenServer call in milliseconds (default: `60_000`)
   """
-  @spec enqueue(query :: Tornex.Query.t() | Tornex.SpecQuery.t()) :: term()
-  def enqueue(%{key_owner: key_owner} = query) when is_integer(key_owner) do
+  @spec enqueue(query :: Tornex.Query.t() | Tornex.SpecQuery.t(), opts :: Keyword.t()) :: term()
+  def enqueue(%Tornex.Query{key_owner: key_owner} = query, opts \\ []) when is_integer(key_owner) do
     pid =
       case get_by_id(key_owner) do
         {:ok, pid} ->
@@ -125,11 +129,13 @@ defmodule Tornex.Scheduler.Bucket do
           new(key_owner)
       end
 
-    enqueue(pid, query)
+    enqueue(pid, query, opts)
   end
 
-  @spec enqueue(pid :: pid(), query :: Tornex.Query.t() | Tornex.SpecQuery.t()) :: term()
-  def enqueue(pid, %Tornex.Query{key_owner: key_owner} = query) when is_pid(pid) and is_integer(key_owner) do
+  @doc false
+  @spec enqueue(pid :: pid(), query :: Tornex.Query.t() | Tornex.SpecQuery.t(), opts :: Keyword.t()) :: term()
+  def enqueue(pid, %Tornex.Query{key_owner: key_owner} = query, opts)
+      when is_pid(pid) and is_integer(key_owner) do
     :telemetry.execute([:tornex, :bucket, :enqueue], %{}, %{
       selections: query.selections,
       resource: query.resource,
@@ -137,7 +143,9 @@ defmodule Tornex.Scheduler.Bucket do
       user: key_owner
     })
 
-    GenServer.call(pid, {:enqueue, query}, 60_000)
+    timeout = Keyword.get(opts, :timeout, 60_000)
+
+    GenServer.call(pid, {:enqueue, query}, timeout)
   end
 
   def enqueue(pid, %Tornex.SpecQuery{key_owner: key_owner} = query) when is_pid(pid) and is_integer(key_owner) do

@@ -26,7 +26,7 @@ defmodule Tornex.API do
   To customize one of these, include the following in a `config/*.exs`:
 
       config :tornex,
-        base_url: "https://tornium.com/api/v1",
+        base_url: "https://api.torn.com",
         comment: "Tornium"
   """
 

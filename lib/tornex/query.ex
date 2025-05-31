@@ -43,19 +43,19 @@ defmodule Tornex.Query do
 
   @type t :: %__MODULE__{
           resource: String.t(),
-          resource_id: Integer | String.t(),
+          resource_id: integer() | String.t(),
           key: String.t(),
-          selections: List,
-          from: Integer,
-          to: Integer,
-          timestamp: Integer,
-          limit: Integer,
-          sort: :asc | :desc,
-          params: Keyword,
+          selections: [String.t()] | nil,
+          from: integer() | nil,
+          to: integer() | nil,
+          timestamp: integer() | nil,
+          limit: integer() | nil,
+          sort: :asc | :desc | nil,
+          params: Keyword | nil,
 
           # Values required for the scheduler
-          key_owner: Integer,
-          nice: Integer,
+          key_owner: integer(),
+          nice: integer(),
           origin: GenServer.from() | nil
         }
 
