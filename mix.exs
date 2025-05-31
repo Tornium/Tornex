@@ -20,16 +20,15 @@ defmodule Tornex.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :hackney]
+      extra_applications: [:logger]
     ]
   end
 
   # Run "mix help deps" to learn about dependencies.
   def deps do
     [
-      {:tesla, "~> 1.14"},
       {:jason, "~> 1.4"},
-      {:hackney, "~> 1.23"},
+      {:finch, "~> 0.19", optional: true},
       {:telemetry, "~> 1.3"},
       {:prom_ex, "~> 1.11", optional: true},
       {:plug_cowboy, "~> 2.7", optional: true},
@@ -54,7 +53,7 @@ defmodule Tornex.MixProject do
     [
       main: "readme",
       extras: ["README.md", "LICENSE.md"],
-      nest_modules_by_prefix: [Torngen.Client.Path, Torngen.Client]
+      nest_modules_by_prefix: [Tornex.HTTP, Torngen.Client.Path, Torngen.Client]
     ]
   end
 end

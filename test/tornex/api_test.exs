@@ -81,7 +81,7 @@ defmodule Tornex.Test.API do
 
   test "ee_basic_user_requeset" do
     assert %{"error" => %{"code" => 2, "error" => "Incorrect key"}} ==
-             Tornex.API.torn_get(%Tornex.Query{
+             Tornex.API.get(%Tornex.Query{
                resource: "user",
                resource_id: 1,
                key: @test_api_key,

@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - APIv2 support through generated code from [torngen](https://github.com/Tornium/torngen)
 
+### Changed
+- Changed HTTP library from Tesla to an adapter with Finch as the default
+
 ## [0.1.1] - 2025-04-18
 ### Added
 - Added `opts.timeout` to `Bucket.enqueue/3` and `Bucket.enqueue/4`

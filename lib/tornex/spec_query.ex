@@ -182,7 +182,6 @@ defmodule Tornex.SpecQuery do
   ## Examples
       iex> query = 
       ...>   Tornex.SpecQuery.new()
-      ...>   |> Tornex.SpecQuery.put_key("foo")
       ...>   |> Tornex.SpecQuery.put_path(Torngen.Client.Path.User.Id.Personalstats)
       ...>   |> Tornex.SpecQuery.put_path(Torngen.Client.Path.User.Id.Bounties)
       ...>   |> Tornex.SpecQuery.put_parameter(:id, 2383326)
@@ -194,26 +193,24 @@ defmodule Tornex.SpecQuery do
         host: "api.torn.com",
         port: 443,
         path: "/v2/user/2383326",
-        query: "selections=personalstats,bounties&key=foo&stat=attackswon,attackslost",
+        query: "selections=personalstats,bounties&stat=attackswon,attackslost",
       }
 
       iex> query = 
       ...>   Tornex.SpecQuery.new()
-      ...>   |> Tornex.SpecQuery.put_key("bar")
       ...>   |> Tornex.SpecQuery.put_path(Torngen.Client.Path.Faction.Id.Chain)
       ...>   |> Tornex.SpecQuery.put_path(Torngen.Client.Path.Faction.Id.Members)
       iex> Tornex.SpecQuery.uri!(query)
-      ** (RuntimeError) Invalid fragment "{id}" in generated URI: https://api.torn.com/v2/faction/{id}/?selections=chain,members&key=bar **
+      ** (RuntimeError) Invalid fragment "{id}" in generated URI: https://api.torn.com/v2/faction/{id}/?selections=chain,members **
   """
   @spec uri!(query :: t()) :: URI.t()
-  def uri!(%__MODULE__{parameters: parameters, paths: paths, key: key} = query) when is_binary(key) do
+  def uri!(%__MODULE__{parameters: parameters, paths: paths} = query) do
     {path, selections} = path_selections!(query)
 
     @host
     |> URI.new!()
     |> URI.append_path("/" <> path <> "/")
     |> append_selections(selections)
-    |> URI.append_query("key=#{key}")
     |> insert_url_path_parameters(paths, parameters)
     |> insert_url_query_parameters(paths, parameters)
     |> validate_url!()
