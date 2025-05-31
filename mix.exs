@@ -1,7 +1,7 @@
 defmodule Tornex.MixProject do
   use Mix.Project
 
-  @version "0.1.2-dev"
+  @version "0.2.0-dev"
 
   def project do
     [
@@ -34,7 +34,8 @@ defmodule Tornex.MixProject do
       {:prom_ex, "~> 1.11", optional: true},
       {:plug_cowboy, "~> 2.7", optional: true},
       {:ex_doc, "~> 0.34", only: :dev, runtime: false},
-      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:torngen, github: "Tornium/torngen", tag: "v0.1.0", only: :dev, runtime: false}
     ]
   end
 
@@ -52,7 +53,8 @@ defmodule Tornex.MixProject do
   def docs do
     [
       main: "readme",
-      extras: ["README.md", "LICENSE.md"]
+      extras: ["README.md", "LICENSE.md"],
+      nest_modules_by_prefix: [Torngen.Client.Path, Torngen.Client]
     ]
   end
 end

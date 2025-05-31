@@ -1,0 +1,58 @@
+defmodule Torngen.Client.Schema.PersonalStatsHospitalPopular do
+  @moduledoc false
+
+  use Torngen.Client.SchemaObjectAccess, deprecated: []
+
+  @behaviour Torngen.Client.Schema
+
+  @keys [:hospital]
+
+  defstruct [
+    :hospital
+  ]
+
+  @type t :: %__MODULE__{
+          hospital: %{:reviving => %{:skill => integer(), :revives => integer()}, :medical_items_used => integer()}
+        }
+
+  @impl true
+  def parse(%{} = data) do
+    %__MODULE__{
+      hospital:
+        data
+        |> Map.get("hospital")
+        |> Torngen.Client.Schema.parse(
+          {:object,
+           %{
+             "medical_items_used" => {:static, :integer},
+             "reviving" => {:object, %{"revives" => {:static, :integer}, "skill" => {:static, :integer}}}
+           }}
+        )
+    }
+  end
+
+  @impl true
+  def parse(_data), do: nil
+
+  @impl true
+  def validate?(%{} = data) do
+    @keys
+    |> Enum.map(fn key -> {key, Map.get(data, Atom.to_string(key))} end)
+    |> Enum.map(fn {key, value} -> validate_key?(key, value) end)
+    |> Enum.all?()
+  end
+
+  defp validate_key?(:hospital, value) do
+    Torngen.Client.Schema.validate?(
+      value,
+      {:object,
+       %{
+         "medical_items_used" => {:static, :integer},
+         "reviving" => {:object, %{"revives" => {:static, :integer}, "skill" => {:static, :integer}}}
+       }}
+    )
+  end
+
+  @spec keys() :: list(atom())
+  def keys(), do: @keys
+end
