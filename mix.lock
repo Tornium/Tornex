@@ -32,5 +32,5 @@
   "telemetry_metrics_prometheus_core": {:hex, :telemetry_metrics_prometheus_core, "1.2.1", "c9755987d7b959b557084e6990990cb96a50d6482c683fb9622a63837f3cd3d8", [:mix], [{:telemetry, "~> 0.4 or ~> 1.0", [hex: :telemetry, repo: "hexpm", optional: false]}, {:telemetry_metrics, "~> 0.6 or ~> 1.0", [hex: :telemetry_metrics, repo: "hexpm", optional: false]}], "hexpm", "5e2c599da4983c4f88a33e9571f1458bf98b0cf6ba930f1dc3a6e8cf45d5afb6"},
   "telemetry_poller": {:hex, :telemetry_poller, "1.2.0", "ba82e333215aed9dd2096f93bd1d13ae89d249f82760fcada0850ba33bac154b", [:rebar3], [{:telemetry, "~> 1.0", [hex: :telemetry, repo: "hexpm", optional: false]}], "hexpm", "7216e21a6c326eb9aa44328028c34e9fd348fb53667ca837be59d0aa2a0156e8"},
   "torngen": {:git, "https://github.com/Tornium/torngen.git", "fc35174393fdbbc4e61aedec87efd1260130777e", []},
-  "torngen_elixir_client": {:git, "https://github.com/Tornium/torngen_elixir_client.git", "b42e573f056022fcd184833a5dcd13f04da4e1cb", []},
+  "torngen_elixir_client": {:git, "https://github.com/Tornium/torngen_elixir_client.git", "737583dd0d3d0f0b07cd50b04151751b23a09f69", []},
 }
