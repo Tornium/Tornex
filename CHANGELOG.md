@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Changed
 - Changed location of generated code from in-line to [torngen_elixir_client](https://github.com/Tornium/torngen_elixir_client)
+- Changed usage of deprecated `torn_get/1` to `get/1`
 
 ## [0.2.0] - 2025-05-31
 ### Added
@@ -15,6 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Changed HTTP library from Tesla to an adapter with Finch as the default
+
+### Deprecated
+- Deprecated `Tornex.API.torn_get/1` in favor of `Tornex.API.get/1`
 
 ## [0.1.1] - 2025-04-18
 ### Added

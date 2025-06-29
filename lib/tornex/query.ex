@@ -16,7 +16,7 @@ defmodule Tornex.Query do
   @moduledoc """
   The query struct containing API request data.
 
-  The `Tornex.Query` struct is utilized by `Tornex.API.torn_get/1` and `Tornex.Scheduler.Bucket.enqueue/1` to make API calls. `Tornex.Query` stores the required information to perform the API call.
+  The `Tornex.Query` struct is utilized by `Tornex.API.get/1` and `Tornex.Scheduler.Bucket.enqueue/1` to make API calls. `Tornex.Query` stores the required information to perform the API call.
 
   > #### Tip {: .tip}
   >

@@ -16,7 +16,7 @@ defmodule Tornex.SpecQuery do
   @moduledoc """
   The query struct containing API request data for API v2 requests.
 
-  The `Tornex.SpecQuery` struct works against the OpenAPI specification for the Torn API v2. `Tornex.SpecQuery` can be used by `Tornex.API.torn_get/1` and `Tornex.Scheduler.Bucket.enqueue/1` to make API calls. The struct stores the required information to perform the API call. Alternatively, to make API calls without the OpenAPI specification use `Tornex.Query` instead and prepend the resource with `v2/` (e.g. `v2/user`).
+  The `Tornex.SpecQuery` struct works against the OpenAPI specification for the Torn API v2. `Tornex.SpecQuery` can be used by `Tornex.API.get/1` and `Tornex.Scheduler.Bucket.enqueue/1` to make API calls. The struct stores the required information to perform the API call. Alternatively, to make API calls without the OpenAPI specification use `Tornex.Query` instead and prepend the resource with `v2/` (e.g. `v2/user`).
 
   ## Preparing Query
   Create an empty query using `new/0`. Use `put_path/2` and `put_parameter` to set up the query.
@@ -28,9 +28,9 @@ defmodule Tornex.SpecQuery do
       ...>   |> Tornex.SpecQuery.put_parameter(:id, 2383326)
 
   ## Making Query
-  The `SpecQuery` can be executed using `Tornex.API.torn_get/1` and `Tornex.Scheduler.Bucket.enqueue/1` to perform the API calls. Once the API call has been finished, the response can be parsed into schema structs and validated using `parse/2`.
+  The `SpecQuery` can be executed using `Tornex.API.get/1` and `Tornex.Scheduler.Bucket.enqueue/1` to perform the API calls. Once the API call has been finished, the response can be parsed into schema structs and validated using `parse/2`.
 
-      iex> api_response = Tornex.API.torn_get(query)
+      iex> api_response = Tornex.API.get(query)
       iex> parsed_response = Tornex.SpecQuery.parse(query, api_response)
   """
 

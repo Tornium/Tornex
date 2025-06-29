@@ -73,7 +73,7 @@ request =
 ```
 <!-- tabs-close -->
 
-Once the query struct has been constructed, the request can be enqueued into the key owner's queue with `Tornex.Scheduler.Bucket.enqueue/1` to be made depending on the request's priority and the state of the key owner's queue. Alternatively, the request can be performed immediately with `Tornex.API.torn_get/1` which performs no ratelimiting. However, both methods are blocking.
+Once the query struct has been constructed, the request can be enqueued into the key owner's queue with `Tornex.Scheduler.Bucket.enqueue/1` to be made depending on the request's priority and the state of the key owner's queue. Alternatively, the request can be performed immediately with `Tornex.API.get/1` which performs no ratelimiting. However, both methods are blocking.
 
 ```elixir
 response = Tornex.Scheduler.Bucket.enqueue(request)

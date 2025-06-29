@@ -248,7 +248,7 @@ defmodule Tornex.Scheduler.Bucket do
   # Utility functions
   @spec make_request_task(query :: Tornex.Query.t() | Tornex.SpecQuery.t(), from :: GenServer.from()) :: :ok
   defp make_request_task(query, from) do
-    GenServer.reply(from, Tornex.API.torn_get(query))
+    GenServer.reply(from, Tornex.API.get(query))
   end
 
   @spec make_request_task(query :: Tornex.Query.t() | Tornex.SpecQuery.t(), from :: GenServer.from()) :: Task.t()
