@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed user agent creation in `Tornex.API` when using an external HTTP adapter implementation (#20)
+- Fixed timeout option in `SpecQuery` enqueued in `Bucket`
 
 ## [0.2.0] - 2025-05-31
 ### Added

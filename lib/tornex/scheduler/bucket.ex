@@ -119,7 +119,9 @@ defmodule Tornex.Scheduler.Bucket do
     * `:timeout` - Timeout of the GenServer call in milliseconds (default: `60_000`)
   """
   @spec enqueue(query :: Tornex.Query.t() | Tornex.SpecQuery.t(), opts :: Keyword.t()) :: term()
-  def enqueue(%Tornex.Query{key_owner: key_owner} = query, opts \\ []) when is_integer(key_owner) do
+  def enqueue(query, opts \\ [])
+
+  def enqueue(%Tornex.Query{key_owner: key_owner} = query, opts) when is_integer(key_owner) do
     pid =
       case get_by_id(key_owner) do
         {:ok, pid} ->
@@ -148,7 +150,7 @@ defmodule Tornex.Scheduler.Bucket do
     GenServer.call(pid, {:enqueue, query}, timeout)
   end
 
-  def enqueue(pid, %Tornex.SpecQuery{key_owner: key_owner} = query) when is_pid(pid) and is_integer(key_owner) do
+  def enqueue(pid, %Tornex.SpecQuery{key_owner: key_owner} = query, opts) when is_pid(pid) and is_integer(key_owner) do
     {base_path, selections} = Tornex.SpecQuery.path_selections!(query)
 
     :telemetry.execute([:tornex, :bucket, :enqueue], %{}, %{
@@ -159,7 +161,9 @@ defmodule Tornex.Scheduler.Bucket do
       user: key_owner
     })
 
-    GenServer.call(pid, {:enqueue, query}, 60_000)
+    timeout = Keyword.get(opts, :timeout, 60_000)
+
+    GenServer.call(pid, {:enqueue, query}, timeout)
   end
 
   @doc """

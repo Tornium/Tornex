@@ -261,7 +261,7 @@ defmodule Tornex.API do
   end
 
   # TODO: Parse error responses into new error struct
-  defp handle_response({:ok, status, response_headers, response_body}, _query) do
+  defp handle_response({:ok, _status, response_headers, response_body}, _query) do
     if Map.get(response_headers, "content-type") == "application/json" do
       case Jason.decode(response_body) do
         {:ok, parsed_body} -> parsed_body
