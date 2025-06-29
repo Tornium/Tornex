@@ -34,7 +34,7 @@ defmodule Tornex.MixProject do
       {:plug_cowboy, "~> 2.7", optional: true},
       {:ex_doc, "~> 0.34", only: :dev, runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
-      {:torngen_elixir_client, github: "Tornium/torngen_elixir_client"}
+      {:torngen_elixir_client, github: "Tornium/torngen_elixir_client", optional: true}
     ]
   end
 

@@ -39,7 +39,7 @@ end
 ```
 
 ## Usage
-Add the supervisor `Tornex.Scheduler.supervisor` to your application supervisor. If you are using the default telemetry handler using `Tornex.Telemetry.attach_default_handler`, make sure to start the handler before starting the supervisor.
+Add the supervisor `Tornex.Scheduler.Supervisor` to your application supervisor. If you are using the default telemetry handler using `Tornex.Telemetry.attach_default_handler`, make sure to start the handler before starting the supervisor.
 
 <!-- tabs-open -->
 ### APIv1
@@ -63,6 +63,8 @@ The query struct must contain the following values:
 - `nice`: The priority of the request (following the Linux niceness values) where -20 is the highest priority and 19 is the lowest priority.
 
 ### APIv2
+To use the auto-generated client for APIv2, you will need to add the [Tornium/torngen_elixir_client](https://github.com/Tornium/torngen_elixir_client) library to your dependencies. Without installing this client, you will have to use the APIv1 style requests through `Tornex.Query` and prepend `v2` to the resource (e.g. `v2/user`).
+
 Create a `Tornex.SpecQuery` struct containing the request information:
 ```elixir
 request =
