@@ -35,6 +35,7 @@ defmodule Tornex.API do
 
   require Logger
 
+  @tornex_version Mix.Project.config()[:version]
   @http_client Application.compile_env(:tornex, :client, Tornex.HTTP.FinchClient)
 
   @type return :: list() | map()
@@ -278,5 +279,5 @@ defmodule Tornex.API do
     {:error, :unknown}
   end
 
-  defp user_agent, do: "Tornex/#{Mix.Project.config()[:version]} (#{@http_client.version()})"
+  defp user_agent, do: "Tornex/#{@tornex_version} (#{@http_client.version()})"
 end
