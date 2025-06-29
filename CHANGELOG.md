@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed location of generated code from in-line to [torngen_elixir_client](https://github.com/Tornium/torngen_elixir_client)
 - Changed usage of deprecated `torn_get/1` to `get/1`
 
+### Fixed
+- Fixed user agent creation in `Tornex.API` when using an external HTTP adapter implementation (#20)
+
 ## [0.2.0] - 2025-05-31
 ### Added
 - APIv2 support through generated code from [torngen](https://github.com/Tornium/torngen)

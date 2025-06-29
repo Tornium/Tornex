@@ -40,7 +40,6 @@ defmodule Tornex.API do
   @type return :: list() | map()
   @type error :: {:error, :cf_challenge | :unknown | :content_type | Jason.DecodeError.t() | term()}
 
-  @user_agent "Tornex/#{Mix.Project.config()[:version]} (#{@http_client.version()})"
   @base_url Application.compile_env(:tornex, :base_url, "https://api.torn.com")
   @comment Application.compile_env(:tornex, :comment, "tex-" <> Mix.Project.config()[:version])
 
@@ -135,7 +134,7 @@ defmodule Tornex.API do
     })
 
     # TODO: Validate query
-    headers = %{"User-Agent" => @user_agent, "Content-Type" => "application/json"}
+    headers = %{"User-Agent" => user_agent(), "Content-Type" => "application/json"}
     {latency, response} = :timer.tc(&@http_client.get/2, [query_to_url(query), headers])
 
     :telemetry.execute([:tornex, :api, :finish], %{latency: latency}, %{
@@ -166,7 +165,7 @@ defmodule Tornex.API do
     })
 
     headers = %{
-      "User-Agent" => @user_agent,
+      "User-Agent" => user_agent(),
       "Content-Type" => "application/json",
       "Authorization" => "ApiKey #{api_key}"
     }
@@ -203,7 +202,7 @@ defmodule Tornex.API do
       user: query.key_owner
     })
 
-    headers = %{"User-Agent" => @user_agent, "Content-Type" => "application/json"}
+    headers = %{"User-Agent" => user_agent(), "Content-Type" => "application/json"}
     {latency, response} = :timer.tc(&@http_client.get/2, [query_to_url(query), headers])
 
     :telemetry.execute([:tornex, :api, :finish], %{latency: latency}, %{
@@ -234,7 +233,7 @@ defmodule Tornex.API do
     })
 
     headers = %{
-      "User-Agent" => @user_agent,
+      "User-Agent" => user_agent(),
       "Content-Type" => "application/json",
       "Authorization" => "ApiKey #{api_key}"
     }
@@ -278,4 +277,6 @@ defmodule Tornex.API do
 
     {:error, :unknown}
   end
+
+  defp user_agent, do: "Tornex/#{Mix.Project.config()[:version]} (#{@http_client.version()})"
 end
