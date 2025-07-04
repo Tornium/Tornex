@@ -93,7 +93,7 @@ end
 ```
 
 ## Documentation
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc) and published on [HexDocs](https://hexdocs.pm). Once published, the docs can be found at <https://hexdocs.pm/tornex>.
+Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc) and can be found at <https://hexdocs.pm/tornex>.
 
 ## License
 Copyright 2024-2025 tiksan
