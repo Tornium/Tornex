@@ -36,7 +36,6 @@ defmodule Tornex.Telemetry do
       [:tornex, :api, :timeout],
       [:tornex, :bucket, :create],
       [:tornex, :bucket, :create_error],
-      [:tornex, :bucket, :dump],
       [:tornex, :bucket, :enqueue]
     ]
 
@@ -92,11 +91,6 @@ defmodule Tornex.Telemetry do
   @doc false
   def handle_event([:tornex, :bucket, :create_error], _measurements, metadata, _opts) do
     Logger.error("Bucket creation failed for #{metadata.user} due to an error: #{inspect(metadata.error)}")
-  end
-
-  @doc false
-  def handle_event([:tornex, :bucket, :dump], _measurements, _metadata, _opts) do
-    Logger.debug("Dump of buckets started")
   end
 
   @doc false

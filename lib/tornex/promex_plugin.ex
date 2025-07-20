@@ -72,10 +72,6 @@ if Code.ensure_loaded?(PromEx) do
           :tornex_bucket_events,
           [
             counter(
-              "tornex.bucket.dump",
-              event_name: [:tornex, :bucket, :dump]
-            ),
-            counter(
               "tornex.bucket.create",
               event_name: [:tornex, :bucket, :create]
             ),
