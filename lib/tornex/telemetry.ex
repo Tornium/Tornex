@@ -27,7 +27,7 @@ defmodule Tornex.Telemetry do
   @doc """
   Attaches the default Tornex `:telemetry` handler built on-top of `Logger`.
   """
-  @spec attach_default_logger() :: :ok | {:error, :already_exists}
+  @spec attach_default_logger(opts :: Keyword.t()) :: :ok | {:error, :already_exists}
   def attach_default_logger(opts \\ []) when is_list(opts) do
     events = [
       [:tornex, :api, :start],
