@@ -18,26 +18,31 @@ defmodule Tornex.Scheduler.Supervisor do
   The `Supervisor` can be replaced if necessary to modify bucket storage, the dump timer, etc.
   """
 
-  use DynamicSupervisor
+  use Supervisor
 
   @doc """
-  Starts the `DynamicSupervisor` required for enqueuing a `Tornex.Query`.
+  Starts the `Supervisor` required for enqueuing queries.
   """
   def start_link(args \\ []) do
-    # TODO: Refactor into a Supervisor with static supervisors and children underneath it
-
-    {:ok, pid} = DynamicSupervisor.start_link(__MODULE__, args, name: __MODULE__)
-
-    {:ok, _} = DynamicSupervisor.start_child(pid, {Task.Supervisor, name: Tornex.Scheduler.TaskSupervisor})
-    {:ok, _} = DynamicSupervisor.start_child(pid, Tornex.Scheduler.Timer)
-    {:ok, _} = DynamicSupervisor.start_child(pid, {Registry, name: Tornex.Scheduler.BucketRegistry, keys: :unique})
-
-    {:ok, pid}
+    Supervisor.start_link(__MODULE__, args, name: __MODULE__)
   end
 
   @doc false
   @impl true
-  def init(_init_args) do
-    DynamicSupervisor.init(strategy: :one_for_one)
+  def init(_args \\ []) do
+    children = [
+      {Task.Supervisor, name: Tornex.Scheduler.TaskSupervisor},
+      Tornex.Scheduler.Timer,
+      {Tornex.Scheduler.bucket_supervisor(), name: Tornex.Scheduler.BucketSupervisor, strategy: :one_for_one}
+    ]
+
+    children =
+      if Tornex.local?() do
+        children
+      else
+        [{ExHashRing.Ring, name: Tornex.Scheduler.Ring} | children]
+      end
+
+    Supervisor.init(children, strategy: :one_for_one)
   end
 end

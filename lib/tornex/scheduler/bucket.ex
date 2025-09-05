@@ -53,18 +53,16 @@ defmodule Tornex.Scheduler.Bucket do
   Starts the bucket for a user.
 
   ## Options
-
     * `:user_id` - (any) A required unique identifier for the user the bucket belongs to
 
   ## Examples
-
       iex> Tornex.Scheduler.Bucket.start_link(user_id: 2383326)
       {:ok, process}
       iex> is_pid(process)
       true
   """
   def start_link(opts \\ []) do
-    GenServer.start_link(__MODULE__, :ok, name: {:via, Registry, {Tornex.Scheduler.BucketRegistry, opts[:user_id]}})
+    GenServer.start_link(__MODULE__, :ok, name: {:via, :global, {Tornex.Scheduler.BucketRegistry, opts[:user_id]}})
   end
 
   @doc """
@@ -75,17 +73,23 @@ defmodule Tornex.Scheduler.Bucket do
   If there is an error in retrieving the `pid` of the bucket or an error in creating the bucket (e.g. maximum number of children in the supervisor reached), `nil` will be returned.
 
   ## Examples
-
       iex> Tornex.Scheduler.Bucket.new(2383326)
       #PID<0.105.0>
   """
   @spec new(user_id :: integer()) :: pid() | nil
   def new(user_id) when is_integer(user_id) do
-    bucket =
-      DynamicSupervisor.start_child(
-        Tornex.Scheduler.Supervisor,
-        {Tornex.Scheduler.Bucket, user_id: user_id}
-      )
+    {_node, bucket} =
+      if Tornex.local?() do
+        {node(), do_start_bucket(user_id)}
+      else
+        {:ok, target_node} = Tornex.Scheduler.ClusterRing.user_node(user_id)
+
+        if target_node == node() do
+          {target_node, do_start_bucket(user_id)}
+        else
+          {target_node, :rpc.call(target_node, __MODULE__, :do_start_bucket, [user_id])}
+        end
+      end
 
     case bucket do
       {:ok, pid} ->
@@ -104,9 +108,19 @@ defmodule Tornex.Scheduler.Bucket do
         :telemetry.execute([:tornex, :bucket, :create_error], %{}, %{user: user_id, error: error})
         nil
 
+      {:badrpc, _error} ->
+        # Only from using RPC to start the bucket on another node
+        nil
+
       _ ->
         nil
     end
+  end
+
+  @doc false
+  @spec do_start_bucket(user_id :: integer) :: DynamicSupervisor.on_start_child()
+  def do_start_bucket(user_id) do
+    Tornex.Scheduler.bucket_supervisor().start_child(Tornex.Scheduler.BucketSupervisor, {__MODULE__, user_id: user_id})
   end
 
   @doc """
@@ -115,7 +129,6 @@ defmodule Tornex.Scheduler.Bucket do
   The `pid` of the bucket belonging to the API key's user will be retrieved with `Tornex.Scheduler.Bucket.get_by_id/1`, and will be used to enqueue the query for that specific bucket.
 
   ## Options
-
     * `:timeout` - Timeout of the GenServer call in milliseconds (default: `60_000`)
   """
   @spec enqueue(query :: Tornex.Query.t() | Tornex.SpecQuery.t(), opts :: Keyword.t()) :: term()
@@ -173,9 +186,9 @@ defmodule Tornex.Scheduler.Bucket do
   """
   @spec get_by_id(user_id :: integer()) :: {:ok, pid()} | :error
   def get_by_id(user_id) when is_integer(user_id) do
-    case Registry.lookup(Tornex.Scheduler.BucketRegistry, user_id) do
-      [{pid, _}] -> {:ok, pid}
-      [] -> :error
+    case :global.whereis_name({Tornex.Scheduler.BucketRegistry, user_id}) do
+      pid when is_pid(pid) -> {:ok, pid}
+      _ -> :error
     end
   end
 
