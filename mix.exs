@@ -28,7 +28,6 @@ defmodule Tornex.MixProject do
   def deps do
     [
       {:jason, "~> 1.4"},
-      {:ex_hash_ring, "~> 7.0", optional: true},
       {:horde, "~> 0.9", optional: true},
       {:finch, "~> 0.19", optional: true},
       {:telemetry, "~> 1.3"},

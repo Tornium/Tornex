@@ -33,15 +33,12 @@ defmodule Tornex.Scheduler.Supervisor do
     children = [
       {Task.Supervisor, name: Tornex.Scheduler.TaskSupervisor},
       Tornex.Scheduler.Timer,
-      {Tornex.Scheduler.bucket_supervisor(), name: Tornex.Scheduler.BucketSupervisor, strategy: :one_for_one}
+      {
+        Tornex.Scheduler.bucket_supervisor(),
+        name: Tornex.Scheduler.BucketSupervisor, strategy: :one_for_one, members: :auto, process_redistribution: :active
+      },
+      {Tornex.Scheduler.bucket_registry(), name: Tornex.Scheduler.BucketRegistry, members: :auto, keys: :unique}
     ]
-
-    children =
-      if Tornex.local?() do
-        children
-      else
-        [{ExHashRing.Ring, name: Tornex.Scheduler.Ring} | children]
-      end
 
     Supervisor.init(children, strategy: :one_for_one)
   end

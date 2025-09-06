@@ -62,7 +62,9 @@ defmodule Tornex.Scheduler.Bucket do
       true
   """
   def start_link(opts \\ []) do
-    GenServer.start_link(__MODULE__, :ok, name: {:via, :global, {Tornex.Scheduler.BucketRegistry, opts[:user_id]}})
+    GenServer.start_link(__MODULE__, :ok,
+      name: {:via, Tornex.Scheduler.bucket_registry(), {Tornex.Scheduler.BucketRegistry, opts[:user_id]}}
+    )
   end
 
   @doc """
@@ -74,42 +76,26 @@ defmodule Tornex.Scheduler.Bucket do
 
   ## Examples
       iex> Tornex.Scheduler.Bucket.new(2383326)
-      #PID<0.105.0>
+      {:nonode@host, #PID<0.105.0>}
   """
-  @spec new(user_id :: integer()) :: pid() | nil
+  @spec new(user_id :: integer()) :: {node(), pid()} | nil
   def new(user_id) when is_integer(user_id) do
-    {_node, bucket} =
-      if Tornex.local?() do
-        {node(), do_start_bucket(user_id)}
-      else
-        {:ok, target_node} = Tornex.Scheduler.ClusterRing.user_node(user_id)
-
-        if target_node == node() do
-          {target_node, do_start_bucket(user_id)}
-        else
-          {target_node, :rpc.call(target_node, __MODULE__, :do_start_bucket, [user_id])}
-        end
-      end
+    bucket = do_start_bucket(user_id)
 
     case bucket do
       {:ok, pid} ->
         :telemetry.execute([:tornex, :bucket, :create], %{}, %{user: user_id, pid: pid})
-        pid
+        {node(pid), pid}
 
       {:ok, pid, _info} ->
         :telemetry.execute([:tornex, :bucket, :create], %{}, %{user: user_id, pid: pid})
-        pid
+        {node(pid), pid}
 
       {:error, {:already_started, pid}} ->
-        :telemetry.execute([:tornex, :bucket, :create_error], %{}, %{user: user_id, error: "Bucket already started"})
-        pid
+        {node(pid), pid}
 
       {:error, error} ->
         :telemetry.execute([:tornex, :bucket, :create_error], %{}, %{user: user_id, error: error})
-        nil
-
-      {:badrpc, _error} ->
-        # Only from using RPC to start the bucket on another node
         nil
 
       _ ->
@@ -135,13 +121,14 @@ defmodule Tornex.Scheduler.Bucket do
   def enqueue(query, opts \\ [])
 
   def enqueue(%Tornex.Query{key_owner: key_owner} = query, opts) when is_integer(key_owner) do
-    pid =
+    pid = 
       case get_by_id(key_owner) do
         {:ok, pid} ->
           pid
 
         :error ->
-          new(key_owner)
+          {_node, pid} = new(key_owner)
+          pid
       end
 
     enqueue(pid, query, opts)
