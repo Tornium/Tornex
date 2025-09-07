@@ -196,7 +196,7 @@ defmodule Tornex.Scheduler.Bucket do
   @impl true
   def init(opts \\ []) do
     ttl = Keyword.get(opts, :ttl, @bucket_ttl)
-    timeout = System.monotonic_time(:millisecond) + ttl
+    timeout = timeout(ttl)
 
     {:ok, %{query_priority_queue: [], pending_count: 0, ttl: ttl, timeout: timeout}, ttl}
   end
@@ -210,7 +210,7 @@ defmodule Tornex.Scheduler.Bucket do
       ) do
     # Add from to query in case the request is dumped for the reply to be sent
     query = %{query | origin: from}
-    timeout = System.monotonic_time(:millisecond) + ttl
+    timeout = timeout(ttl)
 
     cond do
       Tornex.Query.query_priority(query) == :user_request and pending_count < @bucket_capacity ->
@@ -270,14 +270,17 @@ defmodule Tornex.Scheduler.Bucket do
     :ok = Enum.each(dumped_queries, fn query -> make_request(query, query.origin) end)
 
     ttl =
-      case timeout - System.monotonic_time(:millisecond) do
-        t when t < 0 ->
+      cond do
+        is_nil(timeout) ->
+          :infinity
+
+        timeout - System.monotonic_time(:millisecond) < 0 ->
           # The timeout value is older than the current time. To be safe, we'll extend the timeout.
           ttl
 
-        t ->
+        true ->
           # The time remaining on the TTL before the dump signal was received.
-          t
+          timeout - System.monotonic_time(:millisecond)
       end
 
     {:noreply, state, ttl}
@@ -287,14 +290,34 @@ defmodule Tornex.Scheduler.Bucket do
   @impl true
   def handle_info(:timeout, %{query_priority_queue: query_priority_queue} = state)
       when query_priority_queue == [] do
-    Logger.info("Shutting down bucket due to timeout")
     {:stop, :shutdown, state}
   end
 
   @doc false
   @impl true
   def handle_info(:timeout, %{ttl: ttl} = state) do
-    Logger.warning("Failed to shut down bucket #{inspect(self())} as requests were pending")
+    {:noreply, state, ttl}
+  end
+
+  @doc false
+  @impl true
+  def handle_info(_msg, %{timeout: timeout, ttl: ttl} = state) do
+    # This is needed to catch extraneous messages and prevent the GenServer from crashing/restarting
+
+    ttl =
+      cond do
+        is_nil(timeout) ->
+          :infinity
+
+        timeout - System.monotonic_time(:millisecond) < 0 ->
+          # The timeout value is older than the current time. To be safe, we'll extend the timeout.
+          ttl
+
+        true ->
+          # The time remaining on the TTL before the dump signal was received.
+          timeout - System.monotonic_time(:millisecond)
+      end
+
     {:noreply, state, ttl}
   end
 
@@ -309,5 +332,14 @@ defmodule Tornex.Scheduler.Bucket do
     Task.Supervisor.async_nolink(Tornex.Scheduler.TaskSupervisor, fn ->
       make_request_task(query, from)
     end)
+  end
+
+  @spec timeout(ttl :: :infinity | integer()) :: integer() | nil
+  defp timeout(:infinity = _ttl) do
+    nil
+  end
+
+  defp timeout(ttl) when is_integer(ttl) do
+    System.monotonic_time(:millisecond) + ttl
   end
 end
