@@ -22,7 +22,7 @@ erl_crash.dump
 /.elixir_ls/
 
 # Ignore package tarball (built via "mix hex.build").
-tornix-*.tar
+tornex-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
