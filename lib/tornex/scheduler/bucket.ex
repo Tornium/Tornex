@@ -42,11 +42,16 @@ defmodule Tornex.Scheduler.Bucket do
         end)
       end)
       |> Task.await_many(timeout)
+
+  ## Bucket Timeouts
+  By default, the bucket will never time out when the bucket does not receive any requests. This can be configured in milliseconds globally using the `:bucket_ttl` configuration key or per-bucket using the `:ttl` option when starting the bucket. If the bucket does not receive any requests for the specified amount of time, the bucket will be stopped and removed from its supervisor. If a request is later enqueued for the removed bucket's user, a new bucket will be created.
   """
 
-  use GenServer
+  # This needs to be transient to ensure timed-out buckets are not restarted multiple times.
+  use GenServer, restart: :transient
 
   @bucket_capacity 10
+  @bucket_ttl Application.compile_env(:tornex, :bucket_ttl, :infinity)
 
   # Public API
   @doc """
@@ -54,15 +59,18 @@ defmodule Tornex.Scheduler.Bucket do
 
   ## Options
     * `:user_id` - (any) A required unique identifier for the user the bucket belongs to
+    * `:ttl` - (integer) Time in milliseconds before the bucket will be stopped without any requests (defaults to `:bucket_ttl`)
 
   ## Examples
-      iex> Tornex.Scheduler.Bucket.start_link(user_id: 2383326)
+      iex> Tornex.Scheduler.Bucket.start_link(user_id: 2383326, ttl: 10_000)
       {:ok, process}
       iex> is_pid(process)
       true
   """
   def start_link(opts \\ []) do
-    GenServer.start_link(__MODULE__, :ok,
+    GenServer.start_link(
+      __MODULE__,
+      opts,
       name: {:via, Tornex.Scheduler.bucket_registry(), {Tornex.Scheduler.BucketRegistry, opts[:user_id]}}
     )
   end
@@ -74,13 +82,16 @@ defmodule Tornex.Scheduler.Bucket do
 
   If there is an error in retrieving the `pid` of the bucket or an error in creating the bucket (e.g. maximum number of children in the supervisor reached), `nil` will be returned.
 
+  ## Options
+    * `:ttl` - (integer) Time in milliseconds before the bucket will be stopped without any requests (defaults to `:bucket_ttl`)
+
   ## Examples
       iex> Tornex.Scheduler.Bucket.new(2383326)
       {:nonode@host, #PID<0.105.0>}
   """
-  @spec new(user_id :: integer()) :: {node(), pid()} | nil
-  def new(user_id) when is_integer(user_id) do
-    bucket = do_start_bucket(user_id)
+  @spec new(user_id :: integer(), opts :: keyword()) :: {node(), pid()} | nil
+  def new(user_id, opts \\ []) when is_integer(user_id) do
+    bucket = do_start_bucket(user_id, opts)
 
     case bucket do
       {:ok, pid} ->
@@ -104,9 +115,10 @@ defmodule Tornex.Scheduler.Bucket do
   end
 
   @doc false
-  @spec do_start_bucket(user_id :: integer) :: DynamicSupervisor.on_start_child()
-  def do_start_bucket(user_id) do
-    Tornex.Scheduler.bucket_supervisor().start_child(Tornex.Scheduler.BucketSupervisor, {__MODULE__, user_id: user_id})
+  @spec do_start_bucket(user_id :: integer, opts :: keyword()) :: DynamicSupervisor.on_start_child()
+  def do_start_bucket(user_id, opts \\ []) do
+    opts = Keyword.put(opts, :user_id, user_id)
+    Tornex.Scheduler.bucket_supervisor().start_child(Tornex.Scheduler.BucketSupervisor, {__MODULE__, opts})
   end
 
   @doc """
@@ -182,8 +194,11 @@ defmodule Tornex.Scheduler.Bucket do
   # GenServer Callbacks
   @doc false
   @impl true
-  def init(_opts) do
-    {:ok, %{query_priority_queue: [], pending_count: 0}}
+  def init(opts \\ []) do
+    ttl = Keyword.get(opts, :ttl, @bucket_ttl)
+    timeout = System.monotonic_time(:millisecond) + ttl
+
+    {:ok, %{query_priority_queue: [], pending_count: 0, ttl: ttl, timeout: timeout}, ttl}
   end
 
   @doc false
@@ -191,27 +206,36 @@ defmodule Tornex.Scheduler.Bucket do
   def handle_call(
         {:enqueue, query},
         from,
-        %{query_priority_queue: query_priority_queue, pending_count: pending_count} = state
+        %{ttl: ttl, query_priority_queue: query_priority_queue, pending_count: pending_count} = state
       ) do
     # Add from to query in case the request is dumped for the reply to be sent
     query = %{query | origin: from}
+    timeout = System.monotonic_time(:millisecond) + ttl
 
     cond do
       Tornex.Query.query_priority(query) == :user_request and pending_count < @bucket_capacity ->
         # Request has a niceness indicating it's a user request and there's available space in the 
         # bucket to perform the request
         make_request(query, from)
-        state = Map.replace(state, :pending_count, pending_count + 1)
 
-        {:noreply, state}
+        state =
+          state
+          |> Map.replace(:pending_count, pending_count + 1)
+          |> Map.replace(:timeout, timeout)
+
+        {:noreply, state, ttl}
 
       Tornex.Query.query_priority(query) in [:user_request, :high_priority] and pending_count < 0.7 * @bucket_capacity ->
         # Request has a niceness indicating it's a user request or high priority and there's available 
         # space in the bucket to perform the request
         make_request(query, from)
-        state = Map.replace(state, :pending_count, pending_count + 1)
 
-        {:noreply, state}
+        state =
+          state
+          |> Map.replace(:pending_count, pending_count + 1)
+          |> Map.replace(:timeout, timeout)
+
+        {:noreply, state, ttl}
 
       true ->
         # Either:
@@ -222,15 +246,19 @@ defmodule Tornex.Scheduler.Bucket do
 
         # Sorts inserted query with higher priority queries at the start
         updated_queue = Enum.sort_by([query | query_priority_queue], & &1.nice, :asc)
-        state = Map.replace(state, :query_priority_queue, updated_queue)
 
-        {:noreply, state}
+        state =
+          state
+          |> Map.replace(:query_priority_queue, updated_queue)
+          |> Map.replace(:timeout, timeout)
+
+        {:noreply, state, ttl}
     end
   end
 
   @doc false
   @impl true
-  def handle_info(:dump, state) do
+  def handle_info(:dump, %{timeout: timeout, ttl: ttl} = state) do
     # TODO: Make this functionality synchronous to prevent race conditions
     {dumped_queries, remaining_queries} = Enum.split(state.query_priority_queue, @bucket_capacity - state.pending_count)
 
@@ -240,13 +268,34 @@ defmodule Tornex.Scheduler.Bucket do
       |> Map.replace(:query_priority_queue, remaining_queries)
 
     :ok = Enum.each(dumped_queries, fn query -> make_request(query, query.origin) end)
-    {:noreply, state}
+
+    ttl =
+      case timeout - System.monotonic_time(:millisecond) do
+        t when t < 0 ->
+          # The timeout value is older than the current time. To be safe, we'll extend the timeout.
+          ttl
+
+        t ->
+          # The time remaining on the TTL before the dump signal was received.
+          t
+      end
+
+    {:noreply, state, ttl}
   end
 
   @doc false
   @impl true
-  def handle_info(_msg, state) do
-    {:noreply, state}
+  def handle_info(:timeout, %{query_priority_queue: query_priority_queue} = state)
+      when query_priority_queue == [] do
+    Logger.info("Shutting down bucket due to timeout")
+    {:stop, :shutdown, state}
+  end
+
+  @doc false
+  @impl true
+  def handle_info(:timeout, %{ttl: ttl} = state) do
+    Logger.warning("Failed to shut down bucket #{inspect(self())} as requests were pending")
+    {:noreply, state, ttl}
   end
 
   # Utility functions

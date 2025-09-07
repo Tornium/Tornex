@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Added cluster mode
+- Added server-side bucket timeouts
 
 ### Removed
 - Removed `tornex.bucket.dump` telemetry event and PromEx counter

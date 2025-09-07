@@ -41,6 +41,7 @@ defmodule Tornex.Scheduler.Timer do
   @doc false
   def handle_info(:dump_signal, state) do
     children = DynamicSupervisor.which_children(Tornex.Scheduler.BucketSupervisor)
+    IO.puts("dumping")
     # TODO: Determine if each node will have its own dump timer for its own bucket supervisor
 
     Enum.each(children, fn
