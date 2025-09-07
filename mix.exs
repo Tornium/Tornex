@@ -28,6 +28,7 @@ defmodule Tornex.MixProject do
   def deps do
     [
       {:jason, "~> 1.4"},
+      {:horde, "~> 0.9", optional: true},
       {:finch, "~> 0.19", optional: true},
       {:telemetry, "~> 1.3"},
       {:prom_ex, "~> 1.11", optional: true},
@@ -52,7 +53,7 @@ defmodule Tornex.MixProject do
   def docs do
     [
       main: "readme",
-      extras: ["README.md", "LICENSE.md"]
+      extras: ["README.md", "LICENSE.md", "cluster.md"]
     ]
   end
 end

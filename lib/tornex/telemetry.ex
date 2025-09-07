@@ -85,7 +85,7 @@ defmodule Tornex.Telemetry do
 
   @doc false
   def handle_event([:tornex, :bucket, :create], _measurements, metadata, _opts) do
-    Logger.info("Bucket created for #{metadata.user}")
+    Logger.info("Bucket (#{inspect(metadata.pid)}) created for #{metadata.user}")
   end
 
   @doc false
