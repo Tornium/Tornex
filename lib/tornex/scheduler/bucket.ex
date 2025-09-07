@@ -322,15 +322,10 @@ defmodule Tornex.Scheduler.Bucket do
   end
 
   # Utility functions
-  @spec make_request_task(query :: Tornex.Query.t() | Tornex.SpecQuery.t(), from :: GenServer.from()) :: :ok
-  defp make_request_task(query, from) do
-    GenServer.reply(from, Tornex.API.get(query))
-  end
-
-  @spec make_request_task(query :: Tornex.Query.t() | Tornex.SpecQuery.t(), from :: GenServer.from()) :: Task.t()
+  @spec make_request(query :: Tornex.Query.t() | Tornex.SpecQuery.t(), from :: GenServer.from()) :: Task.t()
   defp make_request(query, from) do
     Task.Supervisor.async_nolink(Tornex.Scheduler.TaskSupervisor, fn ->
-      make_request_task(query, from)
+      GenServer.reply(from, Tornex.API.get(query))
     end)
   end
 
