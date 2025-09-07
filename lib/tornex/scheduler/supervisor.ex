@@ -35,7 +35,11 @@ defmodule Tornex.Scheduler.Supervisor do
       Tornex.Scheduler.Timer,
       {
         Tornex.Scheduler.bucket_supervisor(),
-        name: Tornex.Scheduler.BucketSupervisor, strategy: :one_for_one, members: :auto, process_redistribution: :active, restart: :transient
+        name: Tornex.Scheduler.BucketSupervisor,
+        strategy: :one_for_one,
+        members: :auto,
+        process_redistribution: :active,
+        restart: :transient
       },
       {Tornex.Scheduler.bucket_registry(), name: Tornex.Scheduler.BucketRegistry, members: :auto, keys: :unique}
     ]
