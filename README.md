@@ -1,13 +1,11 @@
 # Tornex
 An Elixir library providing robust API call planning and execution for the [Torn City](https://torn.com) API.
 
-> #### NOTE
-> Currently, tornex is intended to work on single-node deployments. Multi-node deployments will experience issues with ratelimiting.
-
 ## Features
 - Efficient API ratelimiting and planning using buckets and prioritized requests
 - `:telemetry`-based logging (with included support for [PromEx](https://hex.pm/packages/prom_ex))
 - Support for APIv1 and APIv2
+- Support for multiple BEAM nodes
 
 ## Roadmap
 - [ ] Per-IP/node global ratelimit
