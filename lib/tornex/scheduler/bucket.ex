@@ -121,7 +121,7 @@ defmodule Tornex.Scheduler.Bucket do
   def enqueue(query, opts \\ [])
 
   def enqueue(%Tornex.Query{key_owner: key_owner} = query, opts) when is_integer(key_owner) do
-    pid = 
+    pid =
       case get_by_id(key_owner) do
         {:ok, pid} ->
           pid
