@@ -53,7 +53,7 @@ defmodule Tornex.MixProject do
   def docs do
     [
       main: "readme",
-      extras: ["README.md", "LICENSE.md"]
+      extras: ["README.md", "LICENSE.md", "cluster.md"]
     ]
   end
 end
