@@ -21,7 +21,7 @@ by adding `tornex` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:tornex, "~> 0.4.0-rc.1"}
+    {:tornex, "~> 0.4.0-rc.2"}
   ]
 end
 ```
