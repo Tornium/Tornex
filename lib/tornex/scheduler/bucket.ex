@@ -290,6 +290,7 @@ defmodule Tornex.Scheduler.Bucket do
   @impl true
   def handle_info(:timeout, %{query_priority_queue: query_priority_queue} = state)
       when query_priority_queue == [] do
+    :telemetry.execute([:tornex, :bucket, :timeout], %{}, %{pid: self()})
     {:stop, :shutdown, state}
   end
 

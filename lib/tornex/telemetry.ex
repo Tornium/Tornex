@@ -36,6 +36,7 @@ defmodule Tornex.Telemetry do
       [:tornex, :api, :timeout],
       [:tornex, :bucket, :create],
       [:tornex, :bucket, :create_error],
+      [:tornex, :bucket, :timeout],
       [:tornex, :bucket, :enqueue]
     ]
 
@@ -91,6 +92,11 @@ defmodule Tornex.Telemetry do
   @doc false
   def handle_event([:tornex, :bucket, :create_error], _measurements, metadata, _opts) do
     Logger.error("Bucket creation failed for #{metadata.user} due to an error: #{inspect(metadata.error)}")
+  end
+
+  @doc false
+  def handle_event([:tornex, :bucket, :timeout], _measurements, metadata, _opts) do
+    Logger.debug("Bucket #{inspect(metadata.pid)} timed out")
   end
 
   @doc false

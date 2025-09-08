@@ -78,6 +78,12 @@ if Code.ensure_loaded?(PromEx) do
             counter(
               "tornex.bucket.create.error",
               event_name: [:tornex, :bucket, :create_error]
+            ),
+            counter(
+              "tornex.bucket.timeout",
+              event_name: [:tornex, :bucket, :timeout],
+              description: "Number of buckets that timed out.",
+              measurement: :total
             )
           ]
         )
