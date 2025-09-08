@@ -113,7 +113,14 @@ if Code.ensure_loaded?(PromEx) do
     end
 
     def execute_bucket_count_metric() do
-      %{workers: count} = Tornex.Scheduler.bucket_supervisor().count_children(Tornex.Scheduler.BucketSupervisor)
+      count =
+        if Tornex.Scheduler.BucketSupervisor |> Process.whereis() |> is_nil() do
+          0
+        else
+          %{workers: count} = Tornex.Scheduler.bucket_supervisor().count_children(Tornex.Scheduler.BucketSupervisor)
+          count
+        end
+
       :telemetry.execute([:tornex, :bucket, :count], %{count: count}, %{})
     end
   end
