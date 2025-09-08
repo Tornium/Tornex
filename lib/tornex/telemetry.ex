@@ -26,19 +26,27 @@ defmodule Tornex.Telemetry do
 
   @doc """
   Attaches the default Tornex `:telemetry` handler built on-top of `Logger`.
+
+  ## Options
+    * `:ignored` - (list) List of events to not be attached
+    * `:encode` - (bool)
+    * `:level` - (atom) Minimum log level for telemetry events
   """
   @spec attach_default_logger(opts :: Keyword.t()) :: :ok | {:error, :already_exists}
   def attach_default_logger(opts \\ []) when is_list(opts) do
-    events = [
-      [:tornex, :api, :start],
-      [:tornex, :api, :finish],
-      [:tornex, :api, :error],
-      [:tornex, :api, :timeout],
-      [:tornex, :bucket, :create],
-      [:tornex, :bucket, :create_error],
-      [:tornex, :bucket, :timeout],
-      [:tornex, :bucket, :enqueue]
-    ]
+    ignored_events = Keyword.get(opts, :ignored, [])
+
+    events =
+      [
+        [:tornex, :api, :start],
+        [:tornex, :api, :finish],
+        [:tornex, :api, :error],
+        [:tornex, :api, :timeout],
+        [:tornex, :bucket, :create],
+        [:tornex, :bucket, :create_error],
+        [:tornex, :bucket, :timeout],
+        [:tornex, :bucket, :enqueue]
+      ] -- ignored_events
 
     opts =
       opts
