@@ -82,8 +82,7 @@ if Code.ensure_loaded?(PromEx) do
             counter(
               "tornex.bucket.timeout",
               event_name: [:tornex, :bucket, :timeout],
-              description: "Number of buckets that timed out.",
-              measurement: :total
+              description: "Number of buckets that timed out."
             )
           ]
         )
@@ -104,8 +103,7 @@ if Code.ensure_loaded?(PromEx) do
             last_value(
               "tornex.bucket.count",
               event_name: [:tornex, :bucket, :count],
-              description: "Total number of buckets across all nodes.",
-              measurement: :total
+              description: "Total number of buckets across all nodes."
             )
           ]
         )
