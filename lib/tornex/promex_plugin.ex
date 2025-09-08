@@ -83,5 +83,32 @@ if Code.ensure_loaded?(PromEx) do
         )
       ]
     end
+
+    @doc false
+    @impl true
+    def polling_metrics(opts \\ []) do
+      poll_rate = Keyword.get(opts, :poll_rate, 5_000)
+
+      [
+        Polling.build(
+          :tornex_bucket_count,
+          poll_rate,
+          {__MODULE__, :execute_bucket_count_metric, []},
+          [
+            last_value(
+              "tornex.bucket.count",
+              event_name: [:tornex, :bucket, :count],
+              description: "Total number of buckets across all nodes.",
+              measurement: :total
+            )
+          ]
+        )
+      ]
+    end
+
+    def execute_bucket_count_metric() do
+      %{workers: count} = Tornex.Scheduler.bucket_supervisor().count_children(Tornex.Scheduler.BucketSupervisor)
+      :telemetry.execute([:tornex, :bucket, :count], %{count: count}, %{})
+    end
   end
 end
