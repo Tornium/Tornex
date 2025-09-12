@@ -132,7 +132,8 @@ defmodule Tornex.Scheduler.Bucket do
   @spec enqueue(query :: Tornex.Query.t() | Tornex.SpecQuery.t(), opts :: Keyword.t()) :: term()
   def enqueue(query, opts \\ [])
 
-  def enqueue(%Tornex.Query{key_owner: key_owner} = query, opts) when is_integer(key_owner) do
+  def enqueue(%{key_owner: key_owner} = query, opts)
+      when is_integer(key_owner) and (is_struct(query, Tornex.Query) or is_struct(query, Tornex.SpecQuery)) do
     pid =
       case get_by_id(key_owner) do
         {:ok, pid} ->
