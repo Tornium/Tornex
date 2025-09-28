@@ -27,7 +27,6 @@ defmodule Tornex.MixProject do
   # Run "mix help deps" to learn about dependencies.
   def deps do
     [
-      {:jason, "~> 1.4"},
       {:horde, "~> 0.9", optional: true},
       {:finch, "~> 0.19", optional: true},
       {:telemetry, "~> 1.3"},

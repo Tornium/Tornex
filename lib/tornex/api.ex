@@ -39,7 +39,7 @@ defmodule Tornex.API do
   @http_client Application.compile_env(:tornex, :client, Tornex.HTTP.FinchClient)
 
   @type return :: list() | map()
-  @type error :: {:error, :cf_challenge | :unknown | :content_type | Jason.DecodeError.t() | term()}
+  @type error :: {:error, :cf_challenge | :unknown | :content_type | JSON.decode_error_reason() | term()}
 
   @base_url Application.compile_env(:tornex, :base_url, "https://api.torn.com")
   @comment Application.compile_env(:tornex, :comment, "tex-" <> Mix.Project.config()[:version])
@@ -264,7 +264,7 @@ defmodule Tornex.API do
   # TODO: Parse error responses into new error struct
   defp handle_response({:ok, _status, response_headers, response_body}, _query) do
     if Map.get(response_headers, "content-type") == "application/json" do
-      case Jason.decode(response_body) do
+      case JSON.decode(response_body) do
         {:ok, parsed_body} -> parsed_body
         {:error, _} = error -> error
       end
