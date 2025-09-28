@@ -214,9 +214,11 @@ defmodule Tornex.Scheduler.Bucket do
     timeout = timeout(ttl)
 
     cond do
-      Tornex.Query.query_priority(query) == :user_request and pending_count < @bucket_capacity ->
+      Tornex.Query.query_priority(query) == :user_request and pending_count < @bucket_capacity and
+          not Tornex.NodeRatelimiter.ratelimited?() ->
         # Request has a niceness indicating it's a user request and there's available space in the 
-        # bucket to perform the request
+        # bucket to perform the request. Additionally, this node is not ratelimited so the request can
+        # be made.
         make_request(query, from)
 
         state =
@@ -226,9 +228,11 @@ defmodule Tornex.Scheduler.Bucket do
 
         {:noreply, state, ttl}
 
-      Tornex.Query.query_priority(query) in [:user_request, :high_priority] and pending_count < 0.7 * @bucket_capacity ->
+      Tornex.Query.query_priority(query) in [:user_request, :high_priority] and pending_count < 0.7 * @bucket_capacity and
+          not Tornex.NodeRatelimiter.ratelimited?() ->
         # Request has a niceness indicating it's a user request or high priority and there's available 
-        # space in the bucket to perform the request
+        # space in the bucket to perform the request. Additionally, this node is not ratelimited so the
+        # request can be made.
         make_request(query, from)
 
         state =
@@ -244,6 +248,8 @@ defmodule Tornex.Scheduler.Bucket do
         #    available space in the bucket to perform the request and thus is queued
         #  - Request has a niceness of greater than 0 and therefore isn't high enough priority and should
         #    be queued
+        #  - The node was ratelimited when the request was enqueued, so the query was enqueued until the
+        #    node is not ratelimited anymore (while the dump signal is sent).
 
         # Sorts inserted query with higher priority queries at the start
         updated_queue = Enum.sort_by([query | query_priority_queue], & &1.nice, :asc)
@@ -261,30 +267,37 @@ defmodule Tornex.Scheduler.Bucket do
   @impl true
   def handle_info(:dump, %{timeout: timeout, ttl: ttl} = state) do
     # TODO: Make this functionality synchronous to prevent race conditions
-    {dumped_queries, remaining_queries} = Enum.split(state.query_priority_queue, @bucket_capacity - state.pending_count)
 
-    state =
-      state
-      |> Map.replace(:pending_count, 0)
-      |> Map.replace(:query_priority_queue, remaining_queries)
+    if Tornex.NodeRatelimiter.ratelimited?() do
+      # The node is ratelimited so queries can't be dumped.
+      {:noreply, state, ttl}
+    else
+      {dumped_queries, remaining_queries} =
+        Enum.split(state.query_priority_queue, @bucket_capacity - state.pending_count)
 
-    :ok = Enum.each(dumped_queries, fn query -> make_request(query, query.origin) end)
+      state =
+        state
+        |> Map.replace(:pending_count, 0)
+        |> Map.replace(:query_priority_queue, remaining_queries)
 
-    ttl =
-      cond do
-        is_nil(timeout) ->
-          :infinity
+      :ok = Enum.each(dumped_queries, fn query -> make_request(query, query.origin) end)
 
-        timeout - System.monotonic_time(:millisecond) < 0 ->
-          # The timeout value is older than the current time. To be safe, we'll extend the timeout.
-          ttl
+      ttl =
+        cond do
+          is_nil(timeout) ->
+            :infinity
 
-        true ->
-          # The time remaining on the TTL before the dump signal was received.
-          timeout - System.monotonic_time(:millisecond)
-      end
+          timeout - System.monotonic_time(:millisecond) < 0 ->
+            # The timeout value is older than the current time. To be safe, we'll extend the timeout.
+            ttl
 
-    {:noreply, state, ttl}
+          true ->
+            # The time remaining on the TTL before the dump signal was received.
+            timeout - System.monotonic_time(:millisecond)
+        end
+
+      {:noreply, state, ttl}
+    end
   end
 
   @doc false

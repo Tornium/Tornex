@@ -37,7 +37,7 @@ end
 ```
 
 ## Usage
-Add the supervisor `Tornex.Scheduler.Supervisor` to your application supervisor. If you are using the default telemetry handler using `Tornex.Telemetry.attach_default_handler`, make sure to start the handler before starting the supervisor.
+Add the supervisor `Tornex.Scheduler.Supervisor` and `Tornex.NodeRatelimiter` to your application supervisor. If you are using the default telemetry handler using `Tornex.Telemetry.attach_default_handler`, make sure to start the handler before starting the supervisor.
 
 <!-- tabs-open -->
 ### APIv1

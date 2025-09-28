@@ -39,7 +39,8 @@ defmodule Tornex.API do
   @http_client Application.compile_env(:tornex, :client, Tornex.HTTP.FinchClient)
 
   @type return :: list() | map()
-  @type error :: {:error, :cf_challenge | :unknown | :content_type | JSON.decode_error_reason() | term()}
+  @type error ::
+          {:error, :cf_challenge | :unknown | :content_type | :ip_ratelimit | JSON.decode_error_reason() | term()}
 
   @base_url Application.compile_env(:tornex, :base_url, "https://api.torn.com")
   @comment Application.compile_env(:tornex, :comment, "tex-" <> Mix.Project.config()[:version])
@@ -186,6 +187,12 @@ defmodule Tornex.API do
 
   @spec handle_response(response :: Tornex.HTTP.Client.response(), query :: Tornex.Query.t() | Tornex.SpecQuery.t()) ::
           return() | error()
+  defp handle_response({:ok, 429 = _status, _response_headers, _response_body}, _query) do
+    # TODO: Disable requests on this IP
+    # TODO: Stop all in-flight requests on this IP
+    {:error, :ip_ratelimit}
+  end
+
   defp handle_response({:ok, 403 = _status, response_headers, response_body}, _query) do
     if Map.get(response_headers, "cf-mitigated") == "challenge" do
       {:error, :cf_challenge}
@@ -198,8 +205,16 @@ defmodule Tornex.API do
   defp handle_response({:ok, _status, response_headers, response_body}, _query) do
     if Map.get(response_headers, "content-type") == "application/json" do
       case JSON.decode(response_body) do
-        {:ok, parsed_body} -> parsed_body
-        {:error, _} = error -> error
+        {:ok, %{"error" => %{"code" => 8}}} ->
+          Tornex.NodeRatelimiter.set_ratelimited()
+          # TODO: Stop all in-flight requests on this IP
+          {:error, :ip_ratelimit}
+
+        {:ok, parsed_body} ->
+          parsed_body
+
+        {:error, _} = error ->
+          error
       end
     else
       {:error, :content_type}
