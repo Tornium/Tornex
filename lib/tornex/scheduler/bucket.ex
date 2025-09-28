@@ -270,6 +270,20 @@ defmodule Tornex.Scheduler.Bucket do
 
     if Tornex.NodeRatelimiter.ratelimited?() do
       # The node is ratelimited so queries can't be dumped.
+      ttl =
+        cond do
+          is_nil(timeout) ->
+            :infinity
+
+          timeout - System.monotonic_time(:millisecond) < 0 ->
+            # The timeout value is older than the current time. To be safe, we'll extend the timeout.
+            ttl
+
+          true ->
+            # The time remaining on the TTL before the dump signal was received.
+            timeout - System.monotonic_time(:millisecond)
+        end
+
       {:noreply, state, ttl}
     else
       {dumped_queries, remaining_queries} =
