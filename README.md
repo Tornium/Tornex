@@ -6,9 +6,11 @@ An Elixir library providing robust API call planning and execution for the [Torn
 - `:telemetry`-based logging (with included support for [PromEx](https://hex.pm/packages/prom_ex))
 - Support for APIv1 and APIv2
 - Support for multiple BEAM nodes
+- Support for multi-node clusters
+- Support for per-node API ratelimiting
 
 ## Roadmap
-- [ ] Per-IP/node global ratelimit
+- [x] Per-node global ratelimit
 - [ ] Combine similar queries to reduce throughput
 - [x] Multi-node support
 - [ ] APIv2 struct coalescing using [torngen](https://github.com/Tornium/torngen)
