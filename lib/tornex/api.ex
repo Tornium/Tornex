@@ -137,7 +137,7 @@ defmodule Tornex.API do
 
     # TODO: Validate query
     headers = %{"User-Agent" => user_agent(), "Content-Type" => "application/json"}
-    {latency, response} = :timer.tc(&@http_client.get/2, [query_to_url(query), headers])
+    {latency, response} = :timer.tc(&@http_client.get/2, [query_to_url(query), headers], :millisecond)
 
     :telemetry.execute([:tornex, :api, :finish], %{latency: latency}, %{
       resource: query.resource,
@@ -173,7 +173,7 @@ defmodule Tornex.API do
     }
 
     # TODO: Validate query
-    {latency, response} = :timer.tc(&@http_client.get/2, [query_to_url(query), headers])
+    {latency, response} = :timer.tc(&@http_client.get/2, [query_to_url(query), headers], :millisecond)
 
     :telemetry.execute([:tornex, :api, :finish], %{latency: latency}, %{
       resource: "v2/#{resource}",

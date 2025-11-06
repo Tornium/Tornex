@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - [BREAKING] Changed minimum Elixir version from 1.16 to 1.18
+- [BREAKING] Changed `tornex.api.finish` to properly report latency in milliseconds
 
 ### Removed
 - Removed `Jason` dependency
