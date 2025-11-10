@@ -188,8 +188,9 @@ defmodule Tornex.API do
   @spec handle_response(response :: Tornex.HTTP.Client.response(), query :: Tornex.Query.t() | Tornex.SpecQuery.t()) ::
           return() | error()
   defp handle_response({:ok, 429 = _status, _response_headers, _response_body}, _query) do
-    # TODO: Disable requests on this IP
     # TODO: Stop all in-flight requests on this IP
+    Tornex.NodeRatelimiter.set_ratelimited()
+
     {:error, :ip_ratelimit}
   end
 
