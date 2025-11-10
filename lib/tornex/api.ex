@@ -188,7 +188,6 @@ defmodule Tornex.API do
   @spec handle_response(response :: Tornex.HTTP.Client.response(), query :: Tornex.Query.t() | Tornex.SpecQuery.t()) ::
           return() | error()
   defp handle_response({:ok, 429 = _status, _response_headers, _response_body}, _query) do
-    # TODO: Stop all in-flight requests on this IP
     Tornex.NodeRatelimiter.set_ratelimited()
 
     {:error, :ip_ratelimit}
@@ -208,7 +207,7 @@ defmodule Tornex.API do
       case JSON.decode(response_body) do
         {:ok, %{"error" => %{"code" => 8}}} ->
           Tornex.NodeRatelimiter.set_ratelimited()
-          # TODO: Stop all in-flight requests on this IP
+
           {:error, :ip_ratelimit}
 
         {:ok, parsed_body} ->
