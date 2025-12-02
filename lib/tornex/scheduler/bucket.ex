@@ -169,8 +169,7 @@ defmodule Tornex.Scheduler.Bucket do
     :telemetry.execute([:tornex, :bucket, :enqueue], %{}, %{
       selections: selections,
       resource: base_path |> String.split("/") |> Enum.at(0),
-      # TODO: Get ID from query
-      resource_id: nil,
+      resource_id: Tornex.SpecQuery.resource_id!(query),
       user: key_owner
     })
 

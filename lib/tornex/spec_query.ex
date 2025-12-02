@@ -230,8 +230,11 @@ defmodule Tornex.SpecQuery do
     |> Map.new()
   end
 
+  @doc """
+  Get the base path of the query.
+  """
   @spec base_path!(query :: t()) :: String.t()
-  defp base_path!(%__MODULE__{paths: paths} = _query) do
+  def base_path!(%__MODULE__{paths: paths} = _query) do
     bases =
       paths
       |> Enum.map(fn path ->
@@ -246,14 +249,70 @@ defmodule Tornex.SpecQuery do
     end
   end
 
+  @doc """
+  Get a list of selections used in the query.
+  """
   @spec selections!(query :: t()) :: [String.t()]
-  defp selections!(%__MODULE__{paths: paths} = _query) do
+  def selections!(%__MODULE__{paths: paths} = _query) do
     paths
     |> Enum.map(fn path ->
       {_base, selection} = path.path_selection()
       selection
     end)
     |> Enum.uniq()
+  end
+
+  @doc """
+  Get the resource for the paths used in the query.
+  """
+  @spec resource!(query :: t()) :: String.t()
+  def resource!(%__MODULE__{} = query) do
+    query
+    |> base_path!()
+    |> String.split("/")
+    |> Enum.at(0)
+  end
+
+  @doc """
+  Get the resource ID used in the query.
+
+  The resource ID is the variable path parameter in some Torn API OpenAPI specification paths. For example, the resource
+  ID of `/user/{id}/basic` would be the value the `{id}` path parameter resolves to. Path parameters that are not `{id}`
+  are less common, but would still apply to this; for example, `/forum/{categoryIds}/threads` would be `{categoryIds}`.
+
+  However, not all specification paths have a resource ID though (e.g. `/faction/warfare`) and these apply to the 
+  "owner" of the resource or apply to everyone. For resources such as `user`, the "owner" is the user themself; but
+  for the `faction` resource, the "owner" is any member of the faction (typically any member of the faction with API
+  Access permissions).
+  """
+  @spec resource_id!(query :: t()) :: parameter() | nil
+  def resource_id!(%__MODULE__{paths: paths, parameters: parameters} = _query) do
+    found_parameters =
+      Enum.filter(parameters, fn {parameter_name, parameter_value} ->
+        Enum.any?(paths, fn path ->
+          case path.parameter(parameter_name, parameter_value) do
+            {:path, path_parameter_name, _value} -> parameter_name == path_parameter_name
+            _ -> false
+          end
+        end)
+      end)
+
+    case found_parameters do
+      [] ->
+        # There were no matching path paramters found. Either no resource ID was provided when the query
+        # struct was constructed; OR there is no resource owner. We can assume that there is no resource
+        # owner as a missing path parameter will be handled when the query is executed by the scheduler.
+        nil
+
+      [{parameter_name, _parameter_value} = resource_id_parameter] when is_atom(parameter_name) ->
+        resource_id_parameter
+
+      _ when is_list(found_parameters) and length(found_parameters) > 1 ->
+        # There should only ever be one path parameter in the Torn API OpenAPI specification. If there are
+        # more, either the specification was updated; OR there's an issue with the parsing of the query
+        # or the query itself.
+        raise "There were #{length(found_parameters)} path parameters found, but only 1 was expected"
+    end
   end
 
   @spec insert_url_path_parameters(uri :: URI.t(), paths :: [atom()], parameters: [parameter()]) :: URI.t()

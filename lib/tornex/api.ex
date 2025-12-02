@@ -128,6 +128,8 @@ defmodule Tornex.API do
   """
   @spec get(Tornex.Query.t()) :: map() | list() | error()
   def get(%Tornex.Query{} = query) do
+    # TODO: prevent the request when the node is ratelimited
+
     :telemetry.execute([:tornex, :api, :start], %{}, %{
       resource: query.resource,
       resource_id: query.resource_id,
@@ -151,6 +153,8 @@ defmodule Tornex.API do
 
   @spec get(Tornex.SpecQuery.t()) :: binary() | error()
   def get(%Tornex.SpecQuery{key: api_key} = query) when is_binary(api_key) do
+    # TODO: prevent the request when the node is ratelimited
+
     {path, selections} = Tornex.SpecQuery.path_selections!(query)
 
     resource =
@@ -160,8 +164,7 @@ defmodule Tornex.API do
 
     :telemetry.execute([:tornex, :api, :start], %{}, %{
       resource: "v2/#{resource}",
-      # TODO: Determine the resource ID from the parameters
-      resource_id: nil,
+      resource_id: Tornex.SpecQuery.resource_id!(query),
       selections: selections,
       user: query.key_owner
     })
