@@ -127,7 +127,7 @@ defmodule Tornex.Scheduler.QueryRegistry do
 
     # To filter conflicting parameters, we want to want to find the set of queries with the largest number of unique paths
     # where the set of queries does not have any parameters with equal keys and differing values.
-    overlapping_queries = filter_parameter_collisions(overlapping_queries) |> IO.inspect()
+    overlapping_queries = filter_parameter_collisions(overlapping_queries)
 
     # Additionally, only the following can be merged:
     #  - public queries into a public query
@@ -147,7 +147,7 @@ defmodule Tornex.Scheduler.QueryRegistry do
     # If there is that SpecQuery with non-public queries, we can merge all public into it. Otherwise, all public queries should be
     # merged into a SpecQUery with only public queries.
 
-    non_public_queries = 
+    non_public_queries =
       Enum.filter(overlapping_queries, fn query ->
         Enum.any?(query.paths, fn path -> Enum.member?(non_public_paths, path) end)
       end)
@@ -171,8 +171,11 @@ defmodule Tornex.Scheduler.QueryRegistry do
     |> Enum.max_by(&count_unique_paths/1, fn -> [] end)
   end
 
-  defp all_subsets(queries) when is_list(queries) do
-    # Generate all subsets of combinations of queries
+  @doc """
+  Generate a list of all possible subsets of the combinations of queries.
+  """
+  @spec all_subsets(queries :: [Tornex.SpecQuery.t()]) :: [[Tornex.SpecQuery.t()]]
+  def all_subsets(queries) when is_list(queries) do
     count = length(queries)
     maximum = :math.pow(2, count) |> round()
 
@@ -181,11 +184,17 @@ defmodule Tornex.Scheduler.QueryRegistry do
     end
   end
 
+  @doc """
+  Determine if a list of queries is "conflict free".
+
+  For the list of queries to be "conflict free", all of the queries must have one unique value for
+  each parameter key-value pair.
+  """
   @spec conflict_free?(queries :: [Tornex.SpecQuery.t()]) :: boolean()
-  defp conflict_free?(queries) do
+  def conflict_free?(queries) do
     queries
     |> Enum.flat_map(& &1.parameters)
-    |> Enum.group_by(fn {key, _} -> key end)
+    |> Enum.group_by(fn {key, _value} -> key end)
     |> Enum.all?(fn {_key, pairs} ->
       pairs
       |> Enum.map(fn {_key, value} -> value end)
@@ -194,6 +203,9 @@ defmodule Tornex.Scheduler.QueryRegistry do
     end)
   end
 
+  @doc """
+  Get the number of unique paths in a list of queries.
+  """
   @spec count_unique_paths(queries :: [Tornex.SpecQuery.t()]) :: non_neg_integer()
   def count_unique_paths(queries) when is_list(queries) do
     queries

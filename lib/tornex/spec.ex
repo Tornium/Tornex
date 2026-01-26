@@ -49,7 +49,7 @@ defmodule Tornex.Spec do
   @spec path_module_public?(path_module :: module()) :: boolean()
   def path_module_public?(path_module) when is_atom(path_module) do
     # TODO: Test this
-    
+
     # We can determine if there are different responses depending on the invoker (determining if the caller "owns"
     # the resource + resource ID) by checking:
     #  - The description of the path is of form: "Requires ... key. ... when requesting ...".
@@ -76,15 +76,20 @@ defmodule Tornex.Spec do
       _path_response_modules
     ] = path_module_docs(path_module)
 
-    path_parameters
-    |> String.split("\n- ")
-    |> Enum.find(fn parameter -> String.starts_with?(parameter, "key: API key") end)
-    |> String.split(["(", ")"])
-    |> Enum.at(1)
-    |> String.downcase()
-    |> String.to_existing_atom()
+    key_type_string = 
+      path_parameters
+      |> String.split("\n- ")
+      |> Enum.find(fn parameter -> String.starts_with?(parameter, "key: API key") end)
+      |> String.split(["(", ")"])
+      |> Enum.at(1)
+      |> String.downcase()
 
-    # TODO: Ensure that the response atom is one of the API key types
+    case key_type_string do
+      "public" -> :public
+      "minimal" -> :minimal
+      "limited" -> :limited
+      "full" -> :full
+    end
   end
 
   @doc """

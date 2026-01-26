@@ -13,7 +13,8 @@
 # limitations under the License.
 
 defmodule Tornex.Test.QueryRegistry do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
+  import Tornex.ListAssertions
   alias Tornex.SpecQuery
 
   test "insert queries with different resources" do
@@ -28,12 +29,12 @@ defmodule Tornex.Test.QueryRegistry do
     assert %{
              "user" => %{
                nil => %{
-                 "basic" => [query_user]
+                 "basic" => [^query_user]
                }
              },
              "faction" => %{
                nil => %{
-                 "revives" => [query_faction]
+                 "revives" => [^query_faction]
                }
              }
            } = :sys.get_state(pid)
@@ -57,8 +58,8 @@ defmodule Tornex.Test.QueryRegistry do
     assert %{
              "user" => %{
                nil => %{
-                 "basic" => [query_basic],
-                 "attacks" => [query_attacks, query_basic]
+                 "basic" => [^query_basic],
+                 "attacks" => [^query_attacks, ^query_basic]
                }
              }
            } = :sys.get_state(pid)
@@ -86,11 +87,145 @@ defmodule Tornex.Test.QueryRegistry do
 
     assert %{
              "user" => %{
-               {:id, 1} => %{"basic" => [query_one], "bounties" => [query_one]},
-               {:id, 2} => %{"basic" => [query_two]}
+               {:id, 1} => %{"basic" => [^query_one], "bounties" => [^query_one]},
+               {:id, 2} => %{"basic" => [^query_two]}
              }
            } = :sys.get_state(pid)
 
     DynamicSupervisor.stop(pid)
+  end
+
+  test "pull similar overlapping queries with no resource ID" do
+    # Public selections for no resource ID and the same key owner (applying as the resource ID
+    # for user resources) should be combined.
+
+    query_one =
+      SpecQuery.new(key_owner: 1)
+      |> SpecQuery.put_path(Torngen.Client.Path.User.Basic)
+
+    query_two =
+      SpecQuery.new(key_owner: 1)
+      |> SpecQuery.put_path(Torngen.Client.Path.User.Bounties)
+
+    state = %{
+      "user" => %{
+        nil => %{
+          "basic" => [query_one],
+          "bounties" => [query_two]
+        }
+      }
+    }
+
+    similar_one = Tornex.Scheduler.QueryRegistry.find_similar(query_one, state)
+    similar_two = Tornex.Scheduler.QueryRegistry.find_similar(query_two, state)
+    assert_unordered([^query_one, ^query_two], similar_one)
+    assert_unordered([^query_one, ^query_two], similar_two)
+  end
+
+  test "pull similar non-overlapping queries with no resource ID and different key owners" do
+    # These queries are not overlapping as they do not have a resource ID so the resource owner is 
+    # the resource ID the operation is running against.
+
+    query_one =
+      SpecQuery.new(key_owner: 1)
+      |> SpecQuery.put_path(Torngen.Client.Path.User.Basic)
+
+    query_two =
+      SpecQuery.new(key_owner: 2)
+      |> SpecQuery.put_path(Torngen.Client.Path.User.Basic)
+
+    state = %{
+      "user" => %{
+        nil => %{
+          "basic" => [query_one, query_two],
+        }
+      }
+    }
+
+    similar_one = Tornex.Scheduler.QueryRegistry.find_similar(query_one, state)
+    similar_two = Tornex.Scheduler.QueryRegistry.find_similar(query_two, state)
+    assert_unordered([^query_one], similar_one)
+    assert_unordered([^query_two], similar_two)
+  end
+
+  test "pull similar overlapping queries with no resource ID and different key owners" do
+    # These queries are overlapping despite not having a resource ID and different key
+    # owners as the data is shared globally across all users.
+
+    query_one =
+      SpecQuery.new(key_owner: 1)
+      |> SpecQuery.put_path(Torngen.Client.Path.Torn.Crimes)
+
+    query_two =
+      SpecQuery.new(key_owner: 1)
+      |> SpecQuery.put_path(Torngen.Client.Path.Torn.Items)
+
+    state = %{
+      "torn" => %{
+        nil => %{
+          "crimes" => [query_one],
+          "items" => [query_two]
+        }
+      }
+    }
+
+    similar_one = Tornex.Scheduler.QueryRegistry.find_similar(query_one, state)
+    similar_two = Tornex.Scheduler.QueryRegistry.find_similar(query_two, state)
+    assert_unordered([^query_one, ^query_two], similar_one)
+    assert_unordered([^query_one, ^query_two], similar_two)
+  end
+
+  test "pull similar overlapping queries with the same resource ID" do
+    query_one =
+      SpecQuery.new(key_owner: 1)
+      |> SpecQuery.put_path(Torngen.Client.Path.User.Id.Basic)
+      |> SpecQuery.put_parameter(:id, 2383326)
+
+    query_two =
+      SpecQuery.new(key_owner: 1)
+      |> SpecQuery.put_path(Torngen.Client.Path.User.Id.Faction)
+      |> SpecQuery.put_parameter(:id, 2383326)
+
+    state = %{
+      "user" => %{
+        {:id, 2383326} => %{
+          "basic" => [query_one],
+          "faction" => [query_two]
+        }
+      }
+    }
+
+    similar_one = Tornex.Scheduler.QueryRegistry.find_similar(query_one, state)
+    similar_two = Tornex.Scheduler.QueryRegistry.find_similar(query_two, state)
+    assert_unordered([^query_one, ^query_two], similar_one)
+    assert_unordered([^query_one, ^query_two], similar_two)
+  end
+
+  test "pull similar non-overlapping with different resource IDs" do
+    query_one =
+      SpecQuery.new(key_owner: 1)
+      |> SpecQuery.put_path(Torngen.Client.Path.User.Id.Basic)
+      |> SpecQuery.put_parameter(:id, 2383326)
+
+    query_two =
+      SpecQuery.new(key_owner: 1)
+      |> SpecQuery.put_path(Torngen.Client.Path.User.Id.Basic)
+      |> SpecQuery.put_parameter(:id, 1)
+
+    state = %{
+      "user" => %{
+        {:id, 2383326} => %{
+          "basic" => [query_one],
+        },
+        {:id, 1} => %{
+          "basic" => [query_two]
+        }
+      }
+    }
+
+    similar_one = Tornex.Scheduler.QueryRegistry.find_similar(query_one, state)
+    similar_two = Tornex.Scheduler.QueryRegistry.find_similar(query_two, state)
+    assert_unordered([^query_one], similar_one)
+    assert_unordered([^query_two], similar_two)
   end
 end

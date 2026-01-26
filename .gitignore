@@ -31,3 +31,4 @@ tornex-*.tar
 .iex.exs
 
 openapi.json
+.tool-versions
