@@ -115,11 +115,11 @@ defmodule Tornex.Scheduler.QueryRegistry do
     `user/{id}/basic`).
     4) Not have an additional permission required such as faction API access.
   """
-  @spec merge_similar(query :: Tornex.SpecQuery.t(), state :: map()) :: [Tornex.SpecQuery.t()]
+  @spec merge_similar(query :: Tornex.SpecQuery.t(), state :: map()) :: Tornex.SpecQuery.t()
   def merge_similar(%Tornex.SpecQuery{} = query, state) when is_map(state) do
     resource = Tornex.SpecQuery.resource!(query)
     resource_id = Tornex.SpecQuery.resource_id!(query)
-    selections = Tornex.SpecQuery.selections!(query)
+    # selections = Tornex.SpecQuery.selections!(query)
 
     # We need to find all queries that have a matching resource and resource ID. This is the bare minimum
     # for matching queries but will substantially reduce potential matches.
@@ -140,11 +140,7 @@ defmodule Tornex.Scheduler.QueryRegistry do
     #  - The queries must not require an additional in-game permission such as faction API access. This can be ensuring
     #    the minimum API key is a public key.
 
-    # To filter conflicting parameters, we want to want to find the set of queries with the largest number of unique paths
-    # where the set of queries does not have any parameters with equal keys and differing values.
-    overlapping_queries = filter_parameter_collisions(overlapping_queries)
-
-    # Additionally, only the following can be merged:
+    # Only the following can be merged:
     #  - public queries into a public query
     #  - public queries into a non-public query
     #  - non-public queries into a non-public query
@@ -158,37 +154,69 @@ defmodule Tornex.Scheduler.QueryRegistry do
       |> Enum.uniq()
       |> Enum.split_with(&Tornex.Spec.path_module_public?/1)
 
+    # To filter conflicting parameters and paths, we want to want to find the subset of queries with the largest number of
+    # unique paths where the subset of queries does not have any parameters with equal keys and differing values and no other
+    # paths conflict.
+    overlapping_queries
+    |> filter_parameter_collisions()
+    |> Enum.map(fn subset -> accumulate_queries(subset, public_paths, non_public_paths, query) end)
+    |> Enum.reject(&is_nil/1)
+    |> Enum.max_by(fn %Tornex.SpecQuery{paths: paths} -> length(paths) end)
+  end
+
+  @spec accumulate_queries(
+          queries_subset :: [Tornex.SpecQuery.t()],
+          public_paths :: [module()],
+          non_public_paths :: [module()],
+          query :: Tornex.SpecQuery.t()
+        ) :: Tornex.SpecQuery.t() | nil
+  defp accumulate_queries(
+         queries_subset,
+         public_paths,
+         non_public_paths,
+         %Tornex.SpecQuery{key_owner: original_query_key_owner} = _query
+       )
+       when is_list(queries_subset) and is_list(public_paths) and is_list(non_public_paths) do
     # We can merge the public and non-public queries by first merging non-public queries into a SpecQuery with non-public queries.
     # If there is that SpecQuery with non-public queries, we can merge all public into it. Otherwise, all public queries should be
     # merged into a SpecQUery with only public queries.
 
     non_public_queries =
-      Enum.filter(overlapping_queries, fn overlapping_query ->
-        Enum.any?(overlapping_query.paths, fn path -> Enum.member?(non_public_paths, path) end)
+      Enum.filter(queries_subset, fn %Tornex.SpecQuery{paths: query_paths, key_owner: query_key_owner} ->
+        original_query_key_owner == query_key_owner and
+          Enum.any?(query_paths, fn path -> Enum.member?(non_public_paths, path) end)
       end)
-      |> IO.inspect(label: "non_public")
 
     only_public_queries =
-      Enum.filter(overlapping_queries, fn overlapping_query ->
-        Enum.all?(overlapping_query.paths, fn path -> Enum.member?(public_paths, path) end)
+      Enum.filter(queries_subset, fn %Tornex.SpecQuery{paths: query_paths} ->
+        Enum.all?(query_paths, fn path -> Enum.member?(public_paths, path) end)
       end)
-      |> IO.inspect(label: "public")
 
     accumulated_queries =
-      if non_public_queries == [] do
-        # If there is no non-public query, we should merge all similar public queries into a single SpecQuery.
-        Enum.reduce(only_public_queries, Enum.fetch!(only_public_queries, 0), &Tornex.SpecQuery.merge/2)
-      else
-        # If there is a non-public query, we can first merge all similar non-public queries into the SpecQuery before
-        # merging all the similar public queries into the query.
-        query_acc = Enum.reduce(non_public_queries, Enum.fetch!(non_public_queries, 0), &Tornex.SpecQuery.merge/2)
-        Enum.reduce(only_public_queries, query_acc, &Tornex.SpecQuery.merge/2)
+      cond do
+        non_public_queries == [] and only_public_queries != [] ->
+          # If there is no non-public query, we should merge all similar public queries into a single SpecQuery.
+          Enum.reduce(only_public_queries, Enum.fetch!(only_public_queries, 0), &Tornex.SpecQuery.merge/2)
+
+        non_public_queries != [] and only_public_queries != [] ->
+          # If there is a non-public query, we can first merge all similar non-public queries into the SpecQuery before
+          # merging all the similar public queries into the query.
+          query_acc = Enum.reduce(non_public_queries, Enum.fetch!(non_public_queries, 0), &Tornex.SpecQuery.merge/2)
+          Enum.reduce(only_public_queries, query_acc, &Tornex.SpecQuery.merge/2)
+
+        non_public_queries != [] and only_public_queries == [] ->
+          # If there is a non-public query, we can first merge all similar non-public queries into the SpecQuery before
+          # merging all the similar public queries into the query.
+          Enum.reduce(non_public_queries, Enum.fetch!(non_public_queries, 0), &Tornex.SpecQuery.merge/2)
+
+        non_public_queries == [] and only_public_queries == [] ->
+          nil
       end
 
     accumulated_queries
   end
 
-  @spec filter_parameter_collisions(queries :: [Tornex.SpecQuery.t()]) :: [Tornex.SpecQuery.t()]
+  @spec filter_parameter_collisions(queries :: [Tornex.SpecQuery.t()]) :: [[Tornex.SpecQuery.t()]]
   defp filter_parameter_collisions(queries) when is_list(queries) do
     # To filter conflicting parameters, we want to want to find the set of queries with the largest number of unique paths
     # where the set of queries does not have any parameters with equal keys and differing values.
@@ -196,7 +224,8 @@ defmodule Tornex.Scheduler.QueryRegistry do
     queries
     |> all_subsets()
     |> Enum.filter(&conflict_free?/1)
-    |> Enum.max_by(&count_unique_paths/1, fn -> [] end)
+    |> Enum.sort_by(&count_unique_paths/1, :desc)
+    |> Enum.reject(fn subset -> subset == [] end)
   end
 
   @doc """

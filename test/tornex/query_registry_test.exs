@@ -227,7 +227,7 @@ defmodule Tornex.Test.QueryRegistry do
     similar_two = Tornex.Scheduler.QueryRegistry.merge_similar(query_two, state)
 
     assert %SpecQuery{
-             parameters: [{id, 2_383_326}],
+             parameters: [{:id, 2_383_326}],
              key_owner: 1,
              nice: 20
            } = similar_one
@@ -235,7 +235,7 @@ defmodule Tornex.Test.QueryRegistry do
     assert_unordered([Torngen.Client.Path.User.Id.Basic, Torngen.Client.Path.User.Id.Faction], similar_one.paths)
 
     assert %SpecQuery{
-             parameters: [{id, 2_383_326}],
+             parameters: [{:id, 2_383_326}],
              key_owner: 1,
              nice: 20
            } = similar_two
