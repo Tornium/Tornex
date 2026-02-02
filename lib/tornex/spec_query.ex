@@ -146,18 +146,8 @@ defmodule Tornex.SpecQuery do
   """
   @deprecated "Use put_parameter!/3 instead."
   @spec put_parameter(query :: t(), parameter_name :: atom(), parameter_value :: term()) :: t()
-  def put_parameter(%__MODULE__{parameters: parameters} = query, parameter_name, parameter_value)
-      when is_atom(parameter_name) do
-    String.Chars.impl_for!(parameter_value)
-
-    if Enum.any?(parameters, fn {k, _v} -> k == parameter_name end) do
-      raise """
-        The #{parameter_name} parameter is already in this query. There can not be duplicate parameter keys in
-        a query.
-      """
-    else
-      %__MODULE__{query | parameters: [{parameter_name, parameter_value} | parameters]}
-    end
+  def put_parameter(%__MODULE__{} = query, parameter_name, parameter_value) do
+    put_parameter!(query, parameter_name, parameter_value)
   end
 
   @doc """
@@ -168,8 +158,9 @@ defmodule Tornex.SpecQuery do
   of the `String.Chars` protocol. If `parameter_value` is a list and the `parameter_name` is a query parameter,
   the values of the list will be joined with commas and used as the parameter value.
 
-  If the parameter name is already in the query, a `RuntimeError` will be raised. If the parameter value is not an 
-  implementation of the `String.Chars` protocol, a `Protocol.UndefinedError` will be raised.
+  If the parameter name is already in the query but the existing parameter value is not equal to the value to
+  be inserted, a `RuntimeError` will be raised. If the parameter value is not an implementation of the
+  `String.Chars` protocol, a `Protocol.UndefinedError` will be raised.
 
   ## Examples
 
@@ -184,13 +175,17 @@ defmodule Tornex.SpecQuery do
       when is_atom(parameter_name) do
     String.Chars.impl_for!(parameter_value)
 
-    if Enum.any?(parameters, fn {k, _v} -> k == parameter_name end) do
-      raise """
-        The #{parameter_name} parameter is already in this query. There can not be duplicate parameter keys in
-        a query.
-      """
-    else
-      %__MODULE__{query | parameters: [{parameter_name, parameter_value} | parameters]}
+    case Enum.find(parameters, fn {k, _v} -> k == parameter_name end) do
+      nil ->
+        %__MODULE__{query | parameters: [{parameter_name, parameter_value} | parameters]}
+
+      {^parameter_name, ^parameter_value} ->
+        query
+
+      {^parameter_name, _existing_parameter_value} ->
+        raise """
+          The #{parameter_name} parameter is already in this query. There can not be duplicate parameter keys in a query.
+        """
     end
   end
 
@@ -493,7 +488,12 @@ defmodule Tornex.SpecQuery do
 
     acc =
       Enum.reduce(parameters, acc, fn {parameter_key, parameter_value}, acc when is_atom(parameter_key) ->
-        __MODULE__.put_parameter!(acc, parameter_key, parameter_value)
+        try do
+          __MODULE__.put_parameter!(acc, parameter_key, parameter_value)
+        rescue
+          # We want to ignore runtime errors from duplicate parameter keys with non-equal values.
+          RuntimeError -> acc
+        end
       end)
 
     acc

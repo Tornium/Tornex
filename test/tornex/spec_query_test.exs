@@ -43,6 +43,12 @@ defmodule Tornex.Test.SpecQuery do
              paths: []
            } ==
              Tornex.SpecQuery.put_parameter!(query, :foo, "bar")
+
+    assert_raise RuntimeError, fn ->
+      query
+      |> Tornex.SpecQuery.put_parameter!(:foo, 1)
+      |> Tornex.SpecQuery.put_parameter!(:foo, 2)
+    end
   end
 
   test "test_uri" do
