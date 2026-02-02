@@ -100,8 +100,23 @@ defmodule Tornex.Scheduler.QueryRegistry do
     # should be separated into a different query.
   end
 
-  @spec find_similar(query :: Tornex.SpecQuery.t(), state :: map()) :: [Tornex.SpecQuery.t()]
-  def find_similar(%Tornex.SpecQuery{} = query, state) when is_map(state) do
+  @doc """
+  Merge "similar" queries to the `Tornex.SpecQuery` provided to create one query containing as many
+  selections as possible.
+
+  **NOTE:** The queries may not necessarily be merged into the query provided if it is more efficient to
+  merge the queries into a different non-public query.
+
+  For a query to be similar to another query, the query must:
+    1) Be for the same resource and resource ID.
+    2) Not have conflicting parameters where the same key has different values.
+    3) Not be different responses depending on the invoker. For example, this can occur when the responses
+    is specific to a resource owner (such as a user for `user/basic` when not providing a user to
+    `user/{id}/basic`).
+    4) Not have an additional permission required such as faction API access.
+  """
+  @spec merge_similar(query :: Tornex.SpecQuery.t(), state :: map()) :: [Tornex.SpecQuery.t()]
+  def merge_similar(%Tornex.SpecQuery{} = query, state) when is_map(state) do
     resource = Tornex.SpecQuery.resource!(query)
     resource_id = Tornex.SpecQuery.resource_id!(query)
     selections = Tornex.SpecQuery.selections!(query)
@@ -148,16 +163,29 @@ defmodule Tornex.Scheduler.QueryRegistry do
     # merged into a SpecQUery with only public queries.
 
     non_public_queries =
-      Enum.filter(overlapping_queries, fn query ->
-        Enum.any?(query.paths, fn path -> Enum.member?(non_public_paths, path) end)
+      Enum.filter(overlapping_queries, fn overlapping_query ->
+        Enum.any?(overlapping_query.paths, fn path -> Enum.member?(non_public_paths, path) end)
       end)
+      |> IO.inspect(label: "non_public")
 
     only_public_queries =
-      Enum.filter(overlapping_queries, fn query ->
-        Enum.all?(query.paths, fn path -> Enum.member?(public_paths, path) end)
+      Enum.filter(overlapping_queries, fn overlapping_query ->
+        Enum.all?(overlapping_query.paths, fn path -> Enum.member?(public_paths, path) end)
       end)
+      |> IO.inspect(label: "public")
 
-    {only_public_queries, non_public_queries}
+    accumulated_queries =
+      if non_public_queries == [] do
+        # If there is no non-public query, we should merge all similar public queries into a single SpecQuery.
+        Enum.reduce(only_public_queries, Enum.fetch!(only_public_queries, 0), &Tornex.SpecQuery.merge/2)
+      else
+        # If there is a non-public query, we can first merge all similar non-public queries into the SpecQuery before
+        # merging all the similar public queries into the query.
+        query_acc = Enum.reduce(non_public_queries, Enum.fetch!(non_public_queries, 0), &Tornex.SpecQuery.merge/2)
+        Enum.reduce(only_public_queries, query_acc, &Tornex.SpecQuery.merge/2)
+      end
+
+    accumulated_queries
   end
 
   @spec filter_parameter_collisions(queries :: [Tornex.SpecQuery.t()]) :: [Tornex.SpecQuery.t()]

@@ -29,7 +29,6 @@ defmodule Tornex.Test.Scheduler do
     {:ok, pid} =
       Tornex.Scheduler.bucket_supervisor().start_child(Tornex.Scheduler.BucketSupervisor, Tornex.Scheduler.Bucket)
 
-
     %{"error" => %{"code" => 2}} =
       Tornex.Scheduler.Bucket.enqueue(
         pid,

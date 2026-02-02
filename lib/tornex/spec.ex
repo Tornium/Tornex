@@ -76,7 +76,7 @@ defmodule Tornex.Spec do
       _path_response_modules
     ] = path_module_docs(path_module)
 
-    key_type_string = 
+    key_type_string =
       path_parameters
       |> String.split("\n- ")
       |> Enum.find(fn parameter -> String.starts_with?(parameter, "key: API key") end)

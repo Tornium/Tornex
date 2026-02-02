@@ -74,14 +74,14 @@ defmodule Tornex.Test.QueryRegistry do
       SpecQuery.new()
       |> SpecQuery.put_path(Torngen.Client.Path.User.Id.Basic)
       |> SpecQuery.put_path(Torngen.Client.Path.User.Id.Bounties)
-      |> SpecQuery.put_parameter(:id, 1)
+      |> SpecQuery.put_parameter!(:id, 1)
 
     Tornex.Scheduler.QueryRegistry.insert(query_one)
 
     query_two =
       SpecQuery.new()
       |> SpecQuery.put_path(Torngen.Client.Path.User.Id.Basic)
-      |> Tornex.SpecQuery.put_parameter(:id, 2)
+      |> Tornex.SpecQuery.put_parameter!(:id, 2)
 
     Tornex.Scheduler.QueryRegistry.insert(query_two)
 
@@ -95,7 +95,7 @@ defmodule Tornex.Test.QueryRegistry do
     DynamicSupervisor.stop(pid)
   end
 
-  test "pull similar overlapping queries with no resource ID" do
+  test "merge similar overlapping queries with no resource ID" do
     # Public selections for no resource ID and the same key owner (applying as the resource ID
     # for user resources) should be combined.
 
@@ -116,13 +116,27 @@ defmodule Tornex.Test.QueryRegistry do
       }
     }
 
-    similar_one = Tornex.Scheduler.QueryRegistry.find_similar(query_one, state)
-    similar_two = Tornex.Scheduler.QueryRegistry.find_similar(query_two, state)
-    assert_unordered([^query_one, ^query_two], similar_one)
-    assert_unordered([^query_one, ^query_two], similar_two)
+    similar_one = Tornex.Scheduler.QueryRegistry.merge_similar(query_one, state)
+    similar_two = Tornex.Scheduler.QueryRegistry.merge_similar(query_two, state)
+
+    assert %SpecQuery{
+             parameters: [],
+             key_owner: 1,
+             nice: 20
+           } = similar_one
+
+    assert_unordered([Torngen.Client.Path.User.Basic, Torngen.Client.Path.User.Bounties], similar_one.paths)
+
+    assert %SpecQuery{
+             parameters: [],
+             key_owner: 1,
+             nice: 20
+           } = similar_two
+
+    assert_unordered([Torngen.Client.Path.User.Basic, Torngen.Client.Path.User.Bounties], similar_two.paths)
   end
 
-  test "pull similar non-overlapping queries with no resource ID and different key owners" do
+  test "merge similar non-overlapping queries with no resource ID and different key owners" do
     # These queries are not overlapping as they do not have a resource ID so the resource owner is 
     # the resource ID the operation is running against.
 
@@ -137,18 +151,18 @@ defmodule Tornex.Test.QueryRegistry do
     state = %{
       "user" => %{
         nil => %{
-          "basic" => [query_one, query_two],
+          "basic" => [query_one, query_two]
         }
       }
     }
 
-    similar_one = Tornex.Scheduler.QueryRegistry.find_similar(query_one, state)
-    similar_two = Tornex.Scheduler.QueryRegistry.find_similar(query_two, state)
-    assert_unordered([^query_one], similar_one)
-    assert_unordered([^query_two], similar_two)
+    similar_one = Tornex.Scheduler.QueryRegistry.merge_similar(query_one, state)
+    similar_two = Tornex.Scheduler.QueryRegistry.merge_similar(query_two, state)
+    assert ^query_one = similar_one
+    assert ^query_two = similar_two
   end
 
-  test "pull similar overlapping queries with no resource ID and different key owners" do
+  test "merge similar overlapping queries with no resource ID and different key owners" do
     # These queries are overlapping despite not having a resource ID and different key
     # owners as the data is shared globally across all users.
 
@@ -169,53 +183,81 @@ defmodule Tornex.Test.QueryRegistry do
       }
     }
 
-    similar_one = Tornex.Scheduler.QueryRegistry.find_similar(query_one, state)
-    similar_two = Tornex.Scheduler.QueryRegistry.find_similar(query_two, state)
-    assert_unordered([^query_one, ^query_two], similar_one)
-    assert_unordered([^query_one, ^query_two], similar_two)
+    similar_one = Tornex.Scheduler.QueryRegistry.merge_similar(query_one, state)
+    similar_two = Tornex.Scheduler.QueryRegistry.merge_similar(query_two, state)
+
+    assert %SpecQuery{
+             parameters: [],
+             key_owner: 1,
+             nice: 20
+           } = similar_one
+
+    assert_unordered([Torngen.Client.Path.Torn.Crimes, Torngen.Client.Path.Torn.Items], similar_one.paths)
+
+    assert %SpecQuery{
+             parameters: [],
+             key_owner: 1,
+             nice: 20
+           } = similar_two
+
+    assert_unordered([Torngen.Client.Path.Torn.Crimes, Torngen.Client.Path.Torn.Items], similar_two.paths)
   end
 
-  test "pull similar overlapping queries with the same resource ID" do
+  test "merge similar overlapping queries with the same resource ID" do
     query_one =
       SpecQuery.new(key_owner: 1)
       |> SpecQuery.put_path(Torngen.Client.Path.User.Id.Basic)
-      |> SpecQuery.put_parameter(:id, 2383326)
+      |> SpecQuery.put_parameter!(:id, 2_383_326)
 
     query_two =
       SpecQuery.new(key_owner: 1)
       |> SpecQuery.put_path(Torngen.Client.Path.User.Id.Faction)
-      |> SpecQuery.put_parameter(:id, 2383326)
+      |> SpecQuery.put_parameter!(:id, 2_383_326)
 
     state = %{
       "user" => %{
-        {:id, 2383326} => %{
+        {:id, 2_383_326} => %{
           "basic" => [query_one],
           "faction" => [query_two]
         }
       }
     }
 
-    similar_one = Tornex.Scheduler.QueryRegistry.find_similar(query_one, state)
-    similar_two = Tornex.Scheduler.QueryRegistry.find_similar(query_two, state)
-    assert_unordered([^query_one, ^query_two], similar_one)
-    assert_unordered([^query_one, ^query_two], similar_two)
+    similar_one = Tornex.Scheduler.QueryRegistry.merge_similar(query_one, state)
+    similar_two = Tornex.Scheduler.QueryRegistry.merge_similar(query_two, state)
+
+    assert %SpecQuery{
+             parameters: [{id, 2_383_326}],
+             key_owner: 1,
+             nice: 20
+           } = similar_one
+
+    assert_unordered([Torngen.Client.Path.User.Id.Basic, Torngen.Client.Path.User.Id.Faction], similar_one.paths)
+
+    assert %SpecQuery{
+             parameters: [{id, 2_383_326}],
+             key_owner: 1,
+             nice: 20
+           } = similar_two
+
+    assert_unordered([Torngen.Client.Path.User.Id.Basic, Torngen.Client.Path.User.Id.Faction], similar_two.paths)
   end
 
-  test "pull similar non-overlapping with different resource IDs" do
+  test "merge similar non-overlapping with different resource IDs" do
     query_one =
       SpecQuery.new(key_owner: 1)
       |> SpecQuery.put_path(Torngen.Client.Path.User.Id.Basic)
-      |> SpecQuery.put_parameter(:id, 2383326)
+      |> SpecQuery.put_parameter!(:id, 2_383_326)
 
     query_two =
       SpecQuery.new(key_owner: 1)
       |> SpecQuery.put_path(Torngen.Client.Path.User.Id.Basic)
-      |> SpecQuery.put_parameter(:id, 1)
+      |> SpecQuery.put_parameter!(:id, 1)
 
     state = %{
       "user" => %{
-        {:id, 2383326} => %{
-          "basic" => [query_one],
+        {:id, 2_383_326} => %{
+          "basic" => [query_one]
         },
         {:id, 1} => %{
           "basic" => [query_two]
@@ -223,9 +265,9 @@ defmodule Tornex.Test.QueryRegistry do
       }
     }
 
-    similar_one = Tornex.Scheduler.QueryRegistry.find_similar(query_one, state)
-    similar_two = Tornex.Scheduler.QueryRegistry.find_similar(query_two, state)
-    assert_unordered([^query_one], similar_one)
-    assert_unordered([^query_two], similar_two)
+    similar_one = Tornex.Scheduler.QueryRegistry.merge_similar(query_one, state)
+    similar_two = Tornex.Scheduler.QueryRegistry.merge_similar(query_two, state)
+    assert ^query_one = similar_one
+    assert ^query_two = similar_two
   end
 end
