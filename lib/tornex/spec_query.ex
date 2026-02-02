@@ -103,7 +103,12 @@ defmodule Tornex.SpecQuery do
   @doc """
   Add an OpenAPI path to the query.
 
-  The OpenAPI path must be an implementation of the `Torngen.Client.Path` behavior (originating from the `torngen` library). However, multiple base resources can not be combined into one query when adding paths to the query. This includes paths for the same resource type (e.g. user) but differing resource IDs such as `/user/${id}/bounties`.
+  The OpenAPI path must be an implementation of the `Torngen.Client.Path` behavior (originating from the `torngen`
+  library). However, multiple base resources can not be combined into one query when adding paths to the query.
+  This includes paths for the same resource type (e.g. user) but differing resource IDs such as
+  `/user/${id}/bounties`.
+
+  If the path is already in the query, the path will not be added to the query.
 
   ## Examples
 
@@ -114,7 +119,11 @@ defmodule Tornex.SpecQuery do
   """
   @spec put_path(query :: t(), path :: term()) :: t()
   def put_path(%__MODULE__{paths: paths} = query, path) when is_atom(path) do
-    %__MODULE__{query | paths: [path | paths]}
+    if Enum.member?(paths, path) do
+      query
+    else
+      %__MODULE__{query | paths: [path | paths]}
+    end
   end
 
   @doc """
