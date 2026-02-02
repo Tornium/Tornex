@@ -63,8 +63,8 @@ defmodule Tornex.API do
       ...>   Tornex.SpecQuery.new()
       ...>   |> Tornex.SpecQuery.put_path(Torngen.Client.Path.Faction.Id.Basic)
       ...>   |> Tornex.SpecQuery.put_path(Torngen.Client.Path.Faction.Id.Chains)
-      ...>   |> Tornex.SpecQuery.put_parameter(:id, 89)
-      ...>   |> Tornex.SpecQuery.put_parameter(:limit, 100)
+      ...>   |> Tornex.SpecQuery.put_parameter!(:id, 89)
+      ...>   |> Tornex.SpecQuery.put_parameter!(:limit, 100)
       ...>   |> Tornex.SpecQuery.put_key("apikey")
       iex> Tornex.API.query_to_url(spec_query)
       "https://api.torn.com/v2/faction/89/?selections=chains,basic&limit=100&comment=tex-#{Mix.Project.config()[:version]}"
