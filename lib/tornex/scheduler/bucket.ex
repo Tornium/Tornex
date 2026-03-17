@@ -250,7 +250,7 @@ defmodule Tornex.Scheduler.Bucket do
               state
               |> Map.replace(:timeout, timeout)
 
-            %Tornex.SpecQuery{} ->
+            _ ->
               state
               |> Map.replace(:pending_count, pending_count + 1)
               |> Map.replace(:timeout, timeout)
@@ -277,7 +277,7 @@ defmodule Tornex.Scheduler.Bucket do
               state
               |> Map.replace(:timeout, timeout)
 
-            %Tornex.SpecQuery{} ->
+            _ ->
               state
               |> Map.replace(:pending_count, pending_count + 1)
               |> Map.replace(:timeout, timeout)

@@ -27,7 +27,10 @@ defmodule Tornex.Test.Scheduler do
     {:ok, n_pid} = ExUnit.Callbacks.start_supervised(Tornex.NodeRatelimiter)
 
     {:ok, pid} =
-      Tornex.Scheduler.bucket_supervisor().start_child(Tornex.Scheduler.BucketSupervisor, Tornex.Scheduler.Bucket)
+      Tornex.Scheduler.bucket_supervisor().start_child(
+        Tornex.Scheduler.BucketSupervisor,
+        {Tornex.Scheduler.Bucket, user_id: 2_383_326}
+      )
 
     %{"error" => %{"code" => 2}} =
       Tornex.Scheduler.Bucket.enqueue(
@@ -43,6 +46,7 @@ defmodule Tornex.Test.Scheduler do
       )
 
     GenServer.stop(pid)
+    GenServer.stop(n_pid)
     Supervisor.stop(s_pid)
   end
 
@@ -51,7 +55,10 @@ defmodule Tornex.Test.Scheduler do
     {:ok, n_pid} = ExUnit.Callbacks.start_supervised(Tornex.NodeRatelimiter)
 
     {:ok, pid} =
-      Tornex.Scheduler.bucket_supervisor().start_child(Tornex.Scheduler.BucketSupervisor, Tornex.Scheduler.Bucket)
+      Tornex.Scheduler.bucket_supervisor().start_child(
+        Tornex.Scheduler.BucketSupervisor,
+        {Tornex.Scheduler.Bucket, user_id: 2_383_326}
+      )
 
     1..10
     |> Enum.map(fn n ->
@@ -72,6 +79,7 @@ defmodule Tornex.Test.Scheduler do
     |> Task.await_many(60_000)
 
     GenServer.stop(pid)
+    GenServer.stop(n_pid)
     Supervisor.stop(s_pid)
   end
 
@@ -80,7 +88,10 @@ defmodule Tornex.Test.Scheduler do
     {:ok, n_pid} = ExUnit.Callbacks.start_supervised(Tornex.NodeRatelimiter)
 
     {:ok, pid} =
-      Tornex.Scheduler.bucket_supervisor().start_child(Tornex.Scheduler.BucketSupervisor, Tornex.Scheduler.Bucket)
+      Tornex.Scheduler.bucket_supervisor().start_child(
+        Tornex.Scheduler.BucketSupervisor,
+        {Tornex.Scheduler.Bucket, user_id: 2_383_326}
+      )
 
     1..10
     |> Enum.map(fn n ->
@@ -101,6 +112,7 @@ defmodule Tornex.Test.Scheduler do
     |> Task.await_many(60_000)
 
     GenServer.stop(pid)
+    GenServer.stop(n_pid)
     Supervisor.stop(s_pid)
   end
 
@@ -109,7 +121,10 @@ defmodule Tornex.Test.Scheduler do
     {:ok, n_pid} = ExUnit.Callbacks.start_supervised(Tornex.NodeRatelimiter)
 
     {:ok, pid} =
-      Tornex.Scheduler.bucket_supervisor().start_child(Tornex.Scheduler.BucketSupervisor, Tornex.Scheduler.Bucket)
+      Tornex.Scheduler.bucket_supervisor().start_child(
+        Tornex.Scheduler.BucketSupervisor,
+        {Tornex.Scheduler.Bucket, user_id: 2_383_326}
+      )
 
     %{"error" => %{"code" => 2}} =
       Tornex.Scheduler.Bucket.enqueue(
@@ -124,6 +139,7 @@ defmodule Tornex.Test.Scheduler do
       )
 
     GenServer.stop(pid)
+    GenServer.stop(n_pid)
     Supervisor.stop(s_pid)
   end
 end
