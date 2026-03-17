@@ -16,24 +16,32 @@ defmodule Tornex.Scheduler.Bucket do
   @moduledoc """
   Representation of a user's bucket for API requests used for rate-limiting and prioritization.
 
-  A bucket can contain as many API requests as the BEAM VM and the memory can handle. However, each bucket will only process 10 API requests every 6 seconds.
+  A bucket can contain as many API requests as the BEAM VM and the memory can handle. However,
+  each bucket will only process 10 API requests every 6 seconds.
 
-  The bucket provides the `enqueue/1` and `enqueue/2` operations providing the core functionality of this module:
+  The bucket provides the `enqueue/1` and `enqueue/2` operations providing the core functionality
+  of this module:
   - creating the bucket if necessary,
   - handling telemetry,
   - and request handling.
 
   ## Bucket Creation
-  Creating buckets is not required, but you can create and store buckets in a different manner if you need to do so.
+  Creating buckets is not required, but you can create and store buckets in a different manner
+  if you need to do so.
 
   A buckets can be created with the following two methods:
     - `new/1` to create a bucket and store the PID of the GenServer manually
-    - `enqueue/1` to create a bucket and let Tornex store the PID of the GenServer in a pre-initialized registry `Tornex.Scheduler.BucketRegistry`
+    - `enqueue/1` to create a bucket and let Tornex store the PID of the GenServer in a pre-initialized
+       registry `Tornex.Scheduler.BucketRegistry`
 
   ## Making API Requests
-  API requests are made with the `enqueue/1` and the `enqueue/2` operations with a `Tornex.Query` or `Tornex.SpecQuery` struct. The operations will then wait until the API call has been scheduled and the Torn API has responded instead of ending the invocation early and using a later `await`-like function.
+  API requests are made with the `enqueue/1` and the `enqueue/2` operations with a `Tornex.Query`
+  or `Tornex.SpecQuery` struct. The operations will then wait until the API call has been
+  scheduled and the Torn API has responded instead of ending the invocation early and using
+  a later `await`-like function.
 
-  However, for example, this can still be done with the built-in `Task` module (including to handle many API requests at once): 
+  However, for example, this can still be done with the built-in `Task` module (including to
+  handle many API requests at once): 
 
       1..10
       |> Enum.map(fn n ->
@@ -44,7 +52,12 @@ defmodule Tornex.Scheduler.Bucket do
       |> Task.await_many(timeout)
 
   ## Bucket Timeouts
-  By default, the bucket will never time out when the bucket does not receive any requests. This can be configured in milliseconds globally using the `:bucket_ttl` configuration key or per-bucket using the `:ttl` option when starting the bucket. If the bucket does not receive any requests for the specified amount of time, the bucket will be stopped and removed from its supervisor. If a request is later enqueued for the removed bucket's user, a new bucket will be created.
+  By default, the bucket will never time out when the bucket does not receive any requests.
+  This can be configured in milliseconds globally using the `:bucket_ttl` configuration key
+  or per-bucket using the `:ttl` option when starting the bucket. If the bucket does not
+  receive any requests for the specified amount of time, the bucket will be stopped and removed
+  from its supervisor. If a request is later enqueued for the removed bucket's user, a new
+  bucket will be created.
   """
 
   # This needs to be transient to ensure timed-out buckets are not restarted multiple times.
@@ -67,20 +80,26 @@ defmodule Tornex.Scheduler.Bucket do
       iex> is_pid(process)
       true
   """
+  @spec start_link(opts :: keyword()) :: GenServer.on_start()
   def start_link(opts \\ []) do
+    user_id = Keyword.fetch!(opts, :user_id)
+
     GenServer.start_link(
       __MODULE__,
       opts,
-      name: {:via, Tornex.Scheduler.bucket_registry(), {Tornex.Scheduler.BucketRegistry, opts[:user_id]}}
+      name: {:via, Tornex.Scheduler.bucket_registry(), {Tornex.Scheduler.BucketRegistry, user_id}}
     )
   end
 
   @doc """
   Attempts to start a `Tornex.Scheduler.Bucket` and return the `pid` of a bucket.
 
-  The `Tornex.Scheduler.Supervisor` will attempt to start the bucket as a child. If the bucket does not exist, the bucket will be created and the `pid` of the bucket will be returned. If the bucket is already a child of `Tornex.Scheduler.Supervisor`, the `pid` of the existing bucket will be returned.
+  The `Tornex.Scheduler.Supervisor` will attempt to start the bucket as a child. If the bucket does not exist,
+  the bucket will be created and the `pid` of the bucket will be returned. If the bucket is already a child of
+  `Tornex.Scheduler.Supervisor`, the `pid` of the existing bucket will be returned.
 
-  If there is an error in retrieving the `pid` of the bucket or an error in creating the bucket (e.g. maximum number of children in the supervisor reached), `nil` will be returned.
+  If there is an error in retrieving the `pid` of the bucket or an error in creating the bucket (e.g. maximum
+  number of children in the supervisor reached), `nil` will be returned.
 
   ## Options
     * `:ttl` - (integer) Time in milliseconds before the bucket will be stopped without any requests (defaults to `:bucket_ttl`)
@@ -108,9 +127,6 @@ defmodule Tornex.Scheduler.Bucket do
       {:error, error} ->
         :telemetry.execute([:tornex, :bucket, :create_error], %{}, %{user: user_id, error: error})
         nil
-
-      _ ->
-        nil
     end
   end
 
@@ -124,7 +140,8 @@ defmodule Tornex.Scheduler.Bucket do
   @doc """
   Enqueues a `Tornex.Query` or `Tornex.SpecQuery` to the queue of the `Tornex.Scheduler.Bucket` for the API key's user.
 
-  The `pid` of the bucket belonging to the API key's user will be retrieved with `Tornex.Scheduler.Bucket.get_by_id/1`, and will be used to enqueue the query for that specific bucket.
+  The `pid` of the bucket belonging to the API key's user will be retrieved with `Tornex.Scheduler.Bucket.get_by_id/1`,
+  and will be used to enqueue the query for that specific bucket.
 
   ## Options
     * `:timeout` - Timeout of the GenServer call in milliseconds (default: `60_000`)
@@ -181,7 +198,9 @@ defmodule Tornex.Scheduler.Bucket do
   @doc """
   Retrieves the `pid` of the bucket by the bucket's user ID.
 
-  Using the `Tornex.Scheduler.BucketRegistry` that creates the relationship between the bucket and the user ID upon bucket creation, the `pid` of the bucket will be returned. If a bucket is not registered for that user, `:error` will be returned.
+  Using the `Tornex.Scheduler.BucketRegistry` that creates the relationship between the bucket and the user ID upon
+  bucket creation, the `pid` of the bucket will be returned. If a bucket is not registered for that user, `:error`
+  will be returned.
   """
   @spec get_by_id(user_id :: integer()) :: {:ok, pid()} | :error
   def get_by_id(user_id) when is_integer(user_id) do
@@ -191,7 +210,6 @@ defmodule Tornex.Scheduler.Bucket do
     end
   end
 
-  # GenServer Callbacks
   @doc false
   @impl true
   def init(opts \\ []) do
@@ -218,12 +236,25 @@ defmodule Tornex.Scheduler.Bucket do
         # Request has a niceness indicating it's a user request and there's available space in the 
         # bucket to perform the request. Additionally, this node is not ratelimited so the request can
         # be made.
-        make_request(query, from)
+
+        # We will want to check if there are any other pending requests that can be combined into this
+        # query before making this request.
+        merged_query = Tornex.Scheduler.QueryRegistry.merge(query)
+        make_request(merged_query)
 
         state =
-          state
-          |> Map.replace(:pending_count, pending_count + 1)
-          |> Map.replace(:timeout, timeout)
+          case merged_query do
+            %Tornex.Scheduler.ExecutionUnit{} ->
+              # We only want to increase the pending count of the Bucket if the user's key is being used
+              # TODO: Implement the above
+              state
+              |> Map.replace(:timeout, timeout)
+
+            %Tornex.SpecQuery{} ->
+              state
+              |> Map.replace(:pending_count, pending_count + 1)
+              |> Map.replace(:timeout, timeout)
+          end
 
         {:noreply, state, ttl}
 
@@ -232,12 +263,25 @@ defmodule Tornex.Scheduler.Bucket do
         # Request has a niceness indicating it's a user request or high priority and there's available 
         # space in the bucket to perform the request. Additionally, this node is not ratelimited so the
         # request can be made.
-        make_request(query, from)
+
+        # We will want to check if there are any other pending requests that can be combined into this
+        # query before making this request.
+        merged_query = Tornex.Scheduler.QueryRegistry.merge(query)
+        make_request(merged_query)
 
         state =
-          state
-          |> Map.replace(:pending_count, pending_count + 1)
-          |> Map.replace(:timeout, timeout)
+          case merged_query do
+            %Tornex.Scheduler.ExecutionUnit{} ->
+              # We only want to increase the pending count of the Bucket if the user's key is being used
+              # TODO: Implement the above
+              state
+              |> Map.replace(:timeout, timeout)
+
+            %Tornex.SpecQuery{} ->
+              state
+              |> Map.replace(:pending_count, pending_count + 1)
+              |> Map.replace(:timeout, timeout)
+          end
 
         {:noreply, state, ttl}
 
@@ -252,6 +296,7 @@ defmodule Tornex.Scheduler.Bucket do
 
         # Sorts inserted query with higher priority queries at the start
         updated_queue = Enum.sort_by([query | query_priority_queue], & &1.nice, :asc)
+        Tornex.Scheduler.QueryRegistry.insert(query)
 
         state =
           state
@@ -285,6 +330,8 @@ defmodule Tornex.Scheduler.Bucket do
 
       {:noreply, state, ttl}
     else
+      # TODO: This should be made recursive such that chunks of the queue can be removed when multiple 
+      # SpecQuery are combined while allowing the bucket to be filled
       {dumped_queries, remaining_queries} =
         Enum.split(state.query_priority_queue, @bucket_capacity - state.pending_count)
 
@@ -293,7 +340,7 @@ defmodule Tornex.Scheduler.Bucket do
         |> Map.replace(:pending_count, 0)
         |> Map.replace(:query_priority_queue, remaining_queries)
 
-      :ok = Enum.each(dumped_queries, fn query -> make_request(query, query.origin) end)
+      Enum.each(dumped_queries, &make_request/1)
 
       ttl =
         cond do
@@ -349,9 +396,16 @@ defmodule Tornex.Scheduler.Bucket do
     {:noreply, state, ttl}
   end
 
-  # Utility functions
-  @spec make_request(query :: Tornex.Query.t() | Tornex.SpecQuery.t(), from :: GenServer.from()) :: Task.t()
-  defp make_request(query, from) do
+  @spec make_request(query :: Tornex.Query.t() | Tornex.SpecQuery.t() | Tornex.Scheduler.ExecutionUnit.t()) :: Task.t()
+  defp make_request(%Tornex.Scheduler.ExecutionUnit{} = _query) do
+    Task.Supervisor.async_nolink(Tornex.Scheduler.TaskSupervisor, fn ->
+      # TODO: Get API reponse with Tornex.API.get/1
+      # TODO: Split API response and fanout response
+      nil
+    end)
+  end
+
+  defp make_request(%{origin: from} = query) do
     Task.Supervisor.async_nolink(Tornex.Scheduler.TaskSupervisor, fn ->
       GenServer.reply(from, Tornex.API.get(query))
     end)

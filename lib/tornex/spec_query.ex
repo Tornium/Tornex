@@ -38,7 +38,7 @@ defmodule Tornex.SpecQuery do
 
   @type parameter :: {atom(), term()}
   @type t :: %__MODULE__{
-          paths: [atom()],
+          paths: [module()],
           parameters: [parameter()],
           key: String.t() | nil,
 

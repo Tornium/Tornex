@@ -37,6 +37,9 @@ defmodule Tornex.Scheduler.QueryRegistry do
   use GenServer
   import Bitwise
 
+  @doc """
+  Start the `QueryRegistry` GenServer.
+  """
   @spec start_link(opts :: keyword()) :: GenServer.on_start()
   def start_link(opts \\ []) do
     GenServer.start_link(__MODULE__, opts, name: {:global, __MODULE__})
@@ -49,6 +52,22 @@ defmodule Tornex.Scheduler.QueryRegistry do
   def insert(%Tornex.SpecQuery{} = query) do
     GenServer.call({:global, __MODULE__}, {:insert, query})
   end
+
+  # We need to have a fallback for Tornex.Query for the Tornex.Bucket to prevent the bucket from crashing
+  # instead of splitting the logic in Tornex.Bucket.
+  def insert(%Tornex.Query{} = _query), do: :ok
+
+  @doc """
+  Merge any applicable `SpecQuery` for this combintion of a resource and resource ID together.
+  """
+  @spec merge(query :: Tornex.SpecQuery.t()) :: Tornex.SpecQuery.t()
+  def merge(%Tornex.SpecQuery{} = query) do
+    GenServer.call({:global, __MODULE__}, {:merge, query})
+  end
+
+  # We need to have a fallback for Tornex.Query for the Tornex.Bucket to prevent the bucket from crashing
+  # instead of splitting the logic in Tornex.Bucket.
+  def merge(%Tornex.Query{} = query), do: query
 
   @impl GenServer
   def init(_opts \\ []) do
@@ -85,19 +104,23 @@ defmodule Tornex.Scheduler.QueryRegistry do
 
   # TODO: Something needs to track what queries will respond for other queries and send the data received
   # from that query to the others.
+  # TODO: We need to decrement the pending count for every query "taken" from a bucket other than the query
+  # being processed. Additionally, we will need to remove the queries from the bucket.
 
   # TODO: There needs to be a way to enqueue quarantined requests that won't be inserted into the query tree
 
   @impl GenServer
-  def handle_call({:call, %Tornex.SpecQuery{} = query}, _from, %{} = state) do
+  def handle_call({:merge, %Tornex.SpecQuery{} = query}, _from, %{} = state) do
     # We need to find similar queries to combine with this query. Any similar queries will need to be
     # marked as being handled by something else. The task handling this query needs to respond to all
-    # queries waiting on this query.
-    #
-    # NOTE: It does not necessarily need to be the query passed into this function invocation that the
-    # queries are merged into. We should prefer to merge it into a query from the resource owner if
-    # possible to ensure extended data is returned. If there a similar query that cannot be merged, those
-    # should be separated into a different query.
+    # queries waiting on this query. This MUST be blocking to avoid responding to a `from` twice. As
+    # such, this should respond as fast as possible to avoid blocking buckets and this GenServer
+    # for too long.
+
+    merge_similar(query, state)
+    # TODO: Make api call
+    # TODO: Split API call response
+    # TODO: Return API call response
   end
 
   @doc """
@@ -220,6 +243,7 @@ defmodule Tornex.Scheduler.QueryRegistry do
   defp filter_parameter_collisions(queries) when is_list(queries) do
     # To filter conflicting parameters, we want to want to find the set of queries with the largest number of unique paths
     # where the set of queries does not have any parameters with equal keys and differing values.
+    # FIXME: This is currently O(2^n) and needs to be significantly faster
 
     queries
     |> all_subsets()
