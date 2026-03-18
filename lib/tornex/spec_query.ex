@@ -37,14 +37,15 @@ defmodule Tornex.SpecQuery do
   @host Application.compile_env(:tornex, :base_url) || "https://api.torn.com/v2"
 
   @type parameter :: {atom(), term()}
+  @type niceness :: -20..20
   @type t :: %__MODULE__{
           paths: [module()],
           parameters: [parameter()],
           key: String.t() | nil,
 
           # Values required for the scheduler
-          key_owner: integer(),
-          nice: integer(),
+          key_owner: pos_integer(),
+          nice: niceness(),
           origin: GenServer.from() | nil
         }
 
@@ -117,12 +118,12 @@ defmodule Tornex.SpecQuery do
       ...>   |> Tornex.SpecQuery.put_path(Torngen.Client.Path.User.Attacks)
       ...>   |> Tornex.SpecQuery.put_path(Torngen.Client.Path.User.Bounties)
   """
-  @spec put_path(query :: t(), path :: term()) :: t()
-  def put_path(%__MODULE__{paths: paths} = query, path) when is_atom(path) do
+  @spec put_path(query :: t() | Tornex.Scheduler.ExecutionUnit.t(), path :: module()) :: t()
+  def put_path(%{paths: paths} = query, path) when is_atom(path) do
     if Enum.member?(paths, path) do
       query
     else
-      %__MODULE__{query | paths: [path | paths]}
+      %{query | paths: [path | paths]}
     end
   end
 
@@ -170,14 +171,17 @@ defmodule Tornex.SpecQuery do
       ...>   |> Tornex.SpecQuery.put_parameter!(:id, 2383326)
       ...>   |> |> Tornex.SpecQuery.put_parameter!(:stat, ["attackswon", "attackslost"])
   """
-  @spec put_parameter!(query :: t(), parameter_name :: atom(), parameter_value :: term()) :: t()
-  def put_parameter!(%__MODULE__{parameters: parameters} = query, parameter_name, parameter_value)
-      when is_atom(parameter_name) do
+  @spec put_parameter!(
+          query :: t() | Tornex.Scheduler.ExecutionUnit.t(),
+          parameter_name :: atom(),
+          parameter_value :: term()
+        ) :: t()
+  def put_parameter!(%{parameters: parameters} = query, parameter_name, parameter_value) when is_atom(parameter_name) do
     String.Chars.impl_for!(parameter_value)
 
     case Enum.find(parameters, fn {k, _v} -> k == parameter_name end) do
       nil ->
-        %__MODULE__{query | parameters: [{parameter_name, parameter_value} | parameters]}
+        %{query | parameters: [{parameter_name, parameter_value} | parameters]}
 
       {^parameter_name, ^parameter_value} ->
         query
@@ -482,20 +486,23 @@ defmodule Tornex.SpecQuery do
   WARNING: It is assumed that it has already been validated that it is possible to merge the
   two `SpecQuery` in terms of security and how the API functions.
   """
-  @spec merge(query :: t(), acc :: t()) :: t()
-  def merge(%__MODULE__{paths: paths, parameters: parameters} = _query, %__MODULE__{} = acc) do
-    acc = Enum.reduce(paths, acc, fn path, acc -> __MODULE__.put_path(acc, path) end)
+  @spec merge(query :: t(), acc :: t() | Tornex.Scheduler.ExecutionUnit.t()) :: t() | Tornex.Scheduler.ExecutionUnit.t()
+  def merge(%__MODULE__{paths: paths, parameters: parameters, nice: nice} = _query, %mod{nice: acc_nice} = acc)
+      when mod in [__MODULE__, Tornex.Scheduler.ExecutionUnit] do
+    acc = Enum.reduce(paths, acc, fn path, acc -> put_path(acc, path) end)
 
     acc =
       Enum.reduce(parameters, acc, fn {parameter_key, parameter_value}, acc when is_atom(parameter_key) ->
         try do
-          __MODULE__.put_parameter!(acc, parameter_key, parameter_value)
+          put_parameter!(acc, parameter_key, parameter_value)
         rescue
           # We want to ignore runtime errors from duplicate parameter keys with non-equal values.
           RuntimeError -> acc
         end
       end)
 
-    acc
+    # We want to use the minimum niceness between the accumulator and the provided query to set the priority of the
+    # query as high as possible (lowest niceness is highest priority).
+    %{acc | nice: min(acc_nice, nice)}
   end
 end

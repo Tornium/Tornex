@@ -34,8 +34,9 @@ defmodule Tornex.Scheduler.QueryRegistry do
   │  ├─ items
   """
 
+  @type state :: %{String.t() => %{(Tornex.SpecQuery.parameter() | nil) => %{String.t() => [Tornex.SpecQuery.t()]}}}
+
   use GenServer
-  import Bitwise
 
   @doc """
   Start the `QueryRegistry` GenServer.
@@ -98,7 +99,6 @@ defmodule Tornex.Scheduler.QueryRegistry do
         end)
       end)
 
-    # TODO: Determine the response value
     {:reply, :ok, new_state}
   end
 
@@ -118,9 +118,6 @@ defmodule Tornex.Scheduler.QueryRegistry do
     # for too long.
 
     merge_similar(query, state)
-    # TODO: Make api call
-    # TODO: Split API call response
-    # TODO: Return API call response
   end
 
   @doc """
@@ -138,11 +135,10 @@ defmodule Tornex.Scheduler.QueryRegistry do
     `user/{id}/basic`).
     4) Not have an additional permission required such as faction API access.
   """
-  @spec merge_similar(query :: Tornex.SpecQuery.t(), state :: map()) :: Tornex.SpecQuery.t()
+  @spec merge_similar(query :: Tornex.SpecQuery.t(), state :: state()) :: Tornex.Scheduler.ExecutionUnit.t()
   def merge_similar(%Tornex.SpecQuery{} = query, state) when is_map(state) do
     resource = Tornex.SpecQuery.resource!(query)
     resource_id = Tornex.SpecQuery.resource_id!(query)
-    # selections = Tornex.SpecQuery.selections!(query)
 
     # We need to find all queries that have a matching resource and resource ID. This is the bare minimum
     # for matching queries but will substantially reduce potential matches.
@@ -184,7 +180,7 @@ defmodule Tornex.Scheduler.QueryRegistry do
     |> filter_parameter_collisions()
     |> Enum.map(fn subset -> accumulate_queries(subset, public_paths, non_public_paths, query) end)
     |> Enum.reject(&is_nil/1)
-    |> Enum.max_by(fn %Tornex.SpecQuery{paths: paths} -> length(paths) end)
+    |> Enum.max_by(fn %Tornex.Scheduler.ExecutionUnit{paths: paths} -> length(paths) end)
   end
 
   @spec accumulate_queries(
@@ -192,7 +188,7 @@ defmodule Tornex.Scheduler.QueryRegistry do
           public_paths :: [module()],
           non_public_paths :: [module()],
           query :: Tornex.SpecQuery.t()
-        ) :: Tornex.SpecQuery.t() | nil
+        ) :: Tornex.Scheduler.ExecutionUnit.t() | nil
   defp accumulate_queries(
          queries_subset,
          public_paths,
@@ -203,66 +199,102 @@ defmodule Tornex.Scheduler.QueryRegistry do
     # We can merge the public and non-public queries by first merging non-public queries into a SpecQuery with non-public queries.
     # If there is that SpecQuery with non-public queries, we can merge all public into it. Otherwise, all public queries should be
     # merged into a SpecQUery with only public queries.
+    IO.inspect(queries_subset)
 
     non_public_queries =
       Enum.filter(queries_subset, fn %Tornex.SpecQuery{paths: query_paths, key_owner: query_key_owner} ->
         original_query_key_owner == query_key_owner and
           Enum.any?(query_paths, fn path -> Enum.member?(non_public_paths, path) end)
       end)
+      |> IO.inspect(label: "non public")
 
     only_public_queries =
       Enum.filter(queries_subset, fn %Tornex.SpecQuery{paths: query_paths} ->
         Enum.all?(query_paths, fn path -> Enum.member?(public_paths, path) end)
       end)
+      |> IO.inspect(label: "only public")
 
-    accumulated_queries =
-      cond do
-        non_public_queries == [] and only_public_queries != [] ->
-          # If there is no non-public query, we should merge all similar public queries into a single SpecQuery.
-          Enum.reduce(only_public_queries, Enum.fetch!(only_public_queries, 0), &Tornex.SpecQuery.merge/2)
+    IO.puts("")
 
-        non_public_queries != [] and only_public_queries != [] ->
-          # If there is a non-public query, we can first merge all similar non-public queries into the SpecQuery before
-          # merging all the similar public queries into the query.
-          query_acc = Enum.reduce(non_public_queries, Enum.fetch!(non_public_queries, 0), &Tornex.SpecQuery.merge/2)
-          Enum.reduce(only_public_queries, query_acc, &Tornex.SpecQuery.merge/2)
+    cond do
+      non_public_queries == [] and only_public_queries != [] ->
+        # If there is no non-public query, we should merge all similar public queries into a single SpecQuery.
+        Enum.reduce(only_public_queries, Tornex.Scheduler.ExecutionUnit.new(), &Tornex.Scheduler.ExecutionUnit.merge/2)
 
-        non_public_queries != [] and only_public_queries == [] ->
-          # If there is a non-public query, we can first merge all similar non-public queries into the SpecQuery before
-          # merging all the similar public queries into the query.
-          Enum.reduce(non_public_queries, Enum.fetch!(non_public_queries, 0), &Tornex.SpecQuery.merge/2)
+      non_public_queries != [] and only_public_queries != [] ->
+        # If there is a non-public query, we can first merge all similar non-public queries into the SpecQuery before
+        # merging all the similar public queries into the query.
+        query_acc =
+          Enum.reduce(non_public_queries, Tornex.Scheduler.ExecutionUnit.new(), &Tornex.Scheduler.ExecutionUnit.merge/2)
 
-        non_public_queries == [] and only_public_queries == [] ->
-          nil
-      end
+        Enum.reduce(only_public_queries, query_acc, &Tornex.Scheduler.ExecutionUnit.merge/2)
 
-    accumulated_queries
+      non_public_queries != [] and only_public_queries == [] ->
+        # If there is a non-public query, we can first merge all similar non-public queries into the SpecQuery before
+        # merging all the similar public queries into the query.
+        Enum.reduce(non_public_queries, Tornex.Scheduler.ExecutionUnit.new(), &Tornex.Scheduler.ExecutionUnit.merge/2)
+
+      non_public_queries == [] and only_public_queries == [] ->
+        nil
+    end
   end
 
   @spec filter_parameter_collisions(queries :: [Tornex.SpecQuery.t()]) :: [[Tornex.SpecQuery.t()]]
   defp filter_parameter_collisions(queries) when is_list(queries) do
     # To filter conflicting parameters, we want to want to find the set of queries with the largest number of unique paths
     # where the set of queries does not have any parameters with equal keys and differing values.
-    # FIXME: This is currently O(2^n) and needs to be significantly faster
 
     queries
-    |> all_subsets()
-    |> Enum.filter(&conflict_free?/1)
+    |> greedy_subsets()
     |> Enum.sort_by(&count_unique_paths/1, :desc)
-    |> Enum.reject(fn subset -> subset == [] end)
+    |> Enum.reject(fn subset when is_list(subset) -> subset == [] end)
   end
 
-  @doc """
-  Generate a list of all possible subsets of the combinations of queries.
-  """
-  @spec all_subsets(queries :: [Tornex.SpecQuery.t()]) :: [[Tornex.SpecQuery.t()]]
-  def all_subsets(queries) when is_list(queries) do
-    count = length(queries)
-    maximum = :math.pow(2, count) |> round()
+  @type conflict_map :: %{Tornex.SpecQuery.t() => MapSet.t(Tornex.SpecQuery.t())}
+  @spec conflict_graph(queries :: [Tornex.SpecQuery.t()]) :: conflict_map()
+  defp conflict_graph(queries) when is_list(queries) do
+    # We want to build a lookup table of the queries that will conflict with other queries to avoid
+    # excessive recomputation. Since we're building all valid subsets, this is better performance-wise.
 
-    for mask <- 0..(maximum - 1) do
-      for {element, bit} <- Enum.zip(queries, 0..(count - 1)), (mask &&& 1 <<< bit) != 0, do: element
-    end
+    queries
+    |> Enum.map(fn %Tornex.SpecQuery{} = query_one ->
+      queries
+      |> Enum.filter(fn %Tornex.SpecQuery{} = query_two ->
+        query_one != query_two and not conflict_free?([query_one, query_two])
+      end)
+      |> MapSet.new()
+      |> then(&{query_one, &1})
+    end)
+    |> Map.new()
+  end
+
+  # TODO: test this
+  @doc """
+  Greedily build subsets of the queries where the subsets of queries' parameters do not conflict.
+  """
+  @spec greedy_subsets(queries :: [Tornex.SpecQuery.t()]) :: [[Tornex.SpecQuery.t()]]
+  def greedy_subsets(queries) when is_list(queries) do
+    conflict_graph = conflict_graph(queries)
+
+    Enum.map(queries, fn start_node ->
+      build_subset(start_node, Enum.reject(queries, &(&1 == start_node)), conflict_graph)
+    end)
+  end
+
+  @spec build_subset(
+          start_node :: Tornex.SpecQuery.t(),
+          queries :: [Tornex.SpecQuery.t()],
+          conflict_graph :: conflict_map()
+        ) :: [Tornex.SpecQuery.t()]
+  defp build_subset(%Tornex.SpecQuery{} = start_node, queries, conflict_graph)
+       when is_list(queries) and is_map(conflict_graph) do
+    Enum.reduce(queries, [start_node], fn %Tornex.SpecQuery{} = query, acc ->
+      if Enum.any?(acc, &MapSet.member?(conflict_graph[&1], query)) do
+        acc
+      else
+        [query | acc]
+      end
+    end)
   end
 
   @doc """
@@ -293,5 +325,41 @@ defmodule Tornex.Scheduler.QueryRegistry do
     |> Enum.flat_map(& &1.paths)
     |> Enum.uniq()
     |> length()
+  end
+
+  @spec remove(state :: state(), query :: Tornex.Spec.t()) :: state()
+  defp remove(state, %Tornex.SpecQuery{} = query) when is_map(state) do
+    # We need to traverse the state tree and remove the leafs that are being fulfilled by this SpecQuery and
+    # the nodes that no longer have a leaf attached to it
+
+    resource = Tornex.SpecQuery.resource!(query)
+    resource_id = Tornex.SpecQuery.resource_id!(query)
+    selections = Tornex.SpecQuery.selections!(query)
+
+    selections
+    |> Enum.reduce(state, fn _selection, acc ->
+      acc
+      |> update_in([resource, resource_id, selections], fn
+        nil ->
+          nil
+
+        queries when is_list(queries) ->
+          # TODO: Implement this such that only the queries that are being handled by this SpecQuery will be removed
+          nil
+      end)
+    end)
+    |> prune_path([resource, resource_id])
+    |> prune_path([resource])
+  end
+
+  @spec prune_path(state :: map(), path :: [term()]) :: map()
+  defp prune_path(state, path) when is_map(state) and is_list(path) do
+    case get_in(state, path) do
+      child when is_map(child) and map_size(child) == 0 ->
+        pop_in(state, path) |> elem(1)
+
+      _ ->
+        state
+    end
   end
 end
