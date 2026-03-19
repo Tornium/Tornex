@@ -48,9 +48,13 @@ defmodule Tornex.Scheduler.QueryRegistry do
 
   @doc """
   Insert a `SpecQuery` into the query tree.
+
+  The `SpecQuery` must be registered against an origin (of type `Genserver.from()`) so that the `ExecutionUnit`
+  generated including the `SpecQuery` will be able to return the piece of the response corresponding to the 
+  `SpecQuery` to the origin.
   """
   @spec insert(query :: Tornex.SpecQuery.t()) :: :ok
-  def insert(%Tornex.SpecQuery{} = query) do
+  def insert(%Tornex.SpecQuery{origin: origin} = query) when not is_nil(origin) do
     GenServer.call({:global, __MODULE__}, {:insert, query})
   end
 
@@ -76,9 +80,12 @@ defmodule Tornex.Scheduler.QueryRegistry do
   end
 
   @impl GenServer
-  def handle_call({:insert, %Tornex.SpecQuery{} = query}, _from, %{} = state) do
-    # TODO: We need to ensure that the spec query has an orgin to respond to
-
+  def handle_call(
+        {:insert, %Tornex.SpecQuery{origin: origin} = query},
+        _from,
+        %{} = state
+      )
+      when not is_nil(origin) do
     resource = Tornex.SpecQuery.resource!(query)
     resource_id = Tornex.SpecQuery.resource_id!(query)
     selections = Tornex.SpecQuery.selections!(query)
@@ -104,11 +111,6 @@ defmodule Tornex.Scheduler.QueryRegistry do
     {:reply, :ok, new_state}
   end
 
-  # TODO: Something needs to track what queries will respond for other queries and send the data received
-  # from that query to the others.
-  # TODO: We need to decrement the pending count for every query "taken" from a bucket other than the query
-  # being processed. Additionally, we will need to remove the queries from the bucket.
-
   # TODO: There needs to be a way to enqueue quarantined requests that won't be inserted into the query tree
 
   @impl GenServer
@@ -119,9 +121,14 @@ defmodule Tornex.Scheduler.QueryRegistry do
     # such, this should respond as fast as possible to avoid blocking buckets and this GenServer
     # for too long.
 
-    execution_unit =  merge_similar(query, state)
+    execution_unit = merge_similar(query, state)
 
-    # TODO: Remove parent queries from the buckets they are in
+    # We want to remove the parents of the execution unit. The query that started this merge is not
+    # guaranteed to be in the queue of the parent's bucket, but Bucket.pop should silently ignore
+    # queries not in the bucket's queue.
+    Enum.each(execution_unit.parents, &Tornex.Scheduler.Bucket.pop/1)
+
+    execution_unit
   end
 
   @doc """
@@ -203,22 +210,17 @@ defmodule Tornex.Scheduler.QueryRegistry do
     # We can merge the public and non-public queries by first merging non-public queries into a SpecQuery with non-public queries.
     # If there is that SpecQuery with non-public queries, we can merge all public into it. Otherwise, all public queries should be
     # merged into a SpecQUery with only public queries.
-    IO.inspect(queries_subset)
 
     non_public_queries =
       Enum.filter(queries_subset, fn %Tornex.SpecQuery{paths: query_paths, key_owner: query_key_owner} ->
         original_query_key_owner == query_key_owner and
           Enum.any?(query_paths, fn path -> Enum.member?(non_public_paths, path) end)
       end)
-      |> IO.inspect(label: "non public")
 
     only_public_queries =
       Enum.filter(queries_subset, fn %Tornex.SpecQuery{paths: query_paths} ->
         Enum.all?(query_paths, fn path -> Enum.member?(public_paths, path) end)
       end)
-      |> IO.inspect(label: "only public")
-
-    IO.puts("")
 
     cond do
       non_public_queries == [] and only_public_queries != [] ->
@@ -361,6 +363,7 @@ defmodule Tornex.Scheduler.QueryRegistry do
           # TODO: Implement this such that only the queries that are being handled by this SpecQuery will be removed
           queries
           |> MapSet.new()
+
           nil
       end)
     end)

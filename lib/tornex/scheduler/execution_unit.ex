@@ -3,7 +3,7 @@ defmodule Tornex.Scheduler.ExecutionUnit do
   An execution unit for the API used by the scheduler to fan out combed queries.
   """
 
-  # TODO: Doducment this module
+  # TODO: Document this module
 
   defstruct [
     :paths,
@@ -100,12 +100,13 @@ defmodule Tornex.Scheduler.ExecutionUnit do
   end
 
   # TODO: Determine response type
-  @spec reply_fan_out(response :: map() | list() | Tornex.API.error(), execution_unit :: t()) :: term()
+  @spec reply_fan_out(response :: map() | list() | Tornex.API.error(), execution_unit :: t()) :: :ok | term()
   defp reply_fan_out(response, %__MODULE__{parents: [%Tornex.SpecQuery{} = parent]} = _execution_unit) do
     # If there is only one parent in the ExecutionUnit, it should have already short-circuited when the
     # query was added to the QueryRegistry, but we can still short-circuit it here. Since there's only
     # one parent in the ExecutionUnit, we can just reply to the parent as normal without handling the 
     # response value.
+
     do_reply(parent, response)
   end
 

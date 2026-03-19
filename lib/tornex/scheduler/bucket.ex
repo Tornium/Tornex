@@ -196,6 +196,27 @@ defmodule Tornex.Scheduler.Bucket do
   end
 
   @doc """
+  Remove a `Tornex.Query` or `Tornex.SpecQuery` from the queue of queries belonging to the bucket of the owner
+  of the API key used fr the query.
+
+  If there does not exist a `Tornex.Scheduler.Bucket` belonging to the key owner, then `{:error, :not_found}`
+  will be returned. Otherwise `:ok` will be returned if the query has been successfully been removed from the
+  bucket it belonged to.
+  """
+  @spec pop(query :: Tornex.Query.t() | Tornex.SpecQuery.t(), opts :: keyword()) :: :ok | {:error, :not_found}
+  def pop(%module{key_owner: key_owner} = query, opts \\ [])
+      when module in [Tornex.Query, Tornex.SpecQuery] and is_integer(key_owner) do
+    case get_by_id(key_owner) do
+      {:ok, bucket_pid} ->
+        timeout = Keyword.get(opts, :timeout, 60_000)
+        GenServer.call(bucket_pid, {:pop, query}, timeout)
+
+      :error ->
+        {:error, :not_found}
+    end
+  end
+
+  @doc """
   Retrieves the `pid` of the bucket by the bucket's user ID.
 
   Using the `Tornex.Scheduler.BucketRegistry` that creates the relationship between the bucket and the user ID upon
@@ -222,10 +243,11 @@ defmodule Tornex.Scheduler.Bucket do
   @doc false
   @impl true
   def handle_call(
-        {:enqueue, query},
+        {:enqueue, %module{key_owner: query_key_owner} = query},
         from,
         %{ttl: ttl, query_priority_queue: query_priority_queue, pending_count: pending_count} = state
-      ) do
+      )
+      when module in [Tornex.Query, Tornex.SpecQuery] do
     # Add from to query in case the request is dumped for the reply to be sent
     query = %{query | origin: from}
     timeout = timeout(ttl)
@@ -244,9 +266,9 @@ defmodule Tornex.Scheduler.Bucket do
 
         state =
           case merged_query do
-            %Tornex.Scheduler.ExecutionUnit{} ->
-              # We only want to increase the pending count of the Bucket if the user's key is being used
-              # TODO: Implement the above
+            %Tornex.Scheduler.ExecutionUnit{key_owner: ^query_key_owner} ->
+              # We only want to increase the pending count of the Bucket if the user's key is being used as
+              # otherwise we would be unnecessarily preventing a user's bucket from making queries.
               state
               |> Map.replace(:timeout, timeout)
 
@@ -271,9 +293,9 @@ defmodule Tornex.Scheduler.Bucket do
 
         state =
           case merged_query do
-            %Tornex.Scheduler.ExecutionUnit{} ->
-              # We only want to increase the pending count of the Bucket if the user's key is being used
-              # TODO: Implement the above
+            %Tornex.Scheduler.ExecutionUnit{key_owner: ^query_key_owner} ->
+              # We only want to increase the pending count of the Bucket if the user's key is being used as
+              # otherwise we would be unnecessarily preventing a user's bucket from making queries.
               state
               |> Map.replace(:timeout, timeout)
 
@@ -309,61 +331,47 @@ defmodule Tornex.Scheduler.Bucket do
 
   @doc false
   @impl true
-  def handle_info(:dump, %{timeout: timeout, ttl: ttl} = state) do
+  def handle_call({:pop, %module{} = query}, _from, %{query_priority_queue: pending_queue} = state)
+      when module in [Tornex.Query, Tornex.SpecQuery] do
+    updated_queue = Enum.reject(pending_queue, &(&1 == query))
+
+    {:reply, :ok, %{state | query_priority_queue: updated_queue}, remaining_ttl(state)}
+  end
+
+  @doc false
+  @impl true
+  def handle_info(:dump, state) when is_map(state) do
     # TODO: Make this functionality synchronous to prevent race conditions
-
-    if Tornex.NodeRatelimiter.ratelimited?() do
-      # The node is ratelimited so queries can't be dumped.
-      ttl =
-        cond do
-          is_nil(timeout) ->
-            :infinity
-
-          timeout - System.monotonic_time(:millisecond) < 0 ->
-            # The timeout value is older than the current time. To be safe, we'll extend the timeout.
-            ttl
-
-          true ->
-            # The time remaining on the TTL before the dump signal was received.
-            timeout - System.monotonic_time(:millisecond)
-        end
-
-      {:noreply, state, ttl}
-    else
-      # TODO: This should be made recursive such that chunks of the queue can be removed when multiple 
-      # SpecQuery are combined while allowing the bucket to be filled
-      {dumped_queries, remaining_queries} =
-        Enum.split(state.query_priority_queue, @bucket_capacity - state.pending_count)
-
-      state =
+    updated_state =
+      if Tornex.NodeRatelimiter.ratelimited?() do
+        # The node is ratelimited so queries can't be dumped.
         state
-        |> Map.replace(:pending_count, 0)
-        |> Map.replace(:query_priority_queue, remaining_queries)
+      else
+        # TODO: This should be made recursive such that chunks of the queue can be removed when multiple 
+        # SpecQuery are combined while allowing the bucket to be filled
+        {dumped_queries, remaining_queries} =
+          Enum.split(state.query_priority_queue, @bucket_capacity - state.pending_count)
 
-      Enum.each(dumped_queries, &make_request/1)
+        state =
+          state
+          |> Map.replace(:pending_count, 0)
+          |> Map.replace(:query_priority_queue, remaining_queries)
 
-      ttl =
-        cond do
-          is_nil(timeout) ->
-            :infinity
+        Enum.each(dumped_queries, &make_request/1)
 
-          timeout - System.monotonic_time(:millisecond) < 0 ->
-            # The timeout value is older than the current time. To be safe, we'll extend the timeout.
-            ttl
+        state
+      end
 
-          true ->
-            # The time remaining on the TTL before the dump signal was received.
-            timeout - System.monotonic_time(:millisecond)
-        end
-
-      {:noreply, state, ttl}
-    end
+    {:noreply, updated_state, remaining_ttl(updated_state)}
   end
 
   @doc false
   @impl true
   def handle_info(:timeout, %{query_priority_queue: query_priority_queue} = state)
       when query_priority_queue == [] do
+    # We only want to shut down buckets where the queue is empty to avoid any issues with the 
+    # QueryRegistry and ExecutionUnits attempting to modify the queue after it has shutdown
+
     :telemetry.execute([:tornex, :bucket, :timeout], %{}, %{pid: self()})
     {:stop, :shutdown, state}
   end
@@ -376,24 +384,9 @@ defmodule Tornex.Scheduler.Bucket do
 
   @doc false
   @impl true
-  def handle_info(_msg, %{timeout: timeout, ttl: ttl} = state) do
+  def handle_info(_msg, state) when is_map(state) do
     # This is needed to catch extraneous messages and prevent the GenServer from crashing/restarting
-
-    ttl =
-      cond do
-        is_nil(timeout) ->
-          :infinity
-
-        timeout - System.monotonic_time(:millisecond) < 0 ->
-          # The timeout value is older than the current time. To be safe, we'll extend the timeout.
-          ttl
-
-        true ->
-          # The time remaining on the TTL before the dump signal was received.
-          timeout - System.monotonic_time(:millisecond)
-      end
-
-    {:noreply, state, ttl}
+    {:noreply, state, remaining_ttl(state)}
   end
 
   @doc false
@@ -421,5 +414,21 @@ defmodule Tornex.Scheduler.Bucket do
 
   defp timeout(ttl) when is_integer(ttl) do
     System.monotonic_time(:millisecond) + ttl
+  end
+
+  # TODO: Create typespec for state
+  @spec remaining_ttl(state :: map()) :: integer() | nil
+  defp remaining_ttl(%{timeout: timeout} = _state) when is_nil(timeout) do
+    :infinity
+  end
+
+  defp remaining_ttl(%{timeout: timeout, ttl: ttl} = _state) do
+    if timeout - System.monotonic_time(:millisecond) < 0 do
+      # The timeout value is older than the current time. To be safe, we'll extend the timeout.
+      ttl
+    else
+      # The time remaining on the TTL before the dump signal was received.
+      timeout - System.monotonic_time(:millisecond)
+    end
   end
 end

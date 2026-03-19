@@ -21,10 +21,17 @@ defmodule Tornex.Test.QueryRegistry do
   test "insert queries with different resources" do
     {:ok, pid} = ExUnit.Callbacks.start_supervised(Tornex.Scheduler.QueryRegistry)
 
-    query_user = SpecQuery.new() |> SpecQuery.put_path(Torngen.Client.Path.User.Basic)
-    Tornex.Scheduler.QueryRegistry.insert(query_user)
+    query_user =
+      SpecQuery.new()
+      |> SpecQuery.put_path(Torngen.Client.Path.User.Basic)
+      |> then(&%SpecQuery{&1 | origin: self()})
 
-    query_faction = SpecQuery.new() |> SpecQuery.put_path(Torngen.Client.Path.Faction.Revives)
+    query_faction =
+      SpecQuery.new()
+      |> SpecQuery.put_path(Torngen.Client.Path.Faction.Revives)
+      |> then(&%SpecQuery{&1 | origin: self()})
+
+    Tornex.Scheduler.QueryRegistry.insert(query_user)
     Tornex.Scheduler.QueryRegistry.insert(query_faction)
 
     assert %{
@@ -50,10 +57,14 @@ defmodule Tornex.Test.QueryRegistry do
       SpecQuery.new()
       |> SpecQuery.put_path(Torngen.Client.Path.User.Basic)
       |> SpecQuery.put_path(Torngen.Client.Path.User.Attacks)
+      |> then(&%SpecQuery{&1 | origin: self()})
+
+    query_attacks =
+      SpecQuery.new()
+      |> SpecQuery.put_path(Torngen.Client.Path.User.Attacks)
+      |> then(&%SpecQuery{&1 | origin: self()})
 
     Tornex.Scheduler.QueryRegistry.insert(query_basic)
-
-    query_attacks = SpecQuery.new() |> SpecQuery.put_path(Torngen.Client.Path.User.Attacks)
     Tornex.Scheduler.QueryRegistry.insert(query_attacks)
 
     assert %{
@@ -76,14 +87,15 @@ defmodule Tornex.Test.QueryRegistry do
       |> SpecQuery.put_path(Torngen.Client.Path.User.Id.Basic)
       |> SpecQuery.put_path(Torngen.Client.Path.User.Id.Bounties)
       |> SpecQuery.put_parameter!(:id, 1)
-
-    Tornex.Scheduler.QueryRegistry.insert(query_one)
+      |> then(&%SpecQuery{&1 | origin: self()})
 
     query_two =
       SpecQuery.new()
       |> SpecQuery.put_path(Torngen.Client.Path.User.Id.Basic)
       |> Tornex.SpecQuery.put_parameter!(:id, 2)
+      |> then(&%SpecQuery{&1 | origin: self()})
 
+    Tornex.Scheduler.QueryRegistry.insert(query_one)
     Tornex.Scheduler.QueryRegistry.insert(query_two)
 
     assert %{
