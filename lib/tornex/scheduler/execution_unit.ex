@@ -90,7 +90,6 @@ defmodule Tornex.Scheduler.ExecutionUnit do
     }
   end
 
-  # TODO: Determine response type
   @spec get(execution_unit :: t()) :: term()
   def get(%__MODULE__{} = execution_unit) do
     execution_unit
@@ -99,8 +98,7 @@ defmodule Tornex.Scheduler.ExecutionUnit do
     |> reply_fan_out(execution_unit)
   end
 
-  # TODO: Determine response type
-  @spec reply_fan_out(response :: map() | list() | Tornex.API.error(), execution_unit :: t()) :: :ok | term()
+  @spec reply_fan_out(response :: map() | list() | Tornex.API.error(), execution_unit :: t()) :: term()
   defp reply_fan_out(response, %__MODULE__{parents: [%Tornex.SpecQuery{} = parent]} = _execution_unit) do
     # If there is only one parent in the ExecutionUnit, it should have already short-circuited when the
     # query was added to the QueryRegistry, but we can still short-circuit it here. Since there's only
@@ -132,6 +130,8 @@ defmodule Tornex.Scheduler.ExecutionUnit do
 
       %Tornex.SpecQuery{} = query ->
         Tornex.Scheduler.Bucket.make_request(query)
+
+        :ok
     end)
   end
 
@@ -143,13 +143,34 @@ defmodule Tornex.Scheduler.ExecutionUnit do
     Enum.each(execution_unit.parents, &do_reply(&1, response))
   end
 
-  defp reply_fan_out(response, %__MODULE__{} = _execution_unit) when is_map(response) do
+  defp reply_fan_out(response, %__MODULE__{} = execution_unit) when is_map(response) do
     # Since we received a proper API response from the client, we need to split up the API response into
     # the sections required for each client such that the client perceives it to be a normal response.
-    # TODO: We need to split up the response into the sections necessary for each caller
+    Enum.each(execution_unit.parents, &reply_part(&1, response))
   end
 
-  @spec do_reply(query :: Tornex.SpecQuery.t(), reply_value :: term()) :: term()
+  @spec reply_part(query :: Tornex.SpecQuery.t(), response :: map()) :: :ok
+  defp reply_part(%Tornex.SpecQuery{paths: paths, origin: origin} = query, response)
+       when is_map(response) and not is_nil(origin) do
+    # To reply for a specific SpecQuery that is part of an ExecutionUnit, we need to determine which subset
+    # of the API response corresponds to the paths requested by the SpecQuery. We do not want to parse the
+    # response with Torngen.Client so we must determine if it would be included by the first level string
+    # keys from the Torngen.Client repsonse schema modules corresponding to the paths requested.
+
+    path_keys =
+      paths
+      |> Enum.map(fn path_module when is_atom(path_module) ->
+        apply(path_module, :keys, [])
+      end)
+      |> Enum.uniq()
+      |> Enum.map(&Atom.to_string/1)
+
+    filtered_response_part = Enum.filter(response, fn {key, _value} -> Enum.member?(path_keys, key) end)
+
+    do_reply(query, filtered_response_part)
+  end
+
+  @spec do_reply(query :: Tornex.SpecQuery.t(), reply_value :: term()) :: :ok | nil
   defp do_reply(%Tornex.SpecQuery{origin: origin} = _query, _reply_value) when is_nil(origin) do
     nil
   end
