@@ -77,6 +77,8 @@ defmodule Tornex.Scheduler.QueryRegistry do
 
   @impl GenServer
   def handle_call({:insert, %Tornex.SpecQuery{} = query}, _from, %{} = state) do
+    # TODO: We need to ensure that the spec query has an orgin to respond to
+
     resource = Tornex.SpecQuery.resource!(query)
     resource_id = Tornex.SpecQuery.resource_id!(query)
     selections = Tornex.SpecQuery.selections!(query)
@@ -117,7 +119,9 @@ defmodule Tornex.Scheduler.QueryRegistry do
     # such, this should respond as fast as possible to avoid blocking buckets and this GenServer
     # for too long.
 
-    merge_similar(query, state)
+    execution_unit =  merge_similar(query, state)
+
+    # TODO: Remove parent queries from the buckets they are in
   end
 
   @doc """
@@ -327,14 +331,24 @@ defmodule Tornex.Scheduler.QueryRegistry do
     |> length()
   end
 
-  @spec remove(state :: state(), query :: Tornex.Spec.t()) :: state()
-  defp remove(state, %Tornex.SpecQuery{} = query) when is_map(state) do
+  @spec remove(state :: state(), execution_unit :: Tornex.Scheduler.ExecutionUnit.t()) :: state()
+  defp remove(state, %Tornex.Scheduler.ExecutionUnit{} = execution_unit) when is_map(state) do
     # We need to traverse the state tree and remove the leafs that are being fulfilled by this SpecQuery and
     # the nodes that no longer have a leaf attached to it
 
-    resource = Tornex.SpecQuery.resource!(query)
-    resource_id = Tornex.SpecQuery.resource_id!(query)
-    selections = Tornex.SpecQuery.selections!(query)
+    first_query =
+      execution_unit
+      |> Map.get(:parents)
+      |> Enum.at(0)
+
+    resource = Tornex.SpecQuery.resource!(first_query)
+    resource_id = Tornex.SpecQuery.resource_id!(first_query)
+
+    selections =
+      execution_unit
+      |> Map.get(:parents)
+      |> Enum.flat_map(&Tornex.SpecQuery.selections!/1)
+      |> Enum.uniq()
 
     selections
     |> Enum.reduce(state, fn _selection, acc ->
@@ -345,6 +359,8 @@ defmodule Tornex.Scheduler.QueryRegistry do
 
         queries when is_list(queries) ->
           # TODO: Implement this such that only the queries that are being handled by this SpecQuery will be removed
+          queries
+          |> MapSet.new()
           nil
       end)
     end)
@@ -352,7 +368,7 @@ defmodule Tornex.Scheduler.QueryRegistry do
     |> prune_path([resource])
   end
 
-  @spec prune_path(state :: map(), path :: [term()]) :: map()
+  @spec prune_path(state :: state(), path :: [term()]) :: map()
   defp prune_path(state, path) when is_map(state) and is_list(path) do
     case get_in(state, path) do
       child when is_map(child) and map_size(child) == 0 ->

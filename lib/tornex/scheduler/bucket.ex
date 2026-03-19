@@ -396,19 +396,22 @@ defmodule Tornex.Scheduler.Bucket do
     {:noreply, state, ttl}
   end
 
+  @doc false
   @spec make_request(query :: Tornex.Query.t() | Tornex.SpecQuery.t() | Tornex.Scheduler.ExecutionUnit.t()) :: Task.t()
-  defp make_request(%Tornex.Scheduler.ExecutionUnit{} = _query) do
-    Task.Supervisor.async_nolink(Tornex.Scheduler.TaskSupervisor, fn ->
-      # TODO: Get API reponse with Tornex.API.get/1
-      # TODO: Split API response and fanout response
-      nil
-    end)
+  def make_request(%Tornex.Scheduler.ExecutionUnit{parents: [%Tornex.SpecQuery{} = parent]} = _query) do
+    # If there is only one parent in the ExecutionUnit, we should short-circuit the request and shunt it
+    # to the normal Tornex.API.get flow to avoid excess processing (and to reduce the potential and
+    # effect of bugs).
+
+    make_request(parent)
   end
 
-  defp make_request(%{origin: from} = query) do
-    Task.Supervisor.async_nolink(Tornex.Scheduler.TaskSupervisor, fn ->
-      GenServer.reply(from, Tornex.API.get(query))
-    end)
+  def make_request(%Tornex.Scheduler.ExecutionUnit{} = query) do
+    Task.Supervisor.async_nolink(Tornex.Scheduler.TaskSupervisor, fn -> Tornex.Scheduler.ExecutionUnit.get(query) end)
+  end
+
+  def make_request(%{origin: from} = query) do
+    Task.Supervisor.async_nolink(Tornex.Scheduler.TaskSupervisor, fn -> GenServer.reply(from, Tornex.API.get(query)) end)
   end
 
   @spec timeout(ttl :: :infinity | integer()) :: integer() | nil
