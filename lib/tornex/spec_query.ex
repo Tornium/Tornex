@@ -46,7 +46,8 @@ defmodule Tornex.SpecQuery do
           # Values required for the scheduler
           key_owner: pos_integer(),
           nice: niceness(),
-          origin: GenServer.from() | nil
+          origin: GenServer.from() | nil,
+          quarantine: boolean()
         }
 
   defstruct [
@@ -57,13 +58,16 @@ defmodule Tornex.SpecQuery do
     # Values required for the scheduler
     :key_owner,
     :nice,
-    :origin
+    :origin,
+    :quarantine
   ]
 
   @doc """
   Initialize an empty query against the OpenAPI specification.
 
-  By default, the niceness of the request will be set to 20 and the key owner will be set to 0. The key owner of 0 is intended to be for requests where the owner of the key is not known (e.g. for determining the owner of the API key).
+  By default, the niceness of the request will be set to 20 and the key owner will be set to 0. The key
+  owner of 0 is intended to be for requests where the owner of the key is not known (e.g. for determining
+  the owner of the API key).
 
   ## Options
 
@@ -72,6 +76,7 @@ defmodule Tornex.SpecQuery do
     * `:key` - API key
     * `:key_owner` - ID of the owner of the API key (default: `0`)
     * `:nice` - Priority of the API call between -20 and 20 (default: `20`)
+    * `:quarantine` - Boolean to quarantine the query from the `QueryRegistry` (default: `false`)
   """
   @spec new(opts :: Keyword.t()) :: t()
   def new(opts \\ []) do
@@ -81,7 +86,8 @@ defmodule Tornex.SpecQuery do
       key: Keyword.get(opts, :key, nil),
       key_owner: Keyword.get(opts, :key_owner, 0),
       nice: Keyword.get(opts, :nice, 20),
-      origin: nil
+      origin: nil,
+      quarantine: Keyword.get(opts, :quarantine, false)
     }
   end
 

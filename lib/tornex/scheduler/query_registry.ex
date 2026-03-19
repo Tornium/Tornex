@@ -17,7 +17,7 @@ defmodule Tornex.Scheduler.QueryRegistry do
   A registry for `SpecQuery` backed by a tree held by a globally registered GenServer.
 
   This module will store each `SpecQuery` and map the query to its `Tornex.Supervisor.Bucket` to allow for 
-  the combination of queries.
+  the combination of queries. This only applies to `SpecQuery` that are not quarantined.
 
   ## Example Tree
   user
@@ -66,6 +66,11 @@ defmodule Tornex.Scheduler.QueryRegistry do
   Merge any applicable `SpecQuery` for this combintion of a resource and resource ID together.
   """
   @spec merge(query :: Tornex.SpecQuery.t()) :: Tornex.SpecQuery.t()
+  def merge(%Tornex.SpecQuery{quarantine: true} = query) do
+    # If the query is quarantined, we should skip this and let the Bucket handle this query normally.
+    query
+  end
+
   def merge(%Tornex.SpecQuery{} = query) do
     GenServer.call({:global, __MODULE__}, {:merge, query})
   end
@@ -111,8 +116,6 @@ defmodule Tornex.Scheduler.QueryRegistry do
     {:reply, :ok, new_state}
   end
 
-  # TODO: There needs to be a way to enqueue quarantined requests that won't be inserted into the query tree
-
   @impl GenServer
   def handle_call({:merge, %Tornex.SpecQuery{} = query}, _from, %{} = state) do
     # We need to find similar queries to combine with this query. Any similar queries will need to be
@@ -128,12 +131,17 @@ defmodule Tornex.Scheduler.QueryRegistry do
     # queries not in the bucket's queue.
     Enum.each(execution_unit.parents, &Tornex.Scheduler.Bucket.pop/1)
 
+    # TODO: After the queries are merged, we'll want to drop the unused branches of the state tree
+    # to minimize memory usage. This can probably be done with some sort of timer, but MUST be done
+    # in a manner that will not block the GenServer from processing requests for a substantial period
+    # of time. This may mean that it's better for it to never clean up.
+
     execution_unit
   end
 
   @doc """
   Merge "similar" queries to the `Tornex.SpecQuery` provided to create one query containing as many
-  selections as possible.
+  selections as possible. Quarantined queries will not be merged and will be executed as provided.
 
   **NOTE:** The queries may not necessarily be merged into the query provided if it is more efficient to
   merge the queries into a different non-public query.
@@ -147,7 +155,7 @@ defmodule Tornex.Scheduler.QueryRegistry do
     4) Not have an additional permission required such as faction API access.
   """
   @spec merge_similar(query :: Tornex.SpecQuery.t(), state :: state()) :: Tornex.Scheduler.ExecutionUnit.t()
-  def merge_similar(%Tornex.SpecQuery{} = query, state) when is_map(state) do
+  def merge_similar(%Tornex.SpecQuery{quarantine: false} = query, state) when is_map(state) do
     resource = Tornex.SpecQuery.resource!(query)
     resource_id = Tornex.SpecQuery.resource_id!(query)
 

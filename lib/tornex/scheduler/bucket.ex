@@ -51,6 +51,13 @@ defmodule Tornex.Scheduler.Bucket do
       end)
       |> Task.await_many(timeout)
 
+  If the query is a `Tornex.SpecQuery` that can be combined with any other `Tornex.SpecQuery`, including
+  those from other buckets, the set of queries will be merged into a `Tornex.Scheduler.ExecutionUnit`
+  that will be executed as one API call. The response of this API call will be split into the necessary
+  components for each `Tornex.SpecQuery` and these components will be returned as if the query was
+  performed directly. For more information, see `Tornex.Scheduler.QueryRegistry` and
+  `Tornex.Scheduler.ExecutionUnit`.
+
   ## Bucket Timeouts
   By default, the bucket will never time out when the bucket does not receive any requests.
   This can be configured in milliseconds globally using the `:bucket_ttl` configuration key
@@ -272,7 +279,7 @@ defmodule Tornex.Scheduler.Bucket do
 
         state =
           case merged_query do
-            %Tornex.Scheduler.ExecutionUnit{key_owner: ^query_key_owner} ->
+            %Tornex.Scheduler.ExecutionUnit{key_owner: key_owner} when key_owner != query_key_owner ->
               # We only want to increase the pending count of the Bucket if the user's key is being used as
               # otherwise we would be unnecessarily preventing a user's bucket from making queries.
               state
@@ -299,7 +306,7 @@ defmodule Tornex.Scheduler.Bucket do
 
         state =
           case merged_query do
-            %Tornex.Scheduler.ExecutionUnit{key_owner: ^query_key_owner} ->
+            %Tornex.Scheduler.ExecutionUnit{key_owner: key_owner} when key_owner != query_key_owner ->
               # We only want to increase the pending count of the Bucket if the user's key is being used as
               # otherwise we would be unnecessarily preventing a user's bucket from making queries.
               state
