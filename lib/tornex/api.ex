@@ -45,7 +45,7 @@ defmodule Tornex.API do
   @base_url Application.compile_env(:tornex, :base_url, "https://api.torn.com")
   @comment Application.compile_env(:tornex, :comment, "tex-" <> Mix.Project.config()[:version])
 
-  @doc ~S"""
+  @doc """
   Converts a `Tornex.Query` or `Tornex.SpecQuery` to the URL required to make the HTTP request.
 
       iex> query = %Tornex.Query{

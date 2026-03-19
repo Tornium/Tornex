@@ -66,7 +66,13 @@ defmodule Tornex.Scheduler.Bucket do
   @bucket_capacity 10
   @bucket_ttl Application.compile_env(:tornex, :bucket_ttl, :infinity)
 
-  # Public API
+  @type state :: %{
+          query_priority_queue: [Tornex.Query.t() | Tornex.SpecQuery.t()],
+          pending_count: non_neg_integer(),
+          ttl: timeout(),
+          timeout: pos_integer() | nil
+        }
+
   @doc """
   Starts the bucket for a user.
 
@@ -407,7 +413,7 @@ defmodule Tornex.Scheduler.Bucket do
     Task.Supervisor.async_nolink(Tornex.Scheduler.TaskSupervisor, fn -> GenServer.reply(from, Tornex.API.get(query)) end)
   end
 
-  @spec timeout(ttl :: :infinity | integer()) :: integer() | nil
+  @spec timeout(ttl :: :infinity | non_neg_integer()) :: non_neg_integer() | nil
   defp timeout(:infinity = _ttl) do
     nil
   end
@@ -416,8 +422,7 @@ defmodule Tornex.Scheduler.Bucket do
     System.monotonic_time(:millisecond) + ttl
   end
 
-  # TODO: Create typespec for state
-  @spec remaining_ttl(state :: map()) :: integer() | nil
+  @spec remaining_ttl(state :: state()) :: non_neg_integer() | nil
   defp remaining_ttl(%{timeout: timeout} = _state) when is_nil(timeout) do
     :infinity
   end
