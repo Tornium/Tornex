@@ -20,6 +20,7 @@ erl_crash.dump
 *.ez
 
 /.elixir_ls/
+/.expert/
 
 # Ignore package tarball (built via "mix hex.build").
 tornex-*.tar
