@@ -14,12 +14,17 @@
 
 defmodule Tornex.Scheduler.QueryRegistry do
   @moduledoc """
-  A registry for `SpecQuery` backed by a tree held by a globally registered GenServer.
+  A registry for `Tornex.SpecQuery` backed by a tree held by a globally registered `GenServer`.
 
-  This module will store each `SpecQuery` and map the query to its `Tornex.Supervisor.Bucket` to allow for 
-  the combination of queries. This only applies to `SpecQuery` that are not quarantined.
+  This module will store each `Tornex.SpecQuery` and map the query to its `Tornex.Scheduler.Bucket`
+  to allow for the combination of queries. This only applies to `Tornex.SpecQuery` that are not quarantined.
+  """
+
+  @typedoc """
+  The state for the `GenServer` of the tree representing pending, un-fulfilled API calls.
 
   ## Example Tree
+  ```
   user
   ├─ 2383326
   │  ├─ profile
@@ -32,14 +37,20 @@ defmodule Tornex.Scheduler.QueryRegistry do
   ├─ nil
   │  ├─ crimes
   │  ├─ items
+  ```
   """
-
-  @type state :: %{String.t() => %{(Tornex.SpecQuery.parameter() | nil) => %{String.t() => [Tornex.SpecQuery.t()]}}}
+  @type state :: %{
+          String.t() => %{
+            (Tornex.SpecQuery.parameter() | nil) => %{
+              String.t() => [Tornex.SpecQuery.t()]
+            }
+          }
+        }
 
   use GenServer
 
   @doc """
-  Start the `QueryRegistry` GenServer.
+  Start the `Tornex.Scheduler.QueryRegistry` GenServer.
   """
   @spec start_link(opts :: keyword()) :: GenServer.on_start()
   def start_link(opts \\ []) do
@@ -47,11 +58,11 @@ defmodule Tornex.Scheduler.QueryRegistry do
   end
 
   @doc """
-  Insert a `SpecQuery` into the query tree.
+  Insert a `Tornex.SpecQuery` into the query tree.
 
-  The `SpecQuery` must be registered against an origin (of type `Genserver.from()`) so that the `ExecutionUnit`
-  generated including the `SpecQuery` will be able to return the piece of the response corresponding to the 
-  `SpecQuery` to the origin.
+  The `Tornex.SpecQuery` must be registered against an origin (of type `Genserver.from()`) so that the
+  `Tornex.Scheduler.ExecutionUnit` generated including the `Tornex.SpecQuery` will be able to return the
+  portion of the response corresponding to the `Tornex.SpecQuery` to the origin.
   """
   @spec insert(query :: Tornex.SpecQuery.t()) :: :ok
   def insert(%Tornex.SpecQuery{origin: origin} = query) when not is_nil(origin) do
@@ -63,9 +74,9 @@ defmodule Tornex.Scheduler.QueryRegistry do
   def insert(%Tornex.Query{} = _query), do: :ok
 
   @doc """
-  Merge any applicable `SpecQuery` for this combintion of a resource and resource ID together.
+  Merge any applicable `Tornex.SpecQuery` for this combintion of a resource and resource ID together.
   """
-  @spec merge(query :: Tornex.SpecQuery.t()) :: Tornex.SpecQuery.t()
+  @spec merge(query :: Tornex.SpecQuery.t()) :: Tornex.Scheduler.ExecutionUnit.t() | Tornex.SpecQuery.t()
   def merge(%Tornex.SpecQuery{quarantine: true} = query) do
     # If the query is quarantined, we should skip this and let the Bucket handle this query normally.
     query
@@ -261,7 +272,9 @@ defmodule Tornex.Scheduler.QueryRegistry do
     |> Enum.reject(fn subset when is_list(subset) -> subset == [] end)
   end
 
+  @typedoc false
   @type conflict_map :: %{Tornex.SpecQuery.t() => MapSet.t(Tornex.SpecQuery.t())}
+
   @spec conflict_graph(queries :: [Tornex.SpecQuery.t()]) :: conflict_map()
   defp conflict_graph(queries) when is_list(queries) do
     # We want to build a lookup table of the queries that will conflict with other queries to avoid
@@ -309,7 +322,7 @@ defmodule Tornex.Scheduler.QueryRegistry do
   end
 
   @doc """
-  Determine if a list of queries is "conflict free".
+  Determine if a list of `Tornex.SpecQuery` is "conflict free".
 
   For the list of queries to be "conflict free", all of the queries must have one unique value for
   each parameter key-value pair.

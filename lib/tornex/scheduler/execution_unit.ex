@@ -1,9 +1,15 @@
 defmodule Tornex.Scheduler.ExecutionUnit do
   @moduledoc """
-  An execution unit for the API used by the scheduler to fan out combed queries.
-  """
+  An execution unit for the API used by the scheduler to fan out combined queries.
 
-  # TODO: Document this module
+  Given a set of parent `Tornex.SpecQuery` from the `Tornex.Scheduler.QueryRegistry` with the same resource and
+  resource ID (eg `user/1` for all queries against Chedburn's user), this module will merge the queries into a
+  single `Tornex.Scheduler.ExecutionUnit` representing all of the queries as a single query. The
+  `Tornex.Scheduler.ExecutionUnit` will act as a `Tornex.SpecQuery` for the purposes of performing the API
+  call with `get/1`, but after the API responds with data, the `Tornex.Scheduler.ExecutionUnit` will split
+  the API response for the paths requested by each parent `Tornex.SpecQuery` and respond to the original caller
+  of the query.
+  """
 
   defstruct [
     :paths,
@@ -23,6 +29,20 @@ defmodule Tornex.Scheduler.ExecutionUnit do
           parents: [Tornex.SpecQuery.t()]
         }
 
+  @doc """
+  Create a new `Tornex.Scheduler.ExecutionUnit`.
+
+  See `Tornex.SpecQuery.new/1` for more information.
+
+  ## Options
+
+    * `:paths` - list of API paths
+    * `:parameters` - list of query/path parameters
+    * `:key` - API key
+    * `:key_owner` - ID of the owner of the API key (default: `0`)
+    * `:nice` - Priority of the API call between -20 and 20 (default: `20`)
+    * `:parents` - List of parent `Tornex.SpecQuery` (default: `[]`)
+  """
   @spec new(opts :: keyword()) :: t()
   def new(opts \\ []) do
     %__MODULE__{
@@ -35,6 +55,19 @@ defmodule Tornex.Scheduler.ExecutionUnit do
     }
   end
 
+  @doc """
+  Merge a `Tornex.SpecQuery` into a `Tornex.Scheduler.ExecutionUnit`.
+
+  This function will add the paths and parameters of the `Tornex.SpecQuery` into those of
+  the `Tornex.Scheduler.ExecutionUnit` such that a portion of the execution unit will represent the 
+  parent query. If there is no API key, API key owner, or niceness in the execution unit, those
+  of the parent query will be added to the execution unit. If there is already a niceness in the
+  execution unit but the parent query has a higher priority niceness, the niceness of the execution
+  unit will be replaced with the parent query's niceness.
+
+  **WARNING:** It is assumed that it has already been validated that it is possible to merge the
+  `Tornex.SpecQuery` into the `Tornex.Scheduler.ExecutionUnit` in terms of security and how the API functions.
+  """
   @spec merge(query :: Tornex.SpecQuery.t(), execution_unit :: t()) :: t()
   def merge(
         %Tornex.SpecQuery{key: query_key, key_owner: query_key_owner, nice: query_nice} = query,
@@ -77,7 +110,11 @@ defmodule Tornex.Scheduler.ExecutionUnit do
   end
 
   @doc """
-  Convert an `ExecutionUnit` to a `SpecQuery`.
+  Convert a `Tornex.Scheduler.ExecutionUnit` to a `Tornex.SpecQuery`.
+
+  When converting the query into an `Tornex.Scheduler.ExecutionUnit`, the API-related data such as the paths and
+  API key stored in the struct will be used in the `Tornex.SpecQuery`. This converted `Tornex.SpecQuery` can be
+  used as normal.
   """
   @spec to_query(execution_unit :: t()) :: Tornex.SpecQuery.t()
   def to_query(%__MODULE__{} = execution_unit) do
@@ -90,6 +127,18 @@ defmodule Tornex.Scheduler.ExecutionUnit do
     }
   end
 
+  @doc """
+  Perform an API call against an `Tornex.Scheduler.ExecutionUnit` and forward the API response.
+
+  This function will perform the API call against the paths, parameters, etc. provided by the
+  `Tornex.Scheduler.ExecutionUnit` with `Tornex.API.get/1` as normal. However, as there can be multiple
+  parents for the `Tornex.Scheduler.ExecutionUnit`, the response needs to be forwarded to all parents.
+
+  To prevent the leakage of potentially sensitive data to other parents and to minimize the size of the
+  API responses forwarded, the API response will be split into only the paths requested by the user.
+  If the API response is either a Torn error or some intermediate error (such as a CloudFlare error or
+  a networking error), the API request may be retried or the error may be forwarded to the parents.
+  """
   @spec get(execution_unit :: t()) :: term()
   def get(%__MODULE__{} = execution_unit) do
     execution_unit
