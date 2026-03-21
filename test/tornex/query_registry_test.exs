@@ -115,10 +115,12 @@ defmodule Tornex.Test.QueryRegistry do
     query_one =
       SpecQuery.new(key_owner: 1)
       |> SpecQuery.put_path(Torngen.Client.Path.User.Basic)
+      |> then(&%{&1 | origin: self()})
 
     query_two =
       SpecQuery.new(key_owner: 1)
       |> SpecQuery.put_path(Torngen.Client.Path.User.Bounties)
+      |> then(&%{&1 | origin: self()})
 
     state = %{
       "user" => %{
@@ -158,10 +160,12 @@ defmodule Tornex.Test.QueryRegistry do
     query_one =
       SpecQuery.new(key_owner: 1)
       |> SpecQuery.put_path(Torngen.Client.Path.User.Basic)
+      |> then(&%{&1 | origin: self()})
 
     query_two =
       SpecQuery.new(key_owner: 2)
       |> SpecQuery.put_path(Torngen.Client.Path.User.Basic)
+      |> then(&%{&1 | origin: self()})
 
     state = %{
       "user" => %{
@@ -200,10 +204,12 @@ defmodule Tornex.Test.QueryRegistry do
     query_one =
       SpecQuery.new(key_owner: 1)
       |> SpecQuery.put_path(Torngen.Client.Path.Torn.Crimes)
+      |> then(&%{&1 | origin: self()})
 
     query_two =
       SpecQuery.new(key_owner: 1)
       |> SpecQuery.put_path(Torngen.Client.Path.Torn.Items)
+      |> then(&%{&1 | origin: self()})
 
     state = %{
       "torn" => %{
@@ -239,11 +245,13 @@ defmodule Tornex.Test.QueryRegistry do
       SpecQuery.new(key_owner: 1)
       |> SpecQuery.put_path(Torngen.Client.Path.User.Id.Basic)
       |> SpecQuery.put_parameter!(:id, 2_383_326)
+      |> then(&%{&1 | origin: self()})
 
     query_two =
       SpecQuery.new(key_owner: 1)
       |> SpecQuery.put_path(Torngen.Client.Path.User.Id.Faction)
       |> SpecQuery.put_parameter!(:id, 2_383_326)
+      |> then(&%{&1 | origin: self()})
 
     state = %{
       "user" => %{
@@ -281,11 +289,13 @@ defmodule Tornex.Test.QueryRegistry do
       SpecQuery.new(key_owner: 1)
       |> SpecQuery.put_path(Torngen.Client.Path.User.Id.Basic)
       |> SpecQuery.put_parameter!(:id, 2_383_326)
+      |> then(&%{&1 | origin: self()})
 
     query_two =
       SpecQuery.new(key_owner: 1)
       |> SpecQuery.put_path(Torngen.Client.Path.User.Id.Basic)
       |> SpecQuery.put_parameter!(:id, 1)
+      |> then(&%{&1 | origin: self()})
 
     state = %{
       "user" => %{
@@ -332,11 +342,13 @@ defmodule Tornex.Test.QueryRegistry do
       Tornex.SpecQuery.new()
       |> Tornex.SpecQuery.put_path(Torngen.Client.Path.User.Profile)
       |> Tornex.SpecQuery.put_path(Torngen.Client.Path.User.Basic)
+      |> then(&%{&1 | origin: self()})
 
     user_one_profile =
       Tornex.SpecQuery.new()
       |> Tornex.SpecQuery.put_path(Torngen.Client.Path.User.Id.Profile)
       |> Tornex.SpecQuery.put_parameter!(:id, 1)
+      |> then(&%{&1 | origin: self()})
 
     state = %{
       "user" => %{
@@ -368,12 +380,14 @@ defmodule Tornex.Test.QueryRegistry do
       Tornex.SpecQuery.new()
       |> Tornex.SpecQuery.put_path(Torngen.Client.Path.User.Id.Profile)
       |> Tornex.SpecQuery.put_parameter!(:id, 1)
+      |> then(&%{&1 | origin: self()})
 
     user_one_profile_bounties =
       Tornex.SpecQuery.new()
       |> Tornex.SpecQuery.put_path(Torngen.Client.Path.User.Id.Profile)
       |> Tornex.SpecQuery.put_path(Torngen.Client.Path.User.Id.Bounties)
       |> Tornex.SpecQuery.put_parameter!(:id, 1)
+      |> then(&%{&1 | origin: self()})
 
     state = %{
       "user" => %{
@@ -412,11 +426,13 @@ defmodule Tornex.Test.QueryRegistry do
       Tornex.SpecQuery.new()
       |> Tornex.SpecQuery.put_path(Torngen.Client.Path.User.Id.Profile)
       |> Tornex.SpecQuery.put_parameter!(:id, 1)
+      |> then(&%{&1 | origin: self()})
 
     user_one_bounties =
       Tornex.SpecQuery.new()
       |> Tornex.SpecQuery.put_path(Torngen.Client.Path.User.Id.Bounties)
       |> Tornex.SpecQuery.put_parameter!(:id, 1)
+      |> then(&%{&1 | origin: self()})
 
     state = %{
       "user" => %{

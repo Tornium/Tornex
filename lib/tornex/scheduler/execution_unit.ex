@@ -70,10 +70,10 @@ defmodule Tornex.Scheduler.ExecutionUnit do
   """
   @spec merge(query :: Tornex.SpecQuery.t(), execution_unit :: t()) :: t()
   def merge(
-        %Tornex.SpecQuery{key: query_key, key_owner: query_key_owner, nice: query_nice} = query,
+        %Tornex.SpecQuery{key: query_key, key_owner: query_key_owner, nice: query_nice, origin: origin} = query,
         %__MODULE__{key: key, key_owner: key_owner, nice: nice, parents: eu_parents} = execution_unit
       )
-      when is_nil(key) or is_nil(key_owner) do
+      when not is_nil(origin) and (is_nil(key) or is_nil(key_owner)) do
     # We need to ensure that the key and key owner are initialized. It must be the earliest possible query
     # to be merged as if there are both public and non-public queries to merge into the ExecutionUnit, the 
     # non-public queries are merged first and we need to ensure that the key is that of the query made against 
@@ -104,7 +104,8 @@ defmodule Tornex.Scheduler.ExecutionUnit do
     %{merged_execution_unit | parents: [query | eu_parents]}
   end
 
-  def merge(%Tornex.SpecQuery{} = query, %__MODULE__{parents: eu_parents} = execution_unit) do
+  def merge(%Tornex.SpecQuery{origin: origin} = query, %__MODULE__{parents: eu_parents} = execution_unit)
+      when not is_nil(origin) do
     %__MODULE__{} = merged_execution_unit = Tornex.SpecQuery.merge(query, execution_unit)
     %{merged_execution_unit | parents: [query | eu_parents]}
   end
@@ -208,13 +209,20 @@ defmodule Tornex.Scheduler.ExecutionUnit do
 
     path_keys =
       paths
-      |> Enum.map(fn path_module when is_atom(path_module) ->
-        apply(path_module, :keys, [])
+      |> Enum.flat_map(fn path_module when is_atom(path_module) ->
+        apply(path_module, :response_modules, [])
+      end)
+      |> Enum.flat_map(fn response_module_name when is_atom(response_module_name) ->
+        response_module = Module.concat(Torngen.Client.Schema, response_module_name)
+        apply(response_module, :keys, [])
       end)
       |> Enum.uniq()
       |> Enum.map(&Atom.to_string/1)
 
-    filtered_response_part = Enum.filter(response, fn {key, _value} -> Enum.member?(path_keys, key) end)
+    filtered_response_part = 
+      response
+      |> Enum.filter(fn {key, _value} -> Enum.member?(path_keys, key) end)
+      |> Map.new()
 
     do_reply(query, filtered_response_part)
   end

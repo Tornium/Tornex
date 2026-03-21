@@ -46,7 +46,7 @@ defmodule Tornex.Scheduler.Timer do
 
     Enum.each(children, fn
       {_, pid, :worker, _} ->
-        send(pid, :dump)
+        Tornex.Scheduler.Bucket.dump(pid)
 
       _ ->
         :ok

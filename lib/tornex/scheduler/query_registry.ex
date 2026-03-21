@@ -128,7 +128,8 @@ defmodule Tornex.Scheduler.QueryRegistry do
   end
 
   @impl GenServer
-  def handle_call({:merge, %Tornex.SpecQuery{} = query}, _from, %{} = state) do
+  def handle_call({:merge, %Tornex.SpecQuery{origin: origin, key_owner: query_key_owner} = query}, _from, %{} = state)
+      when not is_nil(origin) do
     # We need to find similar queries to combine with this query. Any similar queries will need to be
     # marked as being handled by something else. The task handling this query needs to respond to all
     # queries waiting on this query. This MUST be blocking to avoid responding to a `from` twice. As
@@ -139,12 +140,16 @@ defmodule Tornex.Scheduler.QueryRegistry do
 
     # We want to remove the parents of the execution unit. The query that started this merge is not
     # guaranteed to be in the queue of the parent's bucket, but Bucket.pop should silently ignore
-    # queries not in the bucket's queue.
-    Enum.each(execution_unit.parents, &Tornex.Scheduler.Bucket.pop/1)
+    # queries not in the bucket's queue. We should skip queries originating from the bucket of the
+    # original query as to not create a deadlock when this GenServer is waiting on that Bucket to pop
+    # the query and that Bucket is waiting on this GenServer to merge the queries.
+    execution_unit.parents
+    |> Enum.reject(fn %Tornex.SpecQuery{key_owner: parent_key_owner} -> parent_key_owner == query_key_owner end)
+    |> Enum.each(&Tornex.Scheduler.Bucket.pop!/1)
 
     # After the queries are merged, we'll want to drop the unused branches of the state tree to
     # minimize memory usage.
-    {:ok, execution_unit, remove(state, execution_unit)}
+    {:reply, execution_unit, remove(state, execution_unit)}
   end
 
   @doc """
@@ -298,6 +303,7 @@ defmodule Tornex.Scheduler.QueryRegistry do
   """
   @spec greedy_subsets(queries :: [Tornex.SpecQuery.t()]) :: [[Tornex.SpecQuery.t()]]
   def greedy_subsets(queries) when is_list(queries) do
+    # TODO: convert this from building permutations to combinations such that order does not matter
     conflict_graph = conflict_graph(queries)
 
     Enum.map(queries, fn start_node ->

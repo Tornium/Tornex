@@ -76,6 +76,8 @@ defmodule Tornex.Scheduler.Bucket do
   @type state :: %{
           query_priority_queue: [Tornex.Query.t() | Tornex.SpecQuery.t()],
           pending_count: non_neg_integer(),
+          dumping?: boolean(),
+          dump_remaining: non_neg_integer(),
           ttl: timeout(),
           timeout: pos_integer() | nil
         }
@@ -184,7 +186,6 @@ defmodule Tornex.Scheduler.Bucket do
     :telemetry.execute([:tornex, :bucket, :enqueue], %{}, %{
       selections: query.selections,
       resource: query.resource,
-      resource_id: query.resource_id,
       user: key_owner
     })
 
@@ -208,25 +209,22 @@ defmodule Tornex.Scheduler.Bucket do
     GenServer.call(pid, {:enqueue, query}, timeout)
   end
 
+  @doc false
+  @spec dump(bucket_pid :: pid(), timeout :: timeout()) :: term()
+  def dump(bucket_pid, timeout \\ :infinity) when is_pid(bucket_pid) do
+    GenServer.call(bucket_pid, :dump, timeout)
+  end
+
   @doc """
   Remove a `Tornex.Query` or `Tornex.SpecQuery` from the queue of queries belonging to the bucket of the owner
   of the API key used fr the query.
-
-  If there does not exist a `Tornex.Scheduler.Bucket` belonging to the key owner, then `{:error, :not_found}`
-  will be returned. Otherwise `:ok` will be returned if the query has been successfully been removed from the
-  bucket it belonged to.
   """
-  @spec pop(query :: Tornex.Query.t() | Tornex.SpecQuery.t(), opts :: keyword()) :: :ok | {:error, :not_found}
-  def pop(%module{key_owner: key_owner} = query, opts \\ [])
+  @spec pop!(query :: Tornex.Query.t() | Tornex.SpecQuery.t(), opts :: keyword()) :: :ok
+  def pop!(%module{key_owner: key_owner} = query, opts \\ [])
       when module in [Tornex.Query, Tornex.SpecQuery] and is_integer(key_owner) do
-    case get_by_id(key_owner) do
-      {:ok, bucket_pid} ->
-        timeout = Keyword.get(opts, :timeout, 60_000)
-        GenServer.call(bucket_pid, {:pop, query}, timeout)
-
-      :error ->
-        {:error, :not_found}
-    end
+    {:ok, bucket_pid} = get_by_id(key_owner)
+    timeout = Keyword.get(opts, :timeout, 60_000)
+    GenServer.call(bucket_pid, {:pop, query}, timeout)
   end
 
   @doc """
@@ -238,7 +236,7 @@ defmodule Tornex.Scheduler.Bucket do
   """
   @spec get_by_id(user_id :: integer()) :: {:ok, pid()} | :error
   def get_by_id(user_id) when is_integer(user_id) do
-    case :global.whereis_name({Tornex.Scheduler.BucketRegistry, user_id}) do
+    case GenServer.whereis({:via, Tornex.Scheduler.bucket_registry(), {Tornex.Scheduler.BucketRegistry, user_id}}) do
       pid when is_pid(pid) -> {:ok, pid}
       _ -> :error
     end
@@ -250,7 +248,11 @@ defmodule Tornex.Scheduler.Bucket do
     ttl = Keyword.get(opts, :ttl, @bucket_ttl)
     timeout = timeout(ttl)
 
-    {:ok, %{query_priority_queue: [], pending_count: 0, ttl: ttl, timeout: timeout}, ttl}
+    {
+      :ok,
+      %{query_priority_queue: [], pending_count: 0, dumping?: false, dump_remaining: 0, ttl: ttl, timeout: timeout},
+      ttl
+    }
   end
 
   @doc false
@@ -353,29 +355,91 @@ defmodule Tornex.Scheduler.Bucket do
 
   @doc false
   @impl true
-  def handle_info(:dump, state) when is_map(state) do
-    # TODO: Make this functionality synchronous to prevent race conditions
+  def handle_call(:dump, _from, %{dumping?: false, pending_count: pending_count} = state)
+      when pending_count >= @bucket_capacity do
+    # The bucket is at capacity, so the dump will need to wait for the next time it's triggered.
+    {:reply, :ok, state, remaining_ttl(state)}
+  end
+
+  @impl true
+  def handle_call(:dump, _from, %{pending_count: pending_count, dumping?: false, dump_remaining: 0} = state) do
+    # This is the first time the dump has been triggered, so we'll want to reset the pending count so that
+    # the bucket can continue to make requests. We'll also want to start the dumping individual requests.
+    updated_state = %{state | pending_count: 0, dumping?: true, dump_remaining: @bucket_capacity - pending_count}
+
+    {:reply, :ok, updated_state, {:continue, :dump}}
+  end
+
+  @impl true
+  def handle_continue(
+        :dump,
+        %{dumping?: true, dump_remaining: dump_remaining, query_priority_queue: query_priority_queue} = state
+      )
+      when dump_remaining == 0 or query_priority_queue == [] do
+    # The bucket was in the process of dumping and has finished dumping either by having a dump_remaining
+    # count of 0 or having an empty queue of queries.
+
+    updated_state = %{state | dumping?: false, dump_remaining: 0}
+    {:noreply, updated_state, remaining_ttl(updated_state)}
+  end
+
+  @impl true
+  def handle_continue(
+        :dump,
+        %{
+          dumping?: true,
+          dump_remaining: dump_remaining,
+          query_priority_queue: [%Tornex.Query{} = query | remaining_queries]
+        } = state
+      ) do
     updated_state =
       if Tornex.NodeRatelimiter.ratelimited?() do
-        # The node is ratelimited so queries can't be dumped.
-        state
+        # The node is ratelimited so query can't be dumped. We should finish the dump early
+        # to avoid sending more requests to Torn.
+        %{state | dump_remaining: 0}
       else
-        # TODO: This should be made recursive such that chunks of the queue can be removed when multiple 
-        # SpecQuery are combined while allowing the bucket to be filled
-        {dumped_queries, remaining_queries} =
-          Enum.split(state.query_priority_queue, @bucket_capacity - state.pending_count)
-
-        state =
-          state
-          |> Map.replace(:pending_count, 0)
-          |> Map.replace(:query_priority_queue, remaining_queries)
-
-        Enum.each(dumped_queries, &make_request/1)
+        make_request(query)
 
         state
+        |> Map.replace(:dump_remaining, dump_remaining - 1)
+        |> Map.replace(:query_priority_queue, remaining_queries)
       end
 
-    {:noreply, updated_state, remaining_ttl(updated_state)}
+    {:noreply, updated_state, {:continue, :dump}}
+  end
+
+  @impl true
+  def handle_continue(
+        :dump,
+        %{
+          dumping?: true,
+          dump_remaining: dump_remaining,
+          query_priority_queue: [%Tornex.SpecQuery{} = query | remaining_queries]
+        } = state
+      ) do
+    updated_state =
+      if Tornex.NodeRatelimiter.ratelimited?() do
+        # The node is ratelimited so query can't be dumped. We should finish the dump early
+        # to avoid sending more requests to Torn.
+        %{state | dump_remaining: 0}
+      else
+        %Tornex.Scheduler.ExecutionUnit{parents: merged_query_parents} =
+          merged_query = Tornex.Scheduler.QueryRegistry.merge(query)
+
+        make_request(merged_query)
+
+        # We want to remove other queries used in the executed unit from the bucket if they are in the
+        # bucket. Other queries not in the bucket will be handled by the QueryRegistry. Only these
+        # belonging to this bucket are being done directly to avoid blocking the bucket and to avoid
+        # racing conditions.
+        updated_queue = Enum.reject(remaining_queries, &Enum.member?(merged_query_parents, &1))
+
+        state
+        |> Map.replace(:dump_remaining, dump_remaining - 1)
+        |> Map.replace(:query_priority_queue, updated_queue)
+      end
+
+    {:noreply, updated_state, {:continue, :dump}}
   end
 
   @doc false

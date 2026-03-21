@@ -29,10 +29,9 @@ defmodule Tornex.Scheduler.Supervisor do
 
   @doc false
   @impl true
-  def init(_args \\ []) do
+  def init(opts \\ []) do
     children = [
       {Task.Supervisor, name: Tornex.Scheduler.TaskSupervisor},
-      Tornex.Scheduler.Timer,
       {
         Tornex.Scheduler.bucket_supervisor(),
         name: Tornex.Scheduler.BucketSupervisor,
@@ -41,8 +40,18 @@ defmodule Tornex.Scheduler.Supervisor do
         process_redistribution: :active,
         restart: :transient
       },
-      {Tornex.Scheduler.bucket_registry(), name: Tornex.Scheduler.BucketRegistry, members: :auto, keys: :unique}
+      {Tornex.Scheduler.bucket_registry(), name: Tornex.Scheduler.BucketRegistry, members: :auto, keys: :unique},
+      Tornex.Scheduler.QueryRegistry
     ]
+
+    children =
+      case Keyword.get(opts, :timer) do
+        false ->
+          children
+
+        _ ->
+          [Tornex.Scheduler.Timer | children]
+      end
 
     Supervisor.init(children, strategy: :one_for_one)
   end
