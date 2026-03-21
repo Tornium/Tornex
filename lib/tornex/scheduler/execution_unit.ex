@@ -67,13 +67,13 @@ defmodule Tornex.Scheduler.ExecutionUnit do
         execution_unit
       end
 
-    merged_execution_unit = Tornex.SpecQuery.merge(query, execution_unit)
-    %__MODULE__{merged_execution_unit | parents: [query | eu_parents]}
+    %__MODULE__{} = merged_execution_unit = Tornex.SpecQuery.merge(query, execution_unit)
+    %{merged_execution_unit | parents: [query | eu_parents]}
   end
 
   def merge(%Tornex.SpecQuery{} = query, %__MODULE__{parents: eu_parents} = execution_unit) do
-    merged_execution_unit = Tornex.SpecQuery.merge(query, execution_unit)
-    %__MODULE__{merged_execution_unit | parents: [query | eu_parents]}
+    %__MODULE__{} = merged_execution_unit = Tornex.SpecQuery.merge(query, execution_unit)
+    %{merged_execution_unit | parents: [query | eu_parents]}
   end
 
   @doc """

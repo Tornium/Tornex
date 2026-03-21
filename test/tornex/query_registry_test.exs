@@ -24,12 +24,12 @@ defmodule Tornex.Test.QueryRegistry do
     query_user =
       SpecQuery.new()
       |> SpecQuery.put_path(Torngen.Client.Path.User.Basic)
-      |> then(&%SpecQuery{&1 | origin: self()})
+      |> then(&%{&1 | origin: self()})
 
     query_faction =
       SpecQuery.new()
       |> SpecQuery.put_path(Torngen.Client.Path.Faction.Revives)
-      |> then(&%SpecQuery{&1 | origin: self()})
+      |> then(&%{&1 | origin: self()})
 
     Tornex.Scheduler.QueryRegistry.insert(query_user)
     Tornex.Scheduler.QueryRegistry.insert(query_faction)
@@ -57,12 +57,12 @@ defmodule Tornex.Test.QueryRegistry do
       SpecQuery.new()
       |> SpecQuery.put_path(Torngen.Client.Path.User.Basic)
       |> SpecQuery.put_path(Torngen.Client.Path.User.Attacks)
-      |> then(&%SpecQuery{&1 | origin: self()})
+      |> then(&%{&1 | origin: self()})
 
     query_attacks =
       SpecQuery.new()
       |> SpecQuery.put_path(Torngen.Client.Path.User.Attacks)
-      |> then(&%SpecQuery{&1 | origin: self()})
+      |> then(&%{&1 | origin: self()})
 
     Tornex.Scheduler.QueryRegistry.insert(query_basic)
     Tornex.Scheduler.QueryRegistry.insert(query_attacks)
@@ -87,13 +87,13 @@ defmodule Tornex.Test.QueryRegistry do
       |> SpecQuery.put_path(Torngen.Client.Path.User.Id.Basic)
       |> SpecQuery.put_path(Torngen.Client.Path.User.Id.Bounties)
       |> SpecQuery.put_parameter!(:id, 1)
-      |> then(&%SpecQuery{&1 | origin: self()})
+      |> then(&%{&1 | origin: self()})
 
     query_two =
       SpecQuery.new()
       |> SpecQuery.put_path(Torngen.Client.Path.User.Id.Basic)
       |> Tornex.SpecQuery.put_parameter!(:id, 2)
-      |> then(&%SpecQuery{&1 | origin: self()})
+      |> then(&%{&1 | origin: self()})
 
     Tornex.Scheduler.QueryRegistry.insert(query_one)
     Tornex.Scheduler.QueryRegistry.insert(query_two)
