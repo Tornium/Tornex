@@ -219,7 +219,7 @@ defmodule Tornex.Scheduler.ExecutionUnit do
       |> Enum.uniq()
       |> Enum.map(&Atom.to_string/1)
 
-    filtered_response_part = 
+    filtered_response_part =
       response
       |> Enum.filter(fn {key, _value} -> Enum.member?(path_keys, key) end)
       |> Map.new()
