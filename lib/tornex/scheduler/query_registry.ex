@@ -403,6 +403,9 @@ defmodule Tornex.Scheduler.QueryRegistry do
       child when is_map(child) and map_size(child) == 0 ->
         pop_in(state, path) |> elem(1)
 
+      nil ->
+        pop_in(state, path) |> elem(1)
+
       _ ->
         state
     end

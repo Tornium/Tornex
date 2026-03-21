@@ -361,7 +361,80 @@ defmodule Tornex.Test.QueryRegistry do
 
     assert %{"user" => %{{:id, 1} => %{"profile" => [^user_one_profile]}}} = new_state
     assert not is_map_key(new_state |> Map.get("user"), nil)
+  end
 
-    # TODO: Add more exhaustive tests for pruning
+  test "state removal of multiple queries" do
+    user_one_profile =
+      Tornex.SpecQuery.new()
+      |> Tornex.SpecQuery.put_path(Torngen.Client.Path.User.Id.Profile)
+      |> Tornex.SpecQuery.put_parameter!(:id, 1)
+
+    user_one_profile_bounties =
+      Tornex.SpecQuery.new()
+      |> Tornex.SpecQuery.put_path(Torngen.Client.Path.User.Id.Profile)
+      |> Tornex.SpecQuery.put_path(Torngen.Client.Path.User.Id.Bounties)
+      |> Tornex.SpecQuery.put_parameter!(:id, 1)
+
+    state = %{
+      "user" => %{
+        {:id, 1} => %{
+          "profile" => [user_one_profile, user_one_profile_bounties],
+          "bounties" => [user_one_profile_bounties]
+        }
+      }
+    }
+
+    state_remaining =
+      Tornex.Scheduler.QueryRegistry.remove(
+        state,
+        %Tornex.Scheduler.ExecutionUnit{
+          parents: [user_one_profile_bounties],
+          paths: [Torngen.Client.Path.User.Id.Profile, Torngen.Client.Path.User.Id.Bounties]
+        }
+      )
+
+    assert %{"user" => %{{:id, 1} => %{"profile" => [^user_one_profile]}}} = state_remaining
+
+    state_none_remaining =
+      Tornex.Scheduler.QueryRegistry.remove(
+        state,
+        %Tornex.Scheduler.ExecutionUnit{
+          parents: [user_one_profile_bounties, user_one_profile],
+          paths: [Torngen.Client.Path.User.Id.Profile, Torngen.Client.Path.User.Id.Bounties]
+        }
+      )
+
+    assert not is_map_key(state_none_remaining, "user")
+  end
+
+  test "state removal of non-existent queries" do
+    user_one_profile =
+      Tornex.SpecQuery.new()
+      |> Tornex.SpecQuery.put_path(Torngen.Client.Path.User.Id.Profile)
+      |> Tornex.SpecQuery.put_parameter!(:id, 1)
+
+    user_one_bounties =
+      Tornex.SpecQuery.new()
+      |> Tornex.SpecQuery.put_path(Torngen.Client.Path.User.Id.Bounties)
+      |> Tornex.SpecQuery.put_parameter!(:id, 1)
+
+    state = %{
+      "user" => %{
+        {:id, 1} => %{
+          "profile" => [user_one_profile]
+        }
+      }
+    }
+
+    new_state =
+      Tornex.Scheduler.QueryRegistry.remove(
+        state,
+        %Tornex.Scheduler.ExecutionUnit{
+          parents: [user_one_bounties],
+          paths: [Torngen.Client.Path.User.Id.Bounties]
+        }
+      )
+
+    assert ^state = new_state
   end
 end
