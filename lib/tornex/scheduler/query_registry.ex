@@ -131,12 +131,9 @@ defmodule Tornex.Scheduler.QueryRegistry do
     # queries not in the bucket's queue.
     Enum.each(execution_unit.parents, &Tornex.Scheduler.Bucket.pop/1)
 
-    # TODO: After the queries are merged, we'll want to drop the unused branches of the state tree
-    # to minimize memory usage. This can probably be done with some sort of timer, but MUST be done
-    # in a manner that will not block the GenServer from processing requests for a substantial period
-    # of time. This may mean that it's better for it to never clean up.
-
-    execution_unit
+    # After the queries are merged, we'll want to drop the unused branches of the state tree to
+    # minimize memory usage.
+    {:ok, execution_unit, remove(state, execution_unit)}
   end
 
   @doc """
@@ -341,18 +338,23 @@ defmodule Tornex.Scheduler.QueryRegistry do
     |> length()
   end
 
+  @doc """
+  Traverse the state tree and remove the branches that are being fulfilled by the
+  `Tornex.Scheduler.ExecutionUnit`.
+
+  After removing the queries being fulfilled from the branches of the state tree, the function will
+  also prune the tree of any branches related to the queries if there are no queries retaining them.
+  """
   @spec remove(state :: state(), execution_unit :: Tornex.Scheduler.ExecutionUnit.t()) :: state()
-  defp remove(state, %Tornex.Scheduler.ExecutionUnit{} = execution_unit) when is_map(state) do
-    # We need to traverse the state tree and remove the leafs that are being fulfilled by this SpecQuery and
-    # the nodes that no longer have a leaf attached to it
-
-    first_query =
-      execution_unit
-      |> Map.get(:parents)
-      |> Enum.at(0)
-
-    resource = Tornex.SpecQuery.resource!(first_query)
-    resource_id = Tornex.SpecQuery.resource_id!(first_query)
+  def remove(
+        state,
+        %Tornex.Scheduler.ExecutionUnit{
+          parents: [%Tornex.SpecQuery{} = first_parent | _] = parents
+        } = execution_unit
+      )
+      when is_map(state) do
+    resource = Tornex.SpecQuery.resource!(first_parent)
+    resource_id = Tornex.SpecQuery.resource_id!(first_parent)
 
     selections =
       execution_unit
@@ -360,20 +362,20 @@ defmodule Tornex.Scheduler.QueryRegistry do
       |> Enum.flat_map(&Tornex.SpecQuery.selections!/1)
       |> Enum.uniq()
 
+    # We want to remove the queries from the branch of the resource + resource_id. If there are no leafs
+    # remaining on the outermost branch (resource + resource_id), we should prune the branch as much as
+    # possible to reduce memory consumption.
     selections
-    |> Enum.reduce(state, fn _selection, acc ->
+    |> Enum.reduce(state, fn selection, acc ->
       acc
-      |> update_in([resource, resource_id, selections], fn
+      |> update_in([resource, resource_id, selection], fn
         nil ->
           nil
 
         queries when is_list(queries) ->
-          # TODO: Implement this such that only the queries that are being handled by this SpecQuery will be removed
-          queries
-          |> MapSet.new()
-
-          nil
+          Enum.reject(queries, &Enum.member?(parents, &1))
       end)
+      |> prune_path([resource, resource_id, selection])
     end)
     |> prune_path([resource, resource_id])
     |> prune_path([resource])
@@ -382,6 +384,9 @@ defmodule Tornex.Scheduler.QueryRegistry do
   @spec prune_path(state :: state(), path :: [term()]) :: map()
   defp prune_path(state, path) when is_map(state) and is_list(path) do
     case get_in(state, path) do
+      [] ->
+        pop_in(state, path) |> elem(1)
+
       child when is_map(child) and map_size(child) == 0 ->
         pop_in(state, path) |> elem(1)
 

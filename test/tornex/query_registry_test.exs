@@ -326,4 +326,42 @@ defmodule Tornex.Test.QueryRegistry do
     query = SpecQuery.new(key_owner: 1) |> SpecQuery.put_path(Torngen.Client.Path.User.Basic)
     assert [[^query]] = Tornex.Scheduler.QueryRegistry.greedy_subsets([query])
   end
+
+  test "state removal" do
+    user_profile_basic =
+      Tornex.SpecQuery.new()
+      |> Tornex.SpecQuery.put_path(Torngen.Client.Path.User.Profile)
+      |> Tornex.SpecQuery.put_path(Torngen.Client.Path.User.Basic)
+
+    user_one_profile =
+      Tornex.SpecQuery.new()
+      |> Tornex.SpecQuery.put_path(Torngen.Client.Path.User.Id.Profile)
+      |> Tornex.SpecQuery.put_parameter!(:id, 1)
+
+    state = %{
+      "user" => %{
+        nil => %{
+          "profile" => [user_profile_basic],
+          "basic" => [user_profile_basic]
+        },
+        {:id, 1} => %{
+          "profile" => [user_one_profile]
+        }
+      }
+    }
+
+    new_state =
+      Tornex.Scheduler.QueryRegistry.remove(
+        state,
+        %Tornex.Scheduler.ExecutionUnit{
+          parents: [user_profile_basic],
+          paths: [Torngen.Client.Path.User.Profile, Torngen.Client.Path.User.Basic]
+        }
+      )
+
+    assert %{"user" => %{{:id, 1} => %{"profile" => [^user_one_profile]}}} = new_state
+    assert not is_map_key(new_state |> Map.get("user"), nil)
+
+    # TODO: Add more exhaustive tests for pruning
+  end
 end
