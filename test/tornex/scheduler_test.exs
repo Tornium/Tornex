@@ -142,4 +142,28 @@ defmodule Tornex.Test.Scheduler do
     GenServer.stop(n_pid)
     Supervisor.stop(s_pid)
   end
+
+  test "quarantined query" do
+    {:ok, s_pid} = ExUnit.Callbacks.start_supervised(Tornex.Scheduler.Supervisor)
+    {:ok, n_pid} = ExUnit.Callbacks.start_supervised(Tornex.NodeRatelimiter)
+
+    {:ok, pid} =
+      Tornex.Scheduler.bucket_supervisor().start_child(
+        Tornex.Scheduler.BucketSupervisor,
+        {Tornex.Scheduler.Bucket, user_id: 2_383_326}
+      )
+
+    user_one_profile =
+      Tornex.SpecQuery.new()
+      |> Tornex.SpecQuery.put_path(Torngen.Client.Path.User.Id.Profile)
+      |> Tornex.SpecQuery.put_parameter!(:id, 1)
+      |> Tornex.SpecQuery.put_key(@test_api_key)
+      |> Tornex.SpecQuery.put_key_owner(2_383_326)
+
+    assert %{"error" => %{"code" => 2}} = Tornex.Scheduler.Bucket.enqueue(user_one_profile)
+
+    GenServer.stop(pid)
+    GenServer.stop(n_pid)
+    Supervisor.stop(s_pid)
+  end
 end

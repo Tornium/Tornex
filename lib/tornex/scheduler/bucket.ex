@@ -414,6 +414,31 @@ defmodule Tornex.Scheduler.Bucket do
         %{
           dumping?: true,
           dump_remaining: dump_remaining,
+          query_priority_queue: [%Tornex.SpecQuery{quarantine: true} = query | remaining_queries]
+        } = state
+      ) do
+    updated_state =
+      if Tornex.NodeRatelimiter.ratelimited?() do
+        # The node is ratelimited so query can't be dumped. We should finish the dump early
+        # to avoid sending more requests to Torn.
+        %{state | dump_remaining: 0}
+      else
+        make_request(query)
+
+        state
+        |> Map.replace(:dump_remaining, dump_remaining - 1)
+        |> Map.replace(:query_priority_queue, remaining_queries)
+      end
+
+    {:noreply, updated_state, {:continue, :dump}}
+  end
+
+  @impl true
+  def handle_continue(
+        :dump,
+        %{
+          dumping?: true,
+          dump_remaining: dump_remaining,
           query_priority_queue: [%Tornex.SpecQuery{} = query | remaining_queries]
         } = state
       ) do
