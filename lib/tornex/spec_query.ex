@@ -178,10 +178,11 @@ defmodule Tornex.SpecQuery do
       ...>   |> |> Tornex.SpecQuery.put_parameter!(:stat, ["attackswon", "attackslost"])
   """
   @spec put_parameter!(
-          query :: t() | Tornex.Scheduler.ExecutionUnit.t(),
+          query,
           parameter_name :: atom(),
           parameter_value :: term()
-        ) :: t()
+        ) :: query
+        when query: t() | Tornex.Scheduler.ExecutionUnit.t()
   def put_parameter!(%{parameters: parameters} = query, parameter_name, parameter_value) when is_atom(parameter_name) do
     String.Chars.impl_for!(parameter_value)
 
