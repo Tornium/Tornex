@@ -110,7 +110,7 @@ defmodule Tornex.Telemetry do
   @doc false
   def handle_event([:tornex, :bucket, :enqueue], _measurements, metadata, _opts) do
     Logger.debug(
-      "[#{metadata.resource}/#{metadata.resource_id || ""}?selections=#{Enum.join(metadata.selections || [], ",")}] Request enqueue for #{metadata.user}"
+      "[#{metadata.resource}/#{Map.get(metadata, :resource_id) || ""}?selections=#{Enum.join(Map.get(metadata, :selections) || [], ",")}] Request enqueue for #{metadata.user}"
     )
   end
 
