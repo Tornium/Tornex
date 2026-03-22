@@ -281,7 +281,8 @@ defmodule Tornex.Scheduler.Bucket do
 
         state =
           case merged_query do
-            %Tornex.Scheduler.ExecutionUnit{key_owner: key_owner, parents: merged_query_parents} when key_owner != query_key_owner ->
+            %Tornex.Scheduler.ExecutionUnit{key_owner: key_owner, parents: merged_query_parents}
+            when key_owner != query_key_owner ->
               # We only want to increase the pending count of the Bucket if the user's key is being used as
               # otherwise we would be unnecessarily preventing a user's bucket from making queries.
               #
@@ -316,7 +317,8 @@ defmodule Tornex.Scheduler.Bucket do
 
         state =
           case merged_query do
-            %Tornex.Scheduler.ExecutionUnit{key_owner: key_owner, parents: merged_query_parents} when key_owner != query_key_owner ->
+            %Tornex.Scheduler.ExecutionUnit{key_owner: key_owner, parents: merged_query_parents}
+            when key_owner != query_key_owner ->
               # We only want to increase the pending count of the Bucket if the user's key is being used as
               # otherwise we would be unnecessarily preventing a user's bucket from making queries.
               #
