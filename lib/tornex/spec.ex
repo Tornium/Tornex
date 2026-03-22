@@ -26,7 +26,7 @@ defmodule Tornex.Spec do
       "Get your faction's detailed attacks.",
       "Requires limited access key with faction API access permissions.",
       "## Parmeters\\n- filters: It's possible to use this query parameter to only get incoming or outgoing attacks / revives\\n- limit: N/A\\n- sort: Sorted by the greatest timestamps\\n- to: Timestamp that sets the upper limit for the data returned\\n- from: Timestamp that sets the lower limit for the data returned\\n- timestamp: Timestamp to bypass cache\\n- comment: Comment for your tool/service/bot/website to be visible in the logs.\\n- key: API key (Limited)",
-      "## Response Module(s)\\n- FactionAttacksResponse\\n"
+      "## Response Module(s)\\n- AttacksResponse\\n"
     ]
   """
   @spec path_module_docs(path_module :: module()) :: parsed_path_module_docs()
