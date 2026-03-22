@@ -32,6 +32,7 @@ defmodule Tornex.Scheduler.Supervisor do
   def init(opts \\ []) do
     children = [
       {Task.Supervisor, name: Tornex.Scheduler.TaskSupervisor},
+      Tornex.Scheduler.Timer,
       {
         Tornex.Scheduler.bucket_supervisor(),
         name: Tornex.Scheduler.BucketSupervisor,
@@ -44,14 +45,7 @@ defmodule Tornex.Scheduler.Supervisor do
       Tornex.Scheduler.QueryRegistry
     ]
 
-    children =
-      case Keyword.get(opts, :timer) do
-        false ->
-          children
-
-        _ ->
-          [Tornex.Scheduler.Timer | children]
-      end
+    # TODO: Use opts.timer to disable the bucket timer
 
     Supervisor.init(children, strategy: :one_for_one)
   end

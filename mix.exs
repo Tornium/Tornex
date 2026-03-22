@@ -13,7 +13,8 @@ defmodule Tornex.MixProject do
       package: package(),
       deps: deps(),
       source_url: "https://github.com/Tornium/tornex",
-      docs: docs()
+      docs: docs(),
+      elixirc_options: elixirc_options()
     ]
   end
 
@@ -53,6 +54,12 @@ defmodule Tornex.MixProject do
     [
       main: "readme",
       extras: ["README.md", "LICENSE.md", "cluster.md"]
+    ]
+  end
+  
+  def elixirc_options() do
+    [
+      docs: true
     ]
   end
 end
