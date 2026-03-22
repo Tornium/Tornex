@@ -8,10 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Added per-node ratelimiting
+- Added combinatorial queries to combine similar `Tornex.Scheduler.SpecQuery` into one `Tornex.Scheduler.ExecutionUnit` to be performed as one API call.
+- Added `Tornex.Scheduler.Bucket.dump/2` and `Tornex.Scheduler.Bucket.pop!/2`
+- Added utility functions to `Tornex.SpecQuery` such as `Tornex.SpecQuery.resource!/1`
 
 ### Changed
-- [BREAKING] Changed minimum Elixir version from 1.16 to 1.18
-- [BREAKING] Changed `tornex.api.finish` to properly report latency in milliseconds
+- \[BREAKING\] Changed minimum Elixir version from 1.16 to 1.18
+- \[BREAKING\] Changed `tornex.api.finish` to properly report latency in milliseconds
+- Changed query dumping process in `Tornex.Scheduler.Bucket` to use `handle_continue`
+
+### Deprecated
+- Deprecated `Tornex.SpecQuery.put_parameter/3`; use `Tornex.SpecQuery.put_parameter!/3` instead.
 
 ### Removed
 - Removed `Jason` dependency
