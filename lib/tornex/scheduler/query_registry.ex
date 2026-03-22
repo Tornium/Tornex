@@ -182,6 +182,7 @@ defmodule Tornex.Scheduler.QueryRegistry do
     overlapping_queries =
       overlapping_resource_id
       |> Enum.flat_map(fn {_selection, queries} -> queries end)
+      |> then(&[query | &1])
       |> Enum.uniq()
 
     # For a query to be eligible to merged:
