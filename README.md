@@ -11,9 +11,9 @@ An Elixir library providing robust API call planning and execution for the [Torn
 
 ## Roadmap
 - [x] Per-node global ratelimit
-- [ ] Combine similar queries to reduce throughput
+- [x] Combine similar queries to reduce throughput
 - [x] Multi-node support
-- [ ] APIv2 struct coalescing using [torngen](https://github.com/Tornium/torngen)
+- [x] APIv2 struct coalescing using [torngen](https://github.com/Tornium/torngen)
 - [ ] APIv2 mocking server using [torngen](https://github.com/Tornium/torngen)
 
 ## Installation
