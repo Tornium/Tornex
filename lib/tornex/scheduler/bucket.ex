@@ -281,11 +281,19 @@ defmodule Tornex.Scheduler.Bucket do
 
         state =
           case merged_query do
-            %Tornex.Scheduler.ExecutionUnit{key_owner: key_owner} when key_owner != query_key_owner ->
+            %Tornex.Scheduler.ExecutionUnit{key_owner: key_owner, parents: merged_query_parents} when key_owner != query_key_owner ->
               # We only want to increase the pending count of the Bucket if the user's key is being used as
               # otherwise we would be unnecessarily preventing a user's bucket from making queries.
+              #
+              # We want to remove other queries used in the executed unit from the bucket if they are in the
+              # bucket. Other queries not in the bucket will be handled by the QueryRegistry. Only these
+              # belonging to this bucket are being done directly to avoid blocking the bucket and to avoid
+              # racing conditions.
+              updated_queue = Enum.reject(query_priority_queue, &Enum.member?(merged_query_parents, &1))
+
               state
               |> Map.replace(:timeout, timeout)
+              |> Map.replace(:query_priority_queue, updated_queue)
 
             _ ->
               state
@@ -308,11 +316,19 @@ defmodule Tornex.Scheduler.Bucket do
 
         state =
           case merged_query do
-            %Tornex.Scheduler.ExecutionUnit{key_owner: key_owner} when key_owner != query_key_owner ->
+            %Tornex.Scheduler.ExecutionUnit{key_owner: key_owner, parents: merged_query_parents} when key_owner != query_key_owner ->
               # We only want to increase the pending count of the Bucket if the user's key is being used as
               # otherwise we would be unnecessarily preventing a user's bucket from making queries.
+              #
+              # We want to remove other queries used in the executed unit from the bucket if they are in the
+              # bucket. Other queries not in the bucket will be handled by the QueryRegistry. Only these
+              # belonging to this bucket are being done directly to avoid blocking the bucket and to avoid
+              # racing conditions.
+              updated_queue = Enum.reject(query_priority_queue, &Enum.member?(merged_query_parents, &1))
+
               state
               |> Map.replace(:timeout, timeout)
+              |> Map.replace(:query_priority_queue, updated_queue)
 
             _ ->
               state
