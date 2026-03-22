@@ -44,7 +44,7 @@ defmodule Tornex.SpecQuery do
           key: String.t() | nil,
 
           # Values required for the scheduler
-          key_owner: pos_integer(),
+          key_owner: non_neg_integer(),
           nice: niceness(),
           origin: GenServer.from() | nil,
           quarantine: boolean()
