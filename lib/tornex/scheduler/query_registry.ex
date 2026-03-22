@@ -209,11 +209,20 @@ defmodule Tornex.Scheduler.QueryRegistry do
     # To filter conflicting parameters and paths, we want to want to find the subset of queries with the largest number of
     # unique paths where the subset of queries does not have any parameters with equal keys and differing values and no other
     # paths conflict.
-    overlapping_queries
-    |> filter_parameter_collisions()
-    |> Enum.map(fn subset -> accumulate_queries(subset, public_paths, non_public_paths, query) end)
-    |> Enum.reject(&is_nil/1)
-    |> Enum.max_by(fn %Tornex.Scheduler.ExecutionUnit{paths: paths} -> length(paths) end)
+    execution_units =
+      overlapping_queries
+      |> filter_parameter_collisions()
+      |> Enum.map(fn subset -> accumulate_queries(subset, public_paths, non_public_paths, query) end)
+      |> Enum.reject(&is_nil/1)
+
+    case execution_units do
+      [] ->
+        # Fallback: no mergeable subsets; return an ExecutionUnit that at least contains the original query.
+        accumulate_queries([query], public_paths, non_public_paths, query)
+
+      units ->
+        Enum.max_by(units, fn %Tornex.Scheduler.ExecutionUnit{paths: paths} -> length(paths) end)
+    end
   end
 
   @spec accumulate_queries(
