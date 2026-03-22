@@ -24,7 +24,8 @@ defmodule Tornex.Test.SpecQuery do
              nice: 20,
              origin: nil,
              parameters: [],
-             paths: [Tornex.Mock.TorngenPath]
+             paths: [Tornex.Mock.TorngenPath],
+             quarantine: false
            } ==
              Tornex.SpecQuery.put_path(query, Tornex.Mock.TorngenPath)
   end
@@ -32,7 +33,7 @@ defmodule Tornex.Test.SpecQuery do
   test "test_put_parameter" do
     query = Tornex.SpecQuery.new()
 
-    assert_raise Protocol.UndefinedError, fn -> Tornex.SpecQuery.put_parameter(query, :foo, self()) end
+    assert_raise Protocol.UndefinedError, fn -> Tornex.SpecQuery.put_parameter!(query, :foo, self()) end
 
     assert %Tornex.SpecQuery{
              key: nil,
@@ -40,9 +41,16 @@ defmodule Tornex.Test.SpecQuery do
              nice: 20,
              origin: nil,
              parameters: [{:foo, "bar"}],
-             paths: []
+             paths: [],
+             quarantine: false
            } ==
-             Tornex.SpecQuery.put_parameter(query, :foo, "bar")
+             Tornex.SpecQuery.put_parameter!(query, :foo, "bar")
+
+    assert_raise RuntimeError, fn ->
+      query
+      |> Tornex.SpecQuery.put_parameter!(:foo, 1)
+      |> Tornex.SpecQuery.put_parameter!(:foo, 2)
+    end
   end
 
   test "test_uri" do
@@ -57,7 +65,7 @@ defmodule Tornex.Test.SpecQuery do
     |> Tornex.SpecQuery.put_key("foo")
     |> Tornex.SpecQuery.put_path(Torngen.Client.Path.Faction.Id.Basic)
     |> Tornex.SpecQuery.put_path(Torngen.Client.Path.Faction.Id.Members)
-    |> Tornex.SpecQuery.put_parameter(:id, 1)
+    |> Tornex.SpecQuery.put_parameter!(:id, 1)
     |> Tornex.SpecQuery.uri!()
     |> URI.to_string()
     |> (&assert(&1 == "https://api.torn.com/v2/faction/1/?selections=members,basic")).()
@@ -66,8 +74,8 @@ defmodule Tornex.Test.SpecQuery do
     |> Tornex.SpecQuery.put_key("foo")
     |> Tornex.SpecQuery.put_path(Torngen.Client.Path.Faction.Id.Chains)
     |> Tornex.SpecQuery.put_path(Torngen.Client.Path.Faction.Id.Basic)
-    |> Tornex.SpecQuery.put_parameter(:id, 89)
-    |> Tornex.SpecQuery.put_parameter(:limit, 100)
+    |> Tornex.SpecQuery.put_parameter!(:id, 89)
+    |> Tornex.SpecQuery.put_parameter!(:limit, 100)
     |> Tornex.SpecQuery.uri!()
     |> URI.to_string()
     |> (&assert(&1 == "https://api.torn.com/v2/faction/89/?selections=basic,chains&limit=100")).()

@@ -45,7 +45,7 @@ defmodule Tornex.API do
   @base_url Application.compile_env(:tornex, :base_url, "https://api.torn.com")
   @comment Application.compile_env(:tornex, :comment, "tex-" <> Mix.Project.config()[:version])
 
-  @doc ~S"""
+  @doc """
   Converts a `Tornex.Query` or `Tornex.SpecQuery` to the URL required to make the HTTP request.
 
       iex> query = %Tornex.Query{
@@ -63,8 +63,8 @@ defmodule Tornex.API do
       ...>   Tornex.SpecQuery.new()
       ...>   |> Tornex.SpecQuery.put_path(Torngen.Client.Path.Faction.Id.Basic)
       ...>   |> Tornex.SpecQuery.put_path(Torngen.Client.Path.Faction.Id.Chains)
-      ...>   |> Tornex.SpecQuery.put_parameter(:id, 89)
-      ...>   |> Tornex.SpecQuery.put_parameter(:limit, 100)
+      ...>   |> Tornex.SpecQuery.put_parameter!(:id, 89)
+      ...>   |> Tornex.SpecQuery.put_parameter!(:limit, 100)
       ...>   |> Tornex.SpecQuery.put_key("apikey")
       iex> Tornex.API.query_to_url(spec_query)
       "https://api.torn.com/v2/faction/89/?selections=chains,basic&limit=100&comment=tex-#{Mix.Project.config()[:version]}"
@@ -128,6 +128,8 @@ defmodule Tornex.API do
   """
   @spec get(Tornex.Query.t()) :: map() | list() | error()
   def get(%Tornex.Query{} = query) do
+    # TODO: prevent the request when the node is ratelimited
+
     :telemetry.execute([:tornex, :api, :start], %{}, %{
       resource: query.resource,
       resource_id: query.resource_id,
@@ -151,6 +153,8 @@ defmodule Tornex.API do
 
   @spec get(Tornex.SpecQuery.t()) :: binary() | error()
   def get(%Tornex.SpecQuery{key: api_key} = query) when is_binary(api_key) do
+    # TODO: prevent the request when the node is ratelimited
+
     {path, selections} = Tornex.SpecQuery.path_selections!(query)
 
     resource =
@@ -160,8 +164,7 @@ defmodule Tornex.API do
 
     :telemetry.execute([:tornex, :api, :start], %{}, %{
       resource: "v2/#{resource}",
-      # TODO: Determine the resource ID from the parameters
-      resource_id: nil,
+      resource_id: Tornex.SpecQuery.resource_id!(query),
       selections: selections,
       user: query.key_owner
     })

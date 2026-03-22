@@ -41,11 +41,12 @@ defmodule Tornex.Scheduler.Timer do
   @doc false
   def handle_info(:dump_signal, state) do
     children = DynamicSupervisor.which_children(Tornex.Scheduler.BucketSupervisor)
-    # TODO: Determine if each node will have its own dump timer for its own bucket supervisor
+    # TODO: Dumping should be performed synchronously so that there aren't issues with combining queries when 
+    # a bucket dumps a query that's already been combined and made by another bucket's query
 
     Enum.each(children, fn
       {_, pid, :worker, _} ->
-        send(pid, :dump)
+        Tornex.Scheduler.Bucket.dump(pid)
 
       _ ->
         :ok

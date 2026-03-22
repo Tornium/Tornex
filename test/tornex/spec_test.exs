@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-Code.require_file("support/list_assertion.exs", __DIR__)
+defmodule Tornex.Test.Spec do
+  use ExUnit.Case, async: true
+  import Tornex.Spec
 
-Supervisor.start_link([Tornex.HTTP.FinchClient], strategy: :one_for_one)
-
-ExUnit.start()
+  doctest Tornex.Spec
+end
