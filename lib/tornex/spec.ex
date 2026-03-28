@@ -31,9 +31,9 @@ defmodule Tornex.Spec do
   """
   @spec path_module_docs(path_module :: module()) :: parsed_path_module_docs()
   def path_module_docs(path_module) when is_atom(path_module) do
-    {:docs_v1, _, :elixir, _, %{"en" => module_doc}, _, _} = Code.fetch_docs(path_module)
-
-    String.split(module_doc, "\n\n")
+    path_module
+    |> apply(:moduledoc, [])
+    |> String.split("\n\n")
   end
 
   @doc """
