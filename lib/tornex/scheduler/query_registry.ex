@@ -160,7 +160,9 @@ defmodule Tornex.Scheduler.QueryRegistry do
           # the query and that Bucket is waiting on this GenServer to merge the queries.
           execution_unit.parents
           |> Enum.reject(fn %Tornex.SpecQuery{key_owner: parent_key_owner} -> parent_key_owner == query_key_owner end)
-          |> Enum.each(&Tornex.Scheduler.Bucket.pop!/1)
+          |> Enum.each(fn %Tornex.SpecQuery{} = query ->
+            Task.start(Tornex.Scheduler.Bucket.pop!(query))
+          end)
 
           execution_unit
 
