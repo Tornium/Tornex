@@ -29,7 +29,7 @@ defmodule Tornex.Scheduler.Supervisor do
 
   @doc false
   @impl true
-  def init(opts \\ []) do
+  def init(_opts \\ []) do
     children = [
       {Task.Supervisor, name: Tornex.Scheduler.TaskSupervisor},
       Tornex.Scheduler.Timer,
