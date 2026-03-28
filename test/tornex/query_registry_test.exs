@@ -311,23 +311,8 @@ defmodule Tornex.Test.QueryRegistry do
     similar_one = Tornex.Scheduler.QueryRegistry.merge_similar(query_one, state)
     similar_two = Tornex.Scheduler.QueryRegistry.merge_similar(query_two, state)
 
-    assert %ExecutionUnit{
-             parameters: [{:id, 2_383_326}],
-             paths: [Torngen.Client.Path.User.Id.Basic],
-             nice: 20,
-             key_owner: 1
-           } = similar_one
-
-    assert_unordered([^query_one], similar_one.parents)
-
-    assert %ExecutionUnit{
-             parameters: [{:id, 1}],
-             paths: [Torngen.Client.Path.User.Id.Basic],
-             nice: 20,
-             key_owner: 1
-           } = similar_two
-
-    assert_unordered([^query_two], similar_two.parents)
+    assert query_one == similar_one
+    assert query_two == similar_two
   end
 
   test "create simple subsets" do

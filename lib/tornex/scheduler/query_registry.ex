@@ -113,20 +113,23 @@ defmodule Tornex.Scheduler.QueryRegistry do
     resource_id = Tornex.SpecQuery.resource_id!(query)
     selections = Tornex.SpecQuery.selections!(query)
 
+    # We need to ensure that there is the resource + resource ID in the structure of the tree
+    # before we can add the selections and queries to it.
+    modified_state =
+      state
+      |> update_in([resource], &(&1 || %{}))
+      |> update_in([resource, resource_id], &(&1 || %{}))
+
     # We need to build the tree out to add any missing nodes and to add the new query.
     # If the query is a duplicate of an existing query, we can skip it.
     new_state =
-      Enum.reduce(selections, state, fn selection, state_acc ->
-        state_acc
-        |> update_in([resource], &(&1 || %{}))
-        |> update_in([resource, resource_id], &(&1 || %{}))
-        |> update_in([resource, resource_id, selection], fn
+      Enum.reduce(selections, modified_state, fn selection, state_acc ->
+        update_in(state_acc, [resource, resource_id, selection], fn
           nil ->
             # Path in the tree does not exist and we must create it.
             [query]
 
-          query_list ->
-            query_list = query_list || []
+          query_list when is_list(query_list) and query_list != [] ->
             [query | query_list] |> Enum.uniq()
         end)
       end)
@@ -135,7 +138,11 @@ defmodule Tornex.Scheduler.QueryRegistry do
   end
 
   @impl GenServer
-  def handle_call({:merge, %Tornex.SpecQuery{origin: origin, key_owner: query_key_owner} = query}, _from, %{} = state)
+  def handle_call(
+        {:merge, %Tornex.SpecQuery{quarantine: false, origin: origin, key_owner: query_key_owner} = query},
+        _from,
+        %{} = state
+      )
       when not is_nil(origin) do
     # We need to find similar queries to combine with this query. Any similar queries will need to be
     # marked as being handled by something else. The task handling this query needs to respond to all
@@ -143,20 +150,27 @@ defmodule Tornex.Scheduler.QueryRegistry do
     # such, this should respond as fast as possible to avoid blocking buckets and this GenServer
     # for too long.
 
-    execution_unit = merge_similar(query, state)
+    unit =
+      case merge_similar(query, state) do
+        %Tornex.Scheduler.ExecutionUnit{} = execution_unit ->
+          # We want to remove the parents of the execution unit. The query that started this merge is not
+          # guaranteed to be in the queue of the parent's bucket, but Bucket.pop should silently ignore
+          # queries not in the bucket's queue. We should skip queries originating from the bucket of the
+          # original query as to not create a deadlock when this GenServer is waiting on that Bucket to pop
+          # the query and that Bucket is waiting on this GenServer to merge the queries.
+          execution_unit.parents
+          |> Enum.reject(fn %Tornex.SpecQuery{key_owner: parent_key_owner} -> parent_key_owner == query_key_owner end)
+          |> Enum.each(&Tornex.Scheduler.Bucket.pop!/1)
 
-    # We want to remove the parents of the execution unit. The query that started this merge is not
-    # guaranteed to be in the queue of the parent's bucket, but Bucket.pop should silently ignore
-    # queries not in the bucket's queue. We should skip queries originating from the bucket of the
-    # original query as to not create a deadlock when this GenServer is waiting on that Bucket to pop
-    # the query and that Bucket is waiting on this GenServer to merge the queries.
-    execution_unit.parents
-    |> Enum.reject(fn %Tornex.SpecQuery{key_owner: parent_key_owner} -> parent_key_owner == query_key_owner end)
-    |> Enum.each(&Tornex.Scheduler.Bucket.pop!/1)
+          execution_unit
+
+        %Tornex.SpecQuery{} = ^query ->
+          query
+      end
 
     # After the queries are merged, we'll want to drop the unused branches of the state tree to
     # minimize memory usage.
-    {:reply, execution_unit, remove(state, execution_unit)}
+    {:reply, unit, remove(state, unit)}
   end
 
   @doc """
@@ -174,7 +188,8 @@ defmodule Tornex.Scheduler.QueryRegistry do
     `user/{id}/basic`).
     4) Not have an additional permission required such as faction API access.
   """
-  @spec merge_similar(query :: Tornex.SpecQuery.t(), state :: state()) :: Tornex.Scheduler.ExecutionUnit.t()
+  @spec merge_similar(query :: Tornex.SpecQuery.t(), state :: state()) ::
+          Tornex.Scheduler.ExecutionUnit.t() | Tornex.SpecQuery.t()
   def merge_similar(%Tornex.SpecQuery{quarantine: false} = query, state) when is_map(state) do
     resource = Tornex.SpecQuery.resource!(query)
     resource_id = Tornex.SpecQuery.resource_id!(query)
@@ -192,6 +207,20 @@ defmodule Tornex.Scheduler.QueryRegistry do
       |> then(&[query | &1])
       |> Enum.uniq()
 
+    do_merge_similar(overlapping_queries, query)
+  end
+
+  @spec do_merge_similar(overlapping_queries :: [Tornex.SpecQuery.t()], query :: Tornex.SpecQuery.t()) ::
+          Tornex.Scheduler.ExecutionUnit.t() | Tornex.SpecQuery.t()
+  defp do_merge_similar([%Tornex.SpecQuery{} = query] = _overlapping_queries, %Tornex.SpecQuery{} = query) do
+    # When there is only one applicable query sharing a resource + resource ID, we can just short-circuit the merging
+    # and return this query as there are no similar queries. For simplicity's sake, and to minimize issues, we will
+    # return this as a `SpecQuery` instead of an `ExecutionUnit`.
+    query
+  end
+
+  defp do_merge_similar(overlapping_queries, %Tornex.SpecQuery{} = original_query)
+       when is_list(overlapping_queries) and overlapping_queries != [] do
     # For a query to be eligible to merged:
     #  - There must not be conflicting parameters: Conflicting parameters may cause incorrect information to
     #    be returned in the API call response.
@@ -219,13 +248,13 @@ defmodule Tornex.Scheduler.QueryRegistry do
     execution_units =
       overlapping_queries
       |> filter_parameter_collisions()
-      |> Enum.map(fn subset -> accumulate_queries(subset, public_paths, non_public_paths, query) end)
+      |> Enum.map(fn subset -> accumulate_queries(subset, public_paths, non_public_paths, original_query) end)
       |> Enum.reject(&is_nil/1)
 
     case execution_units do
       [] ->
         # Fallback: no mergeable subsets; return an ExecutionUnit that at least contains the original query.
-        accumulate_queries([query], public_paths, non_public_paths, query)
+        accumulate_queries([original_query], public_paths, non_public_paths, original_query)
 
       units ->
         Enum.max_by(units, fn %Tornex.Scheduler.ExecutionUnit{paths: paths} -> length(paths) end)
@@ -284,6 +313,12 @@ defmodule Tornex.Scheduler.QueryRegistry do
   end
 
   @spec filter_parameter_collisions(queries :: [Tornex.SpecQuery.t()]) :: [[Tornex.SpecQuery.t()]]
+  defp filter_parameter_collisions([%Tornex.SpecQuery{} = query]) do
+    # We should short-circuit this function to reduce the latency of this hot-path of the GenServer. Since there is only
+    # one query, we can just return that one query.
+    query
+  end
+
   defp filter_parameter_collisions(queries) when is_list(queries) do
     # To filter conflicting parameters, we want to want to find the set of queries with the largest number of unique paths
     # where the set of queries does not have any parameters with equal keys and differing values.
@@ -381,7 +416,7 @@ defmodule Tornex.Scheduler.QueryRegistry do
   After removing the queries being fulfilled from the branches of the state tree, the function will
   also prune the tree of any branches related to the queries if there are no queries retaining them.
   """
-  @spec remove(state :: state(), execution_unit :: Tornex.Scheduler.ExecutionUnit.t()) :: state()
+  @spec remove(state :: state(), execution_unit :: Tornex.Scheduler.ExecutionUnit.t() | Tornex.SpecQuery.t()) :: state()
   def remove(
         state,
         %Tornex.Scheduler.ExecutionUnit{
@@ -410,6 +445,27 @@ defmodule Tornex.Scheduler.QueryRegistry do
 
         queries when is_list(queries) ->
           Enum.reject(queries, &Enum.member?(parents, &1))
+      end)
+      |> prune_path([resource, resource_id, selection])
+    end)
+    |> prune_path([resource, resource_id])
+    |> prune_path([resource])
+  end
+
+  def remove(state, %Tornex.SpecQuery{} = query) when is_map(state) do
+    resource = Tornex.SpecQuery.resource!(query)
+    resource_id = Tornex.SpecQuery.resource_id!(query)
+    selections = Tornex.SpecQuery.selections!(query)
+
+    selections
+    |> Enum.reduce(state, fn selection, acc ->
+      acc
+      |> update_in([resource, resource_id, selection], fn
+        nil ->
+          nil
+
+        queries when is_list(queries) ->
+          Enum.reject(queries, &(&1 == query))
       end)
       |> prune_path([resource, resource_id, selection])
     end)
