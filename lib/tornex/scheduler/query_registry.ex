@@ -48,6 +48,7 @@ defmodule Tornex.Scheduler.QueryRegistry do
         }
 
   use GenServer
+  require Logger
 
   @doc """
   Start the `Tornex.Scheduler.QueryRegistry` GenServer.
@@ -83,7 +84,13 @@ defmodule Tornex.Scheduler.QueryRegistry do
   end
 
   def merge(%Tornex.SpecQuery{} = query) do
-    GenServer.call({:global, __MODULE__}, {:merge, query})
+    try do
+      GenServer.call({:global, __MODULE__}, {:merge, query})
+    rescue
+      e ->
+        Logger.error(Exception.format(:error, e, __STACKTRACE__))
+        query
+    end
   end
 
   # We need to have a fallback for Tornex.Query for the Tornex.Bucket to prevent the bucket from crashing
