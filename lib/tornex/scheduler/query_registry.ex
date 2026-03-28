@@ -388,6 +388,19 @@ defmodule Tornex.Scheduler.QueryRegistry do
   each parameter key-value pair.
   """
   @spec conflict_free?(queries :: [Tornex.SpecQuery.t()]) :: boolean()
+  def conflict_free?([%Tornex.SpecQuery{} = query_one, %Tornex.SpecQuery{} = query_two] = _queries) do
+    # We want to provide a faster case to use in `conflict_graph/1`
+    not Enum.any?(query_one.parameters, fn {parameter_key, parameter_value} ->
+      case Enum.find(query_two.parameters, fn {k, _v} -> k == parameter_key end) do
+        nil ->
+          false
+
+        {^parameter_key, other_parameter_value} ->
+          other_parameter_value != parameter_value
+      end
+    end)
+  end
+
   def conflict_free?(queries) do
     queries
     |> Enum.flat_map(& &1.parameters)

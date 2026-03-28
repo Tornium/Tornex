@@ -271,7 +271,7 @@ defmodule Tornex.Test.QueryRegistry do
              nice: 20
            } = similar_one
 
-    assert_unordered([Torngen.Client.Path.User.Id.Basic, Torngen.Client.Path.User.Id.Faction], similar_one.paths)
+    assert_unordered([Torngen.Client.Path.User.Id.Basic, Torngen.Client.Path.User.Id.Faction], similar_one.paths |> IO.inspect())
     assert_unordered([^query_one, ^query_two], similar_one.parents)
 
     assert %ExecutionUnit{

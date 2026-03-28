@@ -466,16 +466,22 @@ defmodule Tornex.Scheduler.Bucket do
         # to avoid sending more requests to Torn.
         %{state | dump_remaining: 0}
       else
-        %Tornex.Scheduler.ExecutionUnit{parents: merged_query_parents} =
-          merged_query = Tornex.Scheduler.QueryRegistry.merge(query)
+        updated_queue =
+          case Tornex.Scheduler.QueryRegistry.merge(query) do
+            %Tornex.Scheduler.ExecutionUnit{parents: merged_query_parents} = merged_query ->
+              make_request(merged_query)
 
-        make_request(merged_query)
+              # We want to remove other queries used in the executed unit from the bucket if they are in the
+              # bucket. Other queries not in the bucket will be handled by the QueryRegistry. Only these
+              # belonging to this bucket are being done directly to avoid blocking the bucket and to avoid
+              # racing conditions.
+              Enum.reject(remaining_queries, &Enum.member?(merged_query_parents, &1))
 
-        # We want to remove other queries used in the executed unit from the bucket if they are in the
-        # bucket. Other queries not in the bucket will be handled by the QueryRegistry. Only these
-        # belonging to this bucket are being done directly to avoid blocking the bucket and to avoid
-        # racing conditions.
-        updated_queue = Enum.reject(remaining_queries, &Enum.member?(merged_query_parents, &1))
+            %Tornex.SpecQuery{} = merged_query ->
+              make_request(merged_query)
+
+              Enum.reject(remaining_queries, &(&1 == merged_query))
+          end
 
         state
         |> Map.replace(:dump_remaining, dump_remaining - 1)
