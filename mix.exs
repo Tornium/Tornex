@@ -1,7 +1,7 @@
 defmodule Tornex.MixProject do
   use Mix.Project
 
-  @version "0.5.0-rc.1"
+  @version "0.5.0-rc.4"
 
   def project do
     [
