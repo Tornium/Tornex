@@ -432,7 +432,7 @@ defmodule Tornex.Scheduler.Bucket do
         %{
           dumping?: true,
           dump_remaining: dump_remaining,
-          query_priority_queue: [%Tornex.SpecQuery{quarantine: true} = query | remaining_queries]
+          query_priority_queue: [%Tornex.SpecQuery{quarantine?: true} = query | remaining_queries]
         } = state
       ) do
     updated_state =

@@ -78,7 +78,7 @@ defmodule Tornex.Scheduler.QueryRegistry do
   Merge any applicable `Tornex.SpecQuery` for this combintion of a resource and resource ID together.
   """
   @spec merge(query :: Tornex.SpecQuery.t()) :: Tornex.Scheduler.ExecutionUnit.t() | Tornex.SpecQuery.t()
-  def merge(%Tornex.SpecQuery{quarantine: true} = query) do
+  def merge(%Tornex.SpecQuery{quarantine?: true} = query) do
     # If the query is quarantined, we should skip this and let the Bucket handle this query normally.
     query
   end
@@ -139,7 +139,7 @@ defmodule Tornex.Scheduler.QueryRegistry do
 
   @impl GenServer
   def handle_call(
-        {:merge, %Tornex.SpecQuery{quarantine: false, origin: origin, key_owner: query_key_owner} = query},
+        {:merge, %Tornex.SpecQuery{quarantine?: false, origin: origin, key_owner: query_key_owner} = query},
         _from,
         %{} = state
       )
@@ -192,7 +192,7 @@ defmodule Tornex.Scheduler.QueryRegistry do
   """
   @spec merge_similar(query :: Tornex.SpecQuery.t(), state :: state()) ::
           Tornex.Scheduler.ExecutionUnit.t() | Tornex.SpecQuery.t()
-  def merge_similar(%Tornex.SpecQuery{quarantine: false} = query, state) when is_map(state) do
+  def merge_similar(%Tornex.SpecQuery{quarantine?: false} = query, state) when is_map(state) do
     resource = Tornex.SpecQuery.resource!(query)
     resource_id = Tornex.SpecQuery.resource_id!(query)
 

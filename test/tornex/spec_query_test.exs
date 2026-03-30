@@ -25,7 +25,7 @@ defmodule Tornex.Test.SpecQuery do
              origin: nil,
              parameters: [],
              paths: [Tornex.Mock.TorngenPath],
-             quarantine: false
+             quarantine?: false
            } ==
              Tornex.SpecQuery.put_path(query, Tornex.Mock.TorngenPath)
   end
@@ -42,7 +42,7 @@ defmodule Tornex.Test.SpecQuery do
              origin: nil,
              parameters: [{:foo, "bar"}],
              paths: [],
-             quarantine: false
+             quarantine?: false
            } ==
              Tornex.SpecQuery.put_parameter!(query, :foo, "bar")
 

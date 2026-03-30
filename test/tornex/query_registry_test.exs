@@ -108,6 +108,36 @@ defmodule Tornex.Test.QueryRegistry do
     DynamicSupervisor.stop(pid)
   end
 
+  test "insert queries with fallback resource IDs" do
+    {:ok, pid} = ExUnit.Callbacks.start_supervised(Tornex.Scheduler.QueryRegistry)
+
+    query_one =
+      SpecQuery.new()
+      |> SpecQuery.put_path(Torngen.Client.Path.User.Id.Basic)
+      |> SpecQuery.put_path(Torngen.Client.Path.User.Id.Bounties)
+      |> SpecQuery.put_parameter!(:id, 1)
+      |> then(&%{&1 | origin: self()})
+
+    query_two =
+      SpecQuery.new(resource_id: {:id, 1})
+      |> SpecQuery.put_path(Torngen.Client.Path.User.Basic)
+      |> SpecQuery.put_path(Torngen.Client.Path.User.Equipment)
+      |> then(&%{&1 | origin: self()})
+
+    Tornex.Scheduler.QueryRegistry.insert(query_one)
+    Tornex.Scheduler.QueryRegistry.insert(query_two)
+
+    assert %{
+             "user" => %{
+               {:id, 1} => %{"basic" => basic_queries, "bounties" => [^query_one], "equipment" => [^query_two]}
+             }
+           } = :sys.get_state(pid)
+
+    assert_unordered([^query_one, query_two], basic_queries)
+
+    DynamicSupervisor.stop(pid)
+  end
+
   test "merge similar overlapping queries with no resource ID" do
     # Public selections for no resource ID and the same key owner (applying as the resource ID
     # for user resources) should be combined.
@@ -125,6 +155,51 @@ defmodule Tornex.Test.QueryRegistry do
     state = %{
       "user" => %{
         nil => %{
+          "basic" => [query_one],
+          "bounties" => [query_two]
+        }
+      }
+    }
+
+    similar_one = Tornex.Scheduler.QueryRegistry.merge_similar(query_one, state)
+    similar_two = Tornex.Scheduler.QueryRegistry.merge_similar(query_two, state)
+
+    assert %ExecutionUnit{
+             parameters: [],
+             key_owner: 1,
+             nice: 20
+           } = similar_one
+
+    assert_unordered([Torngen.Client.Path.User.Basic, Torngen.Client.Path.User.Bounties], similar_one.paths)
+    assert_unordered([^query_one, ^query_two], similar_one.parents)
+
+    assert %ExecutionUnit{
+             parameters: [],
+             key_owner: 1,
+             nice: 20
+           } = similar_two
+
+    assert_unordered([Torngen.Client.Path.User.Basic, Torngen.Client.Path.User.Bounties], similar_two.paths)
+    assert_unordered([^query_one, ^query_two], similar_two.parents)
+  end
+
+  test "merge similar overlapping queries with fallback resource IDs" do
+    # Public selections for no resource ID and the same key owner (applying as the resource ID
+    # for user resources) should be combined.
+
+    query_one =
+      SpecQuery.new(key_owner: 1, resource_id: {:id, 1})
+      |> SpecQuery.put_path(Torngen.Client.Path.User.Basic)
+      |> then(&%{&1 | origin: self()})
+
+    query_two =
+      SpecQuery.new(key_owner: 1, resource_id: {:id, 1})
+      |> SpecQuery.put_path(Torngen.Client.Path.User.Bounties)
+      |> then(&%{&1 | origin: self()})
+
+    state = %{
+      "user" => %{
+        {:id, 1} => %{
           "basic" => [query_one],
           "bounties" => [query_two]
         }
@@ -271,7 +346,11 @@ defmodule Tornex.Test.QueryRegistry do
              nice: 20
            } = similar_one
 
-    assert_unordered([Torngen.Client.Path.User.Id.Basic, Torngen.Client.Path.User.Id.Faction], similar_one.paths |> IO.inspect())
+    assert_unordered(
+      [Torngen.Client.Path.User.Id.Basic, Torngen.Client.Path.User.Id.Faction],
+      similar_one.paths |> IO.inspect()
+    )
+
     assert_unordered([^query_one, ^query_two], similar_one.parents)
 
     assert %ExecutionUnit{
