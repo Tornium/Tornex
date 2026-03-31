@@ -45,12 +45,22 @@ defmodule Tornex.SpecQuery do
 
   @host Application.compile_env(:tornex, :base_url) || "https://api.torn.com/v2"
 
+  @typedoc """
+  Path or query parameters following the paths provided to the `Tornex.SpecQuery`.
+
+  The parameter should be of the form `{:parameter_key, parameter_value}`. For example, for the `{crimeId}`
+  path parameter in `Torngen.Client.Path.Torn.CrimeId.Subcrimes` would be `{:crimeId, 1}` to list the
+  subcrimes of `Search for Cash`.
+  """
   @type parameter :: {atom(), term()}
+
   @type niceness :: -20..20
 
   @typedoc """
-  This is the fallback value for the ID of the resource. It only needs to be set when
-  `Tornex.Scheduler.Bucket.enqueue/1` is used.
+  The fallback value for the ID of the resource.
+
+  This only needs to be set to `{:parameter_key, parameter_value}` when `Tornex.Scheduler.Bucket.enqueue/1`
+  is used. For example, `Torngen.Client.User.Equipment` would have a `:resource_id` of `{:id, 2_383_326}`.
   """
   @type resource_id :: {atom(), term()} | nil
 
