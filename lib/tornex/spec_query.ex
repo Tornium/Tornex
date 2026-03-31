@@ -413,38 +413,33 @@ defmodule Tornex.SpecQuery do
   @spec insert_url_path_parameters(uri :: URI.t(), paths :: [atom()], parameters: [parameter()]) :: URI.t()
   defp insert_url_path_parameters(%URI{} = uri, paths, parameters)
        when is_list(paths) and is_list(parameters) do
-    # TODO: Restructure this code
-    parameters =
-      parameters
-      |> Enum.filter(fn {name, value} ->
-        Enum.any?(paths, fn path ->
-          case path.parameter(name, value) do
-            {:path, _name, _value} -> true
-            :error -> false
-            _ -> false
-          end
-        end)
-      end)
+    parameters = Enum.filter(parameters, fn {name, value} -> valid_parameter?(paths, :path, name, value) end)
 
     do_insert_path_parameter(uri, parameters)
   end
 
   @spec insert_url_query_parameters(uri :: URI.t(), paths :: [atom()], parameters: [parameter()]) :: URI.t()
   defp insert_url_query_parameters(%URI{} = uri, paths, parameters) when is_list(paths) and is_list(parameters) do
-    # TODO: Restructure this code
-    parameters =
-      parameters
-      |> Enum.filter(fn {name, value} ->
-        Enum.any?(paths, fn path ->
-          case path.parameter(name, value) do
-            {:query, _name, _value} -> true
-            :error -> false
-            _ -> false
-          end
-        end)
-      end)
+    parameters = Enum.filter(parameters, fn {name, value} -> valid_parameter?(paths, :query, name, value) end)
 
     do_insert_query_parameter(uri, parameters)
+  end
+
+  @spec valid_parameter?(
+          paths :: [module()],
+          parameter_type :: :path | :query,
+          parameter_key :: atom(),
+          parameter_value :: term()
+        ) :: boolean()
+  defp valid_parameter?(paths, parameter_type, parameter_key, parameter_value)
+       when is_list(paths) and parameter_type in [:path, :query] and is_atom(parameter_key) do
+    Enum.any?(paths, fn path ->
+      case path.parameter(parameter_key, parameter_value) do
+        {^parameter_type, _name, _value} -> true
+        :error -> false
+        _ -> false
+      end
+    end)
   end
 
   defp do_insert_path_parameter(%URI{} = uri, [{name, value} | remaining_parameters])
