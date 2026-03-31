@@ -133,7 +133,7 @@ defmodule Tornex.Test.QueryRegistry do
              }
            } = :sys.get_state(pid)
 
-    assert_unordered([^query_one, query_two], basic_queries)
+    assert_unordered([^query_one, ^query_two], basic_queries)
 
     DynamicSupervisor.stop(pid)
   end
