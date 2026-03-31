@@ -1,7 +1,7 @@
 defmodule Tornex.MixProject do
   use Mix.Project
 
-  @version "0.5.0-rc.5"
+  @version "0.5.0"
 
   def project do
     [
@@ -35,8 +35,7 @@ defmodule Tornex.MixProject do
       {:plug_cowboy, "~> 2.7", optional: true},
       {:ex_doc, "~> 0.34", only: :dev, runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
-      # {:torngen_elixir_client, ">= 1.0.0"}
-      {:torngen_elixir_client, github: "Tornium/torngen_elixir_client", tag: "v5.5.3+torngen-v0.1.10", override: true},
+      {:torngen_elixir_client, ">= 5.0.0"},
       {:torngen, ">= 0.1.10"},
     ]
   end
