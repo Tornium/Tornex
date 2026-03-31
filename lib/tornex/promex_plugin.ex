@@ -52,7 +52,7 @@ if Code.ensure_loaded?(PromEx) do
               reporter_options: [
                 buckets: [0, 100, 250, 500, 1_000, 2_500, 5_000, 10_000]
               ],
-              unit: {:native, :microsecond}
+              unit: {:native, :millisecond}
             ),
             counter(
               "tornex.api.errors",
