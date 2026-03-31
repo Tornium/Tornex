@@ -27,7 +27,7 @@ defmodule Tornex.NodeRatelimiter do
   @doc """
   Initialize the ETS table for the node ratelimiter.
   """
-  @spec start_link(opts :: keyword()) :: :ets.table()
+  @spec start_link(opts :: keyword()) :: GenServer.on_start()
   def start_link(opts \\ []) do
     GenServer.start_link(__MODULE__, opts, name: __MODULE__)
   end
