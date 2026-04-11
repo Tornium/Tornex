@@ -36,7 +36,7 @@ defmodule Tornex.MixProject do
       {:ex_doc, "~> 0.34", only: :dev, runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:torngen_elixir_client, ">= 5.0.0"},
-      {:torngen, ">= 0.1.10"},
+      {:torngen, ">= 0.1.10"}
     ]
   end
 
