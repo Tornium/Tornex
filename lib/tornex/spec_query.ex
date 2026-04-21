@@ -313,12 +313,14 @@ defmodule Tornex.SpecQuery do
 
   @doc """
   Parse the response of an API call against the query into schema structs.
+
+  Using the path modules in the generated [`Torngen.Client` library](https://hex.pm/packages/torngen_elixir_client),
+  we can parse the parts of the API response into the a map containing the parsed schema struct
+  for each path.
   """
   @spec parse(query :: t(), response :: list() | map()) :: %{module() => term()}
   def parse(%__MODULE__{paths: paths} = _query, response)
       when (is_list(response) or is_map(response)) and Kernel.length(paths) > 0 do
-    # TODO: Document this function
-
     paths
     |> Enum.map(fn path when is_atom(path) -> {path, path.parse(response)} end)
     |> Map.new()
