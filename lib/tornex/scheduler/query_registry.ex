@@ -475,7 +475,11 @@ defmodule Tornex.Scheduler.QueryRegistry do
     selections
     |> Enum.reduce(state, fn selection, acc ->
       acc
-      |> update_in([resource, resource_id, selection], fn
+      |> update_in([
+        Access.key(resource, %{}),
+        Access.key(resource_id, %{}),
+        Access.key(selection, [])
+      ], fn
         nil ->
           nil
 

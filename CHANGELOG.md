@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- Fixed removal of non-existent leafs of the `Tornex.Scheduler.QueryRegistry`
 
 ## [0.5.0] - 2026-03-31
 ### Added
