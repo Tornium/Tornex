@@ -67,28 +67,28 @@ defmodule Tornex.Telemetry do
   @doc false
   def handle_event([:tornex, :api, :start], _measurements, metadata, _opts) do
     Logger.debug(
-      "[#{metadata.resource}/#{metadata.resource_id || ""}?selections=#{Enum.join(metadata.selections || [], ",")}] Request started for #{metadata.user}"
+      "[#{metadata.resource}/#{resource_id(metadata)}?selections=#{Enum.join(metadata.selections || [], ",")}] Request started for #{metadata.user}"
     )
   end
 
   @doc false
   def handle_event([:tornex, :api, :finish], measurements, metadata, _opts) do
     Logger.debug(
-      "[#{metadata.resource}/#{metadata.resource_id || ""}?selections=#{Enum.join(metadata.selections || [], ",")}] Request finished in #{measurements.latency} ms"
+      "[#{metadata.resource}/#{resource_id(metadata)}?selections=#{Enum.join(metadata.selections || [], ",")}] Request finished in #{measurements.latency} ms"
     )
   end
 
   @doc false
   def handle_event([:tornex, :api, :timeout], _measurements, metadata, _opts) do
     Logger.debug(
-      "[#{metadata.resource}/#{metadata.resource_id || ""}?selections=#{Enum.join(metadata.selections || [], ",")}] Request failed due to timeout"
+      "[#{metadata.resource}/#{resource_id(metadata)}?selections=#{Enum.join(metadata.selections || [], ",")}] Request failed due to timeout"
     )
   end
 
   @doc false
   def handle_event([:tornex, :api, :error], measurements, metadata, _opts) do
     Logger.info(
-      "[#{metadata.resource}/#{metadata.resource_id || ""}?selections=#{Enum.join(metadata.selections || [], ",")}] Request failed due to #{metadata.error} in #{measurements.latency} ms"
+      "[#{metadata.resource}/#{resource_id(metadata)}?selections=#{Enum.join(metadata.selections || [], ",")}] Request failed due to #{metadata.error} in #{measurements.latency} ms"
     )
   end
 
@@ -110,7 +110,7 @@ defmodule Tornex.Telemetry do
   @doc false
   def handle_event([:tornex, :bucket, :enqueue], _measurements, metadata, _opts) do
     Logger.debug(
-      "[#{metadata.resource}/#{Map.get(metadata, :resource_id) || ""}?selections=#{Enum.join(Map.get(metadata, :selections) || [], ",")}] Request enqueue for #{metadata.user}"
+      "[#{metadata.resource}/#{resource_id(metadata)}?selections=#{Enum.join(Map.get(metadata, :selections) || [], ",")}] Request enqueue for #{metadata.user}"
     )
   end
 
@@ -118,4 +118,9 @@ defmodule Tornex.Telemetry do
   def handle_event([:tornex, _event_type, _event], _measurements, _metadata, _opts) do
     :ok
   end
+
+  @spec resource_id(metadata :: map()) :: term()
+  defp resource_id(%{resource_id: {_, id}}), do: id
+  defp resource_id(%{resource_id: id}), do: id || ""
+  defp resource_id(_), do: ""
 end
