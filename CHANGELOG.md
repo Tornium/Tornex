@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- Fixed `Tornex.local?/0` using a compile-time value instead of checking for Horde at runtime
+- Fixed `Tornex.Scheduler.QueryRegistry` crashing non-original nodes in clusters
 
 ## [0.5.1] - 2026-04-21
 ### Fixed
