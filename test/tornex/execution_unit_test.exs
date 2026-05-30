@@ -19,6 +19,7 @@ defmodule Tornex.Test.ExecutionUnit do
              raise("The \"TORN_API_KEY\" environment variable must be set for these tests to run")
   @api_key_owner 2_383_326
 
+  @tag :integration
   test "validate fanout of multiple requests" do
     {:ok, s_pid} = ExUnit.Callbacks.start_supervised({Tornex.Scheduler.Supervisor, timer: false})
     {:ok, n_pid} = ExUnit.Callbacks.start_supervised(Tornex.NodeRatelimiter)
