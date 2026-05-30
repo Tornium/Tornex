@@ -1,12 +1,13 @@
 defmodule Tornex do
   @moduledoc false
 
-  @clustered? Code.ensure_loaded?(Horde.DynamicSupervisor) and Code.ensure_loaded?(Horde.Registry) and
-                not Application.compile_env(:tornex, :local, true)
+  @force_local? Application.compile_env(:tornex, :local, true)
 
   @doc """
   Determine if Tornex is running locally or on a cluster.
   """
   @spec local?() :: boolean()
-  def local?(), do: not @clustered?
+  def local?() do
+    not Code.ensure_loaded?(Horde.DynamicSupervisor) or not Code.ensure_loaded?(Horde.Registry) or @force_local?
+  end
 end
