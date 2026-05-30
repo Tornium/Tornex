@@ -55,7 +55,16 @@ defmodule Tornex.Scheduler.QueryRegistry do
   """
   @spec start_link(opts :: keyword()) :: GenServer.on_start()
   def start_link(opts \\ []) do
-    GenServer.start_link(__MODULE__, opts, name: {:global, __MODULE__})
+    case GenServer.start_link(__MODULE__, opts, name: {:global, __MODULE__}) do
+      {:ok, pid} ->
+        {:ok, pid}
+
+      {:error, {:already_started, pid}} ->
+        {:ok, pid}
+
+      other ->
+        other
+    end
   end
 
   @doc """
