@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed `Tornex.Scheduler.QueryRegistry` crashing non-original nodes in clusters
 - Fixed tests failing on CI due to a missing API key
 - Fixed `Tornex.Scheduler.QueryRegistry.merge/1` failing to start a Task for removing the queries belonging to an `ExecutionUnit`
+- Fixed `tornex.api.latency` histogram not reporting the correct counts for each bucket
 
 ## [0.5.1] - 2026-04-21
 ### Fixed
