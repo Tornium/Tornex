@@ -39,6 +39,7 @@ jobs:
             coverage: true
     env:
       MIX_ENV: test
+      TORN_API_KEY: "::add-mask::${{ secrets.TORN_API_KEY }}"
     steps:
       - uses: actions/checkout@v2
 
