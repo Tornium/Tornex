@@ -16,7 +16,7 @@ defmodule Tornex.Test.API do
   @test_api_key "asdf1234asdf1234"
   @comment_string "&comment=tex-" <> Mix.Project.config()[:version]
 
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
   doctest Tornex.API, only: [query_to_url: 1]
 
   test "current_user_resource_url" do
