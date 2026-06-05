@@ -16,11 +16,15 @@ defmodule Tornex.Query do
   @moduledoc """
   The query struct containing API request data.
 
-  The `Tornex.Query` struct is utilized by `Tornex.API.get/1` and `Tornex.Scheduler.Bucket.enqueue/1` to make API calls. `Tornex.Query` stores the required information to perform the API call.
+  The `Tornex.Query` struct is utilized by `Tornex.API.get/1` and `Tornex.Scheduler.Bucket.enqueue/1`
+  to make API calls. `Tornex.Query` stores the required information to perform the API call.
 
   > #### Tip {: .tip}
   >
-  > It is recommended to use `Tornex.SpecQuery` for APIv2 requests as it uses the OpenAPI specification to generate types and to parse and validate API responses. However, APIv2 does not currently support all of the selections that APIv1 supports, so you may have to remain on v1 for the immediate future.
+  > It is recommended to use `Tornex.SpecQuery` for APIv2 requests as it uses the OpenAPI
+  > specification to generate types and to parse and validate API responses. However, APIv2
+  > does not currently support all of the selections that APIv1 supports, so you may have to
+  > remain on v1 for the immediate future.
   """
 
   defstruct [
@@ -62,7 +66,9 @@ defmodule Tornex.Query do
   @doc """
   Determines the priority of a `Tornex.Query` by the `nice` value as a priority "bucket" atom.
 
-  The nice value of a query is based on the Linux niceness value between -20 and 19. A niceness of -20 is the highest priority request and 19 is the lowest priority. For more information on the scheduling of requests against `Tornex.Query`, see `Tornex.Scheduler.Bucket`.
+  The nice value of a query is based on the Linux niceness value between -20 and 19. A niceness of -20
+  is the highest priority request and 19 is the lowest priority. For more information on the scheduling
+  of requests against `Tornex.Query`, see `Tornex.Scheduler.Bucket`.
 
   There are three priority buckets:
   - generic requests (nice > 0) => Requests that are intended to be made with as much latency as needed
