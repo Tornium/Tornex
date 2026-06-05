@@ -41,12 +41,39 @@ defmodule Tornex.Scheduler.Supervisor do
         process_redistribution: :active,
         restart: :transient
       },
-      {Tornex.Scheduler.bucket_registry(), name: Tornex.Scheduler.BucketRegistry, members: :auto, keys: :unique},
-      Tornex.Scheduler.QueryRegistry
+      {Tornex.Scheduler.bucket_registry(), name: Tornex.Scheduler.BucketRegistry, members: :auto, keys: :unique}
     ]
+
+    children =
+      if Tornex.local?() do
+        [Tornex.Scheduler.QueryRegistry | children]
+      else
+        [
+          Supervisor.child_spec({Task, &start_query_registry/0}, restart: :transient)
+          | [
+              {Horde.Registry, name: Tornex.Scheduler.HordeRegistry, keys: :unique, members: :auto}
+              | [
+                  {Horde.DynamicSupervisor,
+                   name: Tornex.Scheduler.HordeSupervisor, strategy: :one_for_one, members: :auto}
+                  | children
+                ]
+            ]
+        ]
+      end
 
     # TODO: Use opts.timer to disable the bucket timer
 
     Supervisor.init(children, strategy: :one_for_one)
+  end
+
+  defp start_query_registry() do
+    # As we can't start children for a DynamicSupervisor (or in this case a Horde.DynamicSupervisor)
+    # until the parent supervisor's init has finished, we can create a task that does so and attach
+    # it to the parent supervisor. This also ensures that the shards are recreated in the
+    # Horde.DynamicSupervisor crashes.
+    #
+    # See https://github.com/slashdotdash/til/blob/master/elixir/dynamic-supervisor-start-children.md
+
+    Horde.DynamicSupervisor.start_child(Tornex.Scheduler.HordeSupervisor, Tornex.Scheduler.QueryRegistry)
   end
 end

@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added `:integration` tagging of tests using the API with an API key
 
+### Changed
+- Changed `Tornex.Scheduler.QueryRegistry` to use `Horde` instead of `:global` when Tornex is not running in local mode
+
 ### Fixed
 - Fixed `Tornex.local?/0` using a compile-time value instead of checking for Horde at runtime
 - Fixed `Tornex.Scheduler.QueryRegistry` crashing non-original nodes in clusters

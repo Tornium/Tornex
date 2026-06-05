@@ -50,12 +50,20 @@ defmodule Tornex.Scheduler.QueryRegistry do
   use GenServer
   require Logger
 
+  defp via() do
+    if Tornex.local?() do
+      {:global, __MODULE__}
+    else
+      {:via, Horde.Registry, {Tornex.Scheduler.HordeRegistry, __MODULE__}}
+    end
+  end
+
   @doc """
   Start the `Tornex.Scheduler.QueryRegistry` GenServer.
   """
   @spec start_link(opts :: keyword()) :: GenServer.on_start()
   def start_link(opts \\ []) do
-    case GenServer.start_link(__MODULE__, opts, name: {:global, __MODULE__}) do
+    case GenServer.start_link(__MODULE__, opts, name: via()) do
       {:ok, pid} ->
         {:ok, pid}
 
@@ -76,7 +84,7 @@ defmodule Tornex.Scheduler.QueryRegistry do
   """
   @spec insert(query :: Tornex.SpecQuery.t()) :: :ok
   def insert(%Tornex.SpecQuery{origin: origin} = query) when not is_nil(origin) do
-    GenServer.call({:global, __MODULE__}, {:insert, query})
+    GenServer.call(via(), {:insert, query})
   end
 
   # We need to have a fallback for Tornex.Query for the Tornex.Bucket to prevent the bucket from crashing
@@ -94,7 +102,7 @@ defmodule Tornex.Scheduler.QueryRegistry do
 
   def merge(%Tornex.SpecQuery{} = query) do
     try do
-      GenServer.call({:global, __MODULE__}, {:merge, query})
+      GenServer.call(via(), {:merge, query})
     rescue
       e ->
         Logger.error(Exception.format(:error, e, __STACKTRACE__))
