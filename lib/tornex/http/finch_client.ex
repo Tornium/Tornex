@@ -29,6 +29,7 @@ defmodule Tornex.HTTP.FinchClient do
       [
         name: @finch_pool_name,
         pools: %{
+          :default => [protocols: [:http2], count: 32, start_pool_metrics?: true],
           "https://api.torn.com" => [protocols: [:http2], count: 32, start_pool_metrics?: true]
         }
       ]
