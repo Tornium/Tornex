@@ -49,16 +49,12 @@ defmodule Tornex.Scheduler.Supervisor do
         [Tornex.Scheduler.QueryRegistry | children]
       else
         [
-          Supervisor.child_spec({Task, &start_query_registry/0}, restart: :transient)
+          {Horde.Registry, name: Tornex.Scheduler.HordeRegistry, keys: :unique, members: :auto}
           | [
-              {Horde.Registry, name: Tornex.Scheduler.HordeRegistry, keys: :unique, members: :auto}
-              | [
-                  {Horde.DynamicSupervisor,
-                   name: Tornex.Scheduler.HordeSupervisor, strategy: :one_for_one, members: :auto}
-                  | children
-                ]
+              {Horde.DynamicSupervisor, name: Tornex.Scheduler.HordeSupervisor, strategy: :one_for_one, members: :auto}
+              | children
             ]
-        ]
+        ] ++ Supervisor.child_spec({Task, &start_query_registry/0}, restart: :transient)
       end
 
     # TODO: Use opts.timer to disable the bucket timer
@@ -74,6 +70,6 @@ defmodule Tornex.Scheduler.Supervisor do
     #
     # See https://github.com/slashdotdash/til/blob/master/elixir/dynamic-supervisor-start-children.md
 
-    Horde.DynamicSupervisor.start_child(Tornex.Scheduler.HordeSupervisor, Tornex.Scheduler.QueryRegistry)
+    Horde.DynamicSupervisor.start_child(Tornex.Scheduler.HordeSupervisor, Tornex.Scheduler.QueryRegistry) |> IO.inspect(label: "Tornex.Scheduler.QueryRegistry")
   end
 end
