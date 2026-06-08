@@ -42,7 +42,7 @@ defmodule Tornex.Scheduler.Timer do
   def handle_info(:dump_signal, state) do
     current_node = Node.self()
 
-    Tornex.Scheduler.BUcketSupervisor
+    Tornex.Scheduler.BucketSupervisor
     |> DynamicSupervisor.which_children()
     |> Enum.filter(fn {_id, pid, type, _modules} -> node(pid) == current_node and type == :worker end)
     |> Enum.each(fn {_id, pid, _type, _modules} -> Tornex.Scheduler.Bucket.dump(pid) end)
