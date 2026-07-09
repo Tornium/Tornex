@@ -210,9 +210,9 @@ defmodule Tornex.Scheduler.Bucket do
   end
 
   @doc false
-  @spec dump(bucket_pid :: pid(), timeout :: timeout()) :: term()
-  def dump(bucket_pid, timeout \\ :infinity) when is_pid(bucket_pid) do
-    GenServer.call(bucket_pid, :dump, timeout)
+  @spec dump(bucket_pid :: pid()) :: :ok
+  def dump(bucket_pid) when is_pid(bucket_pid) do
+    GenServer.cast(bucket_pid, :dump)
   end
 
   @doc """
@@ -373,19 +373,19 @@ defmodule Tornex.Scheduler.Bucket do
 
   @doc false
   @impl true
-  def handle_call(:dump, _from, %{dumping?: false, pending_count: pending_count} = state)
+  def handle_cast(:dump, %{dumping?: false, pending_count: pending_count} = state)
       when pending_count >= @bucket_capacity do
     # The bucket is at capacity, so the dump will need to wait for the next time it's triggered.
-    {:reply, :ok, state, remaining_ttl(state)}
+    {:noreply, state, remaining_ttl(state)}
   end
 
   @impl true
-  def handle_call(:dump, _from, %{pending_count: pending_count, dumping?: false, dump_remaining: 0} = state) do
+  def handle_cast(:dump, %{pending_count: pending_count, dumping?: false, dump_remaining: 0} = state) do
     # This is the first time the dump has been triggered, so we'll want to reset the pending count so that
     # the bucket can continue to make requests. We'll also want to start the dumping individual requests.
     updated_state = %{state | pending_count: 0, dumping?: true, dump_remaining: @bucket_capacity - pending_count}
 
-    {:reply, :ok, updated_state, {:continue, :dump}}
+    {:noreply, updated_state, {:continue, :dump}}
   end
 
   @impl true

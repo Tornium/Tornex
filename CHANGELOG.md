@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed startup order of `Tornex.Scheduler.QueryRegistry` in `Tornex.Scheduler.Supervisor`
 - Fixed `Tornex.Scheduler.Timer` failing to dump queries in other nodes
 
+### Changed
+- Changed `Tornex.Scheduler.Bucket.dump/1` to cast instead of callthe `:dump` request to the GenServer
+
 ## [0.6.0] - 2026-06-05
 ### Added
 - Added `:integration` tagging of tests using the API with an API key
