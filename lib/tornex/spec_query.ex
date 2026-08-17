@@ -54,7 +54,6 @@ defmodule Tornex.SpecQuery do
   """
   @type parameter :: {atom(), term()}
 
-
   @typedoc """
   The fallback value for the ID of the resource.
 
