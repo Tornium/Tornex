@@ -45,21 +45,29 @@ defmodule Tornex.Query do
     :origin
   ]
 
+  @typedoc """
+  Priority of the API call.
+
+  The nice value of a query is based on the Linux niceness value between -20 and 19. A niceness of -20
+  is the highest priority request and 19 is the lowest priority.
+  """
+  @type niceness() :: -20..19
+
   @type t :: %__MODULE__{
           resource: String.t(),
-          resource_id: integer() | String.t(),
+          resource_id: pos_integer() | String.t(),
           key: String.t(),
           selections: [String.t()] | nil,
-          from: integer() | nil,
-          to: integer() | nil,
-          timestamp: integer() | nil,
-          limit: integer() | nil,
+          from: pos_integer() | nil,
+          to: pos_integer() | nil,
+          timestamp: pos_integer() | nil,
+          limit: pos_integer() | nil,
           sort: :asc | :desc | nil,
-          params: Keyword | nil,
+          params: keyword() | nil,
 
           # Values required for the scheduler
-          key_owner: integer(),
-          nice: integer(),
+          key_owner: pos_integer(),
+          nice: niceness(),
           origin: GenServer.from() | nil
         }
 

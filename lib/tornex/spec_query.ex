@@ -54,7 +54,6 @@ defmodule Tornex.SpecQuery do
   """
   @type parameter :: {atom(), term()}
 
-  @type niceness :: -20..20
 
   @typedoc """
   The fallback value for the ID of the resource.
@@ -71,7 +70,7 @@ defmodule Tornex.SpecQuery do
 
           # Values required for the scheduler
           key_owner: non_neg_integer(),
-          nice: niceness(),
+          nice: Tornex.Query.niceness(),
           origin: GenServer.from() | nil,
           quarantine?: boolean(),
           resource_id: resource_id()

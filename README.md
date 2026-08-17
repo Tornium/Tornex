@@ -3,18 +3,12 @@ An Elixir library providing robust API call planning and execution for the [Torn
 
 ## Features
 - Efficient API ratelimiting and planning using buckets and prioritized requests
+- Combined similar queries to reduce API throughput
 - `:telemetry`-based logging (with included support for [PromEx](https://hex.pm/packages/prom_ex))
 - Support for APIv1 and APIv2
 - Support for multiple BEAM nodes
 - Support for multi-node clusters
 - Support for per-node API ratelimiting
-
-## Roadmap
-- [x] Per-node global ratelimit
-- [x] Combine similar queries to reduce throughput
-- [x] Multi-node support
-- [x] APIv2 struct coalescing using [torngen](https://github.com/Tornium/torngen)
-- [ ] APIv2 mocking server using [torngen](https://github.com/Tornium/torngen)
 
 ## Installation
 Once [available in Hex](https://hex.pm/docs/publish), the library can be installed
@@ -23,7 +17,7 @@ by adding `tornex` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:tornex, "~> 0.4.0"}
+    {:tornex, "~> 0.6"}
   ]
 end
 ```

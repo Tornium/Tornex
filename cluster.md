@@ -10,7 +10,7 @@ Add [Tornex](https://hex.pm/packages/tornex) and [horde](https://hex.pm/packages
 ```elixir
 defp deps do
   [
-    {:tornex, "~> 0.4"},
+    {:tornex, "~> 0.6"},
     {:horde, "~> 0.9"}
   ]
 end
