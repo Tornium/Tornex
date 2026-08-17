@@ -17,7 +17,49 @@ defmodule Tornex.Telemetry do
   Telemetry for Tornex using `:telemetry`.
 
   `Tornex.Telemetry` defaults to using `Logger` to handle telemetry events, but this behavior can be 
-  customized by not attaching the default logger.
+  customized by not attaching the default telemetry handler.
+
+  ## Telemetry Events
+  Tornex dispatches the following events through `:telemetry`:
+
+  * `[:tornex, :api, :start]`: Executed when there is an API call started against a `Tornex.Query` or
+    a `Tornex.SpecQuery`.
+    * Measurement: `%{}`
+    * Metadata: `%{resource: String.t, resource_id: integer, selections: [String.t()], user: pos_integer}`
+
+  * `[:tornex, :api, :finish]`: Executed when the API call started against a `Tornex.Query` or a
+    `Tornex.SpecQuery` has finished.
+    * Measurement: `%{latency: pos_integer}`
+    * Metadata: `%{resource: String.t, resource_id: integer, selections: [String.t()], user: pos_integer}`
+
+  * `[:tornex, :api, :error]`: Executed when an API call has failed.
+    * Measurement: `%{}`
+    * Metadata: `%{}`
+
+  * `[:tornex, :api, :timeout]`: Executed when an API call is over the timeout value and the API call
+    has been ended.
+    * Measurement: `%{}`
+    * Metadata: `%{}`
+
+  * `[:tornex, :bucket, :create]`: Executed when a new `Tornex.Scheduler.Bucket` has been created
+    for a user ID.
+    * Measurement: `%{}`
+    * Metadata: `%{user_id: pos_integer, pid: pid}`
+
+  * `[:tornex, :bucket, :create_error]`: Executed when a `Tornex.Scheduler.Bucket` could not be created
+    due to some issue.
+    * Measurement: `%{}`
+    * Metadata: `%{user_id: pos_integer, error: term}`
+
+  * `[:tornex, :bucket, :timeout]`: Dispatched by a `Tornex.Scheduler.Bucket` when it has been empty
+    for too long and has been killed.
+    * Measurement: `%{}`
+    * Metadata: `%{pid: pid}`
+
+  * `[:tornex, :bucket, :enqueue]`: Dispatched by a `Tornex.Scheduler.Bucket` when a `Tornex.SpecQuery`
+    has been run against it or has been enqueued to it.
+    * Measurement: `%{}`
+    * Metadata: `%{selections: [String.t], resource: String.t, optional(resource_id): integer, user: pos_integer}`
   """
 
   require Logger
